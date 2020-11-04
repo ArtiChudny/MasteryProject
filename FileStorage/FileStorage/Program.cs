@@ -9,10 +9,17 @@ namespace FileStorage
             if (StorageCommand.LoginToApp(args))
             {
                 Console.WriteLine("You logged in.");
+                while (true)
+                {
+                    Console.Write(">");
+                    string currentCommand = Console.ReadLine().ToLower();
+                    StorageCommand.ExecuteConsoleCommand(currentCommand);
+                }
             }
             else
             {
-                Environment.Exit(-1);
+                ConsolePrinter.PrintBadInitialParameters();
+                StorageCommand.ExitApplication();
             }
         }
     }
