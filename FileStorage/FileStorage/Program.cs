@@ -6,14 +6,27 @@ namespace FileStorage
     {
         static void Main(string[] args)
         {
-            if (StorageCommand.LoginToApp(args))
+            if (ConsoleCommandParser.IsInitialParametersCorrect(args))
             {
-                Console.WriteLine("You logged in.");
-                while (true)
+                string login = string.Empty;
+                string password = string.Empty;
+                
+                ConsoleCommandParser.GetCredentialsFromInitialParameters(args, ref login, ref password);
+
+                if (StorageCommand.IsLoginToApp(login, password))
                 {
-                    Console.Write(">");
-                    string currentCommand = Console.ReadLine().ToLower();
-                    StorageCommand.ExecuteConsoleCommand(currentCommand);
+                    ConsolePrinter.PrintAuthenticationSuccessful();
+                    while (true)
+                    {
+                        ConsolePrinter.PrintСommandWaitingIcon();
+                        string currentCommand = Console.ReadLine().ToLower();
+                        StorageCommand.ExecuteConsoleCommand(currentCommand);
+                    }
+                }
+                else
+                {
+                    ConsolePrinter.PrintAuthenticationFailed();
+                    StorageCommand.ExitApplication();
                 }
             }
             else

@@ -5,11 +5,23 @@ namespace FileStorage
 {
     static class ConsolePrinter
     {
-        public static void PrintStorageInformation()
+        public static void PrintUserInformation(User user)
         {
-            Console.WriteLine("\nlogin: {0}", StorageInfo.login);
-            Console.WriteLine("creation date: {0}", StorageInfo.creationDate);
-            Console.WriteLine("max storage for use: {0}\n", StorageInfo.maxStorage);
+            Console.WriteLine("\nlogin: {0}", user.Login);
+            Console.WriteLine("creation date: {0}", "2020-11-03");
+            Console.WriteLine("storage used: {0}\n","512MB");
+        }
+        public static void PrintAuthenticationSuccessful()
+        {
+            Console.WriteLine("You logged in.\n");
+        }
+        public static void PrintAuthenticationFailed()
+        {
+            Console.WriteLine("\nIncorrect login or password\n");
+        }
+        public static void PrintBadInitialParameters()
+        {
+            Console.WriteLine("Uncorrect initial parameters. Use --l for login and --p for password.");
         }
 
         public static void PrintBadParameter(string command, string badParameter)
@@ -22,19 +34,14 @@ namespace FileStorage
             Console.WriteLine("\nCommand '{0}' needs at least one parameter\n", commandName);
         }
 
-        public static void PrintAuthenticationFailed()
-        {
-            Console.WriteLine("\nIncorrect login or password\n");
-        }
-
         public static void PrintWrongCommand(string command)
         {
             Console.WriteLine("\n{0} is not programm command.\n", command);
         }
 
-        public static void PrintBadInitialParameters()
+        public static void PrintСommandWaitingIcon()
         {
-            Console.WriteLine("Uncorrect initial parameters. Use --l for login and --p for password.");
+            Console.Write(">");
         }
     }
 }
