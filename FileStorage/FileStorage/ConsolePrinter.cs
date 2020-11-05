@@ -9,7 +9,7 @@ namespace FileStorage
         {
             Console.WriteLine("\nlogin: {0}", user.Login);
             Console.WriteLine("creation date: {0}", "2020-11-03");
-            Console.WriteLine("storage used: {0}\n","512MB");
+            Console.WriteLine("storage used: {0}\n", "512MB");
         }
         public static void PrintAuthenticationSuccessful()
         {
@@ -34,14 +34,19 @@ namespace FileStorage
             Console.WriteLine("\nCommand '{0}' needs at least one parameter\n", commandName);
         }
 
-        public static void PrintWrongCommand(string command)
+        public static void PrintWrongCommand(string commandName)
         {
-            Console.WriteLine("\n{0} is not programm command.\n", command);
+            Console.WriteLine("\n{0} is not programm command.\n", commandName);
         }
 
         public static void PrintСommandWaitingIcon()
         {
             Console.Write(">");
+        }
+
+        public static void PrintErrorMessage(string errorMessage)
+        {
+            Console.WriteLine("\n{0}\n", errorMessage);
         }
     }
 }

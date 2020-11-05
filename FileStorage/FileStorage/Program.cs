@@ -1,4 +1,5 @@
 ﻿using System;
+using FileStorage.Enums;
 using FileStorage.Models;
 
 namespace FileStorage
@@ -7,29 +8,42 @@ namespace FileStorage
     {
         static void Main(string[] args)
         {
-            if (ConsoleCommandParser.IsInitialParametersCorrect(args))
+            try
             {
-                Credentials credentials = ConsoleCommandParser.GetCredentialsFromInitialParameters(args);
-                if (StorageCommand.IsLoginToApp(credentials))
+                var flags = ConsoleFlagParser.Parse(args);
+                if (flags.ContainsKey(StorageFlags.Login) && flags.ContainsKey(StorageFlags.Password))
                 {
-                    ConsolePrinter.PrintAuthenticationSuccessful();
-                    while (true)
+                    Credentials credentials = new Credentials(flags[StorageFlags.Login], flags[StorageFlags.Password]);
+                    if (Controller.IsLoginToApp(credentials))
                     {
-                        ConsolePrinter.PrintСommandWaitingIcon();
-                        string currentCommand = Console.ReadLine().ToLower();
-                        StorageCommand.ExecuteConsoleCommand(currentCommand);
+                        ConsolePrinter.PrintAuthenticationSuccessful();
+                        while (true)
+                        {
+                            ConsolePrinter.PrintСommandWaitingIcon();
+                            string currentCommand = Console.ReadLine().ToLower();
+                            //Controller.ExecuteConsoleCommand(currentCommand);
+                        }
+                    }
+                    else
+                    {
+                        ConsolePrinter.PrintAuthenticationFailed();
+                        Controller.ExitApplication();
                     }
                 }
                 else
                 {
-                    ConsolePrinter.PrintAuthenticationFailed();
-                    StorageCommand.ExitApplication();
+                    ConsolePrinter.PrintBadInitialParameters();
                 }
             }
-            else
+            catch (ApplicationException ex)
             {
-                ConsolePrinter.PrintBadInitialParameters();
-                StorageCommand.ExitApplication();
+                ConsolePrinter.PrintErrorMessage(ex.Message);
+                Controller.ExitApplication();
+            }
+            catch (Exception ex)
+            {
+                ConsolePrinter.PrintErrorMessage(ex.Message);
+                Controller.ExitApplication();
             }
         }
     }
