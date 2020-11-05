@@ -21,7 +21,19 @@ namespace FileStorage
                         {
                             ConsolePrinter.PrintСommandWaitingIcon();
                             string currentCommand = Console.ReadLine().ToLower();
-                            //Controller.ExecuteConsoleCommand(currentCommand);
+                            try
+                            {
+                               Controller.ExecuteConsoleCommand(ConsoleCommandParser.Parse(currentCommand));
+                            }
+                            catch (ApplicationException ex)
+                            {
+                                ConsolePrinter.PrintErrorMessage(ex.Message);
+                            }
+                            catch (Exception ex)
+                            {
+                                ConsolePrinter.PrintErrorMessage(ex.Message);
+                                Controller.ExitApplication();
+                            }
                         }
                     }
                     else

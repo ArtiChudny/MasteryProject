@@ -1,21 +1,19 @@
 ﻿using System;
 using FileStorage;
-using FileStorage.Enums;
 using FileStorage.Models;
 using FileStorage.Services;
-
-static class Controller
+public static class Controller
 {
-    public static void ExecuteConsoleCommand(StorageCommands consoleCommand)
+    public static void ExecuteConsoleCommand(StorageCommand command)
     {
-        switch (consoleCommand)
+        switch (command.CommandName)
         {
-            case StorageCommands.user:
+            case "user":
                 {
                     ConsolePrinter.PrintUserInformation(UserService.GetUserInfo());
                     break;
                 }
-            case StorageCommands.exit:
+            case "exit":
                 {
                     ExitApplication();
                     break;

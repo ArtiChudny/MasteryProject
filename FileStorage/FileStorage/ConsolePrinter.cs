@@ -21,7 +21,7 @@ namespace FileStorage
         }
         public static void PrintBadInitialParameters()
         {
-            Console.WriteLine("Uncorrect initial parameters. Use --l for login and --p for password.");
+            Console.WriteLine("You have to enter your login and password. Use --l for login and --p for password.");
         }
 
         public static void PrintBadParameter(string command, string badParameter)
