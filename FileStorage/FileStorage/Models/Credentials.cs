@@ -1,6 +1,6 @@
 ﻿namespace FileStorage.Models
 {
-    class Credentials
+    public class Credentials
     {
         public string Login { get; set; }
         public string Password { get; set; }

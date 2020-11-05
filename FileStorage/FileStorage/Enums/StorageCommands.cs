@@ -1,8 +1,12 @@
 ﻿namespace FileStorage.Enums
 {
-    enum StorageCommands
+    public static class StorageCommands
     {
-        user,
-        exit
+        public static string[] commandsArray =
+        {
+            "exit",
+            "user"
+        };
     }
+
 }
