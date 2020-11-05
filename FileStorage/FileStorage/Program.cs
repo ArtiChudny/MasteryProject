@@ -1,4 +1,5 @@
 ﻿using System;
+using FileStorage.Models;
 
 namespace FileStorage
 {
@@ -8,12 +9,8 @@ namespace FileStorage
         {
             if (ConsoleCommandParser.IsInitialParametersCorrect(args))
             {
-                string login = string.Empty;
-                string password = string.Empty;
-                
-                ConsoleCommandParser.GetCredentialsFromInitialParameters(args, ref login, ref password);
-
-                if (StorageCommand.IsLoginToApp(login, password))
+                Credentials credentials = ConsoleCommandParser.GetCredentialsFromInitialParameters(args);
+                if (StorageCommand.IsLoginToApp(credentials))
                 {
                     ConsolePrinter.PrintAuthenticationSuccessful();
                     while (true)

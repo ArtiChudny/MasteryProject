@@ -30,10 +30,10 @@ static class StorageCommand
         }
     }
 
-    public static bool IsLoginToApp(string login, string password)
+    public static bool IsLoginToApp(Credentials credentials)
     {
         User user = UserService.GetUserInfo();
-        if (login == user.Login && password == user.Password)
+        if (credentials.Login == user.Login && credentials.Password == user.Password)
         {
             return true;
         }

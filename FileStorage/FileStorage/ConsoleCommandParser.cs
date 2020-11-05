@@ -1,7 +1,6 @@
-﻿using FileStorage.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
+using FileStorage.Models;
+
 
 namespace FileStorage
 {
@@ -19,18 +18,21 @@ namespace FileStorage
             }
         }
 
-        public static void GetCredentialsFromInitialParameters(string[] args, ref string login, ref string password)
+        public static Credentials GetCredentialsFromInitialParameters(string[] args)
         {
-            if (args[0] == "--l" && args[2] == "--p")
+           Credentials credentials = new Credentials();
+            
+           if (args[0] == "--l" && args[2] == "--p")
             {
-                login = args[1];
-                password = args[3];
+                credentials.Login = args[1];
+                credentials.Password = args[3];
             }
             else
             {
-                login = args[3];
-                password = args[1];
+                credentials.Login = args[3];
+                credentials.Password = args[1];
             }
+            return credentials;
         }
     }
 }
