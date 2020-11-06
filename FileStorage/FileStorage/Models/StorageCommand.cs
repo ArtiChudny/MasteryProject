@@ -13,5 +13,5 @@ namespace FileStorage.Models
             Parameters = new List<string>();
         }
     }
-    
+
 }

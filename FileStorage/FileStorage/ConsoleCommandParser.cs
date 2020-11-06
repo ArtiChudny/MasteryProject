@@ -15,7 +15,7 @@ namespace FileStorage
             StorageCommand command = new StorageCommand();
             string[] arguments = rawCommand.Split(" ");
             command.CommandType = GetCommandType(arguments[0]);
-            if (arguments.Length>1)
+            if (arguments.Length > 1)
             {
                 command.Parameters = GetParametersList(arguments);
             }

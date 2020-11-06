@@ -5,7 +5,7 @@ namespace FileStorage.Services
 {
     public static class UserService
     {
-        public static User GetUserInfo()
+        public static User GetUser()
         {
             return new User
             {

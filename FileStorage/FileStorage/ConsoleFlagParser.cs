@@ -19,7 +19,7 @@ namespace FileStorage
                 if ((argIndex + 1) < args.Length)
                 {
                     value = args[argIndex + 1];
-                }    
+                }
                 if (flagsValues.ContainsKey(flag))
                 {
                     throw new ApplicationException($"Flag {flag} repeats.");
@@ -28,7 +28,7 @@ namespace FileStorage
                 {
                     flagsValues.Add(flag, value);
                     argIndex++;
-                }             
+                }
             }
             return flagsValues;
         }
