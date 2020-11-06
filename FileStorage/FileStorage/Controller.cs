@@ -1,17 +1,24 @@
-﻿using System;
-using FileStorage;
+﻿using FileStorage;
 using FileStorage.Enums;
 using FileStorage.Models;
 using FileStorage.Services;
-public static class Controller
+using FileStorage.ViewModels;
+
+public class Controller
 {
-    public static void ExecuteConsoleCommand(StorageCommand command)
+    ConsolePrinter consolePrinter;
+    public Controller(ConsolePrinter _consolePrinter)
+    {
+        consolePrinter = _consolePrinter;
+    }
+
+    public void ExecuteConsoleCommand(StorageCommand command)
     {
         switch (command.CommandType)
         {
             case StorageCommands.UserInfo:
                 {
-                    ConsolePrinter.PrintUserInformation(UserService.GetUserInfo());
+                    ExecuteCommandGetUserInfo();
                     break;
                 }
             case StorageCommands.Exit:
@@ -22,21 +29,23 @@ public static class Controller
         }
     }
 
-    public static bool IsLoginToApp(Credentials credentials)
+    private void ExecuteCommandGetUserInfo()
     {
-        User user = UserService.GetUserInfo();
-        if (credentials.Login == user.Login && credentials.Password == user.Password)
+        User user = UserService.GetUser();
+        StorageInfo storageInfo = StorageService.GetStorageInfo();
+        UserInfoViewModel userInfo = new UserInfoViewModel
         {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+            Login = user.Login,
+            UsedStorage = storageInfo.UsedStorage,
+            CreationDate = storageInfo.CreationDate
+        };
+
+        consolePrinter.PrintUserInformation(userInfo);
     }
 
-    public static void ExitApplication()
+    public void ExitApplication()
     {
-        Environment.Exit(-1);
+        consolePrinter.PrintExitMessage();
     }
+
 }
