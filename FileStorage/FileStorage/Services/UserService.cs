@@ -13,25 +13,5 @@ namespace FileStorage.Services
                 Password = ConfigurationManager.AppSettings["password"]
             };
         }
-
-        public static void ExecuteCommand(StorageCommand command)
-        {
-            if (command.Parameters.Count!=0)
-            {
-                switch (command.Parameters[0])
-                {
-                    case "info":
-                        ConsolePrinter.PrintUserInformation(UserService.GetUserInfo());
-                        break;
-                    default:
-                        ConsolePrinter.PrintBadParameter(command.CommandName, command.Parameters[0]);
-                        break;
-                }
-            }
-            else
-            {
-                ConsolePrinter.PrintParameterNeeding(command.CommandName);
-            }
-        }
     }
 }
