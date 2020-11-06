@@ -28,6 +28,10 @@ namespace FileStorage
                     try
                     {
                         StorageCommand command = GetCommand();
+                        if (command.CommandType == StorageCommands.Exit) 
+                        {
+                            break;
+                        }
                         controller.ExecuteConsoleCommand(command);
                     }
                     catch (Exception ex)
