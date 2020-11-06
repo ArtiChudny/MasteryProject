@@ -1,5 +1,4 @@
 ﻿using System;
-using FileStorage;
 using FileStorage.Models;
 using FileStorage.Services;
 public static class Controller
@@ -10,7 +9,7 @@ public static class Controller
         {
             case "user":
                 {
-                    ConsolePrinter.PrintUserInformation(UserService.GetUserInfo());
+                    UserService.ExecuteCommand(command);
                     break;
                 }
             case "exit":

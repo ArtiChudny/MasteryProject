@@ -16,7 +16,7 @@ namespace FileStorage
                 command.CommandName = arguments[0];
                 for (int argIndex = 1; argIndex < arguments.Length; argIndex++)
                 {
-                    command.Options.Add(arguments[argIndex]);
+                    command.Parameters.Add(arguments[argIndex]);
                 }
                 return command;
             }
