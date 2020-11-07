@@ -5,43 +5,63 @@ using FileStorage.Models;
 
 namespace FileStorage
 {
-    public static class ConsoleCommandParser
+    public class ConsoleCommandParser
     {
         private const string UserInfo = "user info";
         private const string Exit = "exit";
 
-        public static StorageCommand Parse(string rawCommand)
+        public StorageCommand Parse(string rawCommand)
         {
             StorageCommand command = new StorageCommand();
-            string[] arguments = rawCommand.Split(" ");
-            command.CommandType = GetCommandType(arguments[0]);
-            if (arguments.Length > 1)
-            {
-                command.Parameters = GetParametersList(arguments);
-            }
+            command = GetCommand(rawCommand);
+
             return command;
         }
 
-        private static StorageCommands GetCommandType(string commandName)
+        private StorageCommand GetCommand(string rawCommand)
         {
-            switch (commandName)
+            StorageCommand storageCommand = new StorageCommand();
+            if (rawCommand.StartsWith(UserInfo))
             {
-                case UserInfo:
-                    return StorageCommands.UserInfo;
-                case Exit:
-                    return StorageCommands.Exit;
-                default:
-                    throw new ApplicationException($"Wrong command: {commandName}.");
+                storageCommand.CommandType = StorageCommands.UserInfo;
+                storageCommand.Parameters = GetParametersList(rawCommand, UserInfo);
+                return storageCommand;
+            }
+            else if (rawCommand.StartsWith(Exit))
+            {
+                storageCommand.CommandType = StorageCommands.Exit;
+                return storageCommand;
+            }
+            else
+            {
+                throw new ApplicationException($"Wrong command: {rawCommand}.");
             }
         }
 
-        private static List<string> GetParametersList(string[] arguments)
+        private List<string> GetParametersList(string rawCommand, string commandType)
+        {
+            List<string> parametersList = new List<string>();
+            string parametersString = rawCommand.Replace(commandType, string.Empty);
+            string[] parameters = parametersString.Split(" ");
+            if (parameters.Length > 1)
+            {
+                for (int argIndex = 1; argIndex < parameters.Length; argIndex++)
+                {
+                    parametersList.Add(parameters[argIndex]);
+                }
+            }
+
+            return parametersList;
+        }
+
+        private List<string> GetParametersList(string[] arguments)
         {
             List<string> parametersList = new List<string>();
             for (int argIndex = 1; argIndex < arguments.Length; argIndex++)
             {
                 parametersList.Add(arguments[argIndex]);
             }
+
             return parametersList;
         }
     }

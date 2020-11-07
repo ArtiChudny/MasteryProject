@@ -28,7 +28,7 @@ namespace FileStorage
                     try
                     {
                         StorageCommand command = GetCommand();
-                        if (command.CommandType == StorageCommands.Exit) 
+                        if (command.CommandType == StorageCommands.Exit)
                         {
                             break;
                         }
@@ -50,7 +50,7 @@ namespace FileStorage
         {
             if (IsContainLoginPassword(flags))
             {
-                return new Credentials(flags[StorageFlags.Login], flags[StorageFlags.Login]);
+                return new Credentials(flags[StorageFlags.Login], flags[StorageFlags.Password]);
             }
             else
             {
@@ -72,10 +72,11 @@ namespace FileStorage
 
         private static StorageCommand GetCommand()
         {
+            ConsoleCommandParser consoleCommandParser = new ConsoleCommandParser();
             consolePrinter.PrintСommandWaitingIcon();
-            string currentCommand = Console.ReadLine().ToLower();
+            string currentCommand = Console.ReadLine().ToLower().Trim();
 
-            return ConsoleCommandParser.Parse(currentCommand);
+            return consoleCommandParser.Parse(currentCommand);
         }
     }
 }
