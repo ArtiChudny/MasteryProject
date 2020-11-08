@@ -1,16 +1,17 @@
 ﻿using FileStorage.Models;
 using System;
+using System.Globalization;
 
 namespace FileStorage.Services
 {
-    public static class StorageService
+    public class StorageService
     {
-        public static StorageInfo GetStorageInfo()
+        public StorageInfo GetStorageInfo()
         {
             return new StorageInfo
             {
                 UsedStorage = 512,
-                CreationDate = DateTime.Parse("2020-11-02")
+                CreationDate = DateTime.Now
             };
         }
     }

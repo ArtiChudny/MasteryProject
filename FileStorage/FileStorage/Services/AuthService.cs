@@ -4,9 +4,10 @@ namespace FileStorage.Services
 {
     public class AuthService
     {
+        private UserService userService = new UserService();
         public bool IsAuthenticated(Credentials credentials)
         {
-            User user = UserService.GetUser();
+            User user = userService.GetUser();
             if (credentials.Login == user.Login && credentials.Password == user.Password)
             {
                 return true;

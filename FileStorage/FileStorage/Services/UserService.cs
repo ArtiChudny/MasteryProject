@@ -3,9 +3,9 @@ using FileStorage.Models;
 
 namespace FileStorage.Services
 {
-    public static class UserService
+    public class UserService
     {
-        public static User GetUser()
+        public User GetUser()
         {
             return new User
             {

@@ -8,7 +8,8 @@ namespace FileStorage
 {
     class Program
     {
-        static ConsolePrinter consolePrinter = new ConsolePrinter();
+        private static ConsolePrinter consolePrinter = new ConsolePrinter();
+
         static void Main(string[] args)
         {
             Controller controller = new Controller(consolePrinter);
@@ -30,6 +31,7 @@ namespace FileStorage
                         StorageCommand command = GetCommand();
                         if (command.CommandType == StorageCommands.Exit)
                         {
+                             consolePrinter.PrintExitMessage();
                             break;
                         }
                         controller.ExecuteConsoleCommand(command);
@@ -72,11 +74,14 @@ namespace FileStorage
 
         private static StorageCommand GetCommand()
         {
+            StorageCommand command;
             ConsoleCommandParser consoleCommandParser = new ConsoleCommandParser();
-            consolePrinter.PrintСommandWaitingIcon();
-            string currentCommand = Console.ReadLine().ToLower().Trim();
 
-            return consoleCommandParser.Parse(currentCommand);
+            consolePrinter.PrintСommandWaitingIcon();
+            string rowCommand = Console.ReadLine().ToLower().Trim();
+            command = consoleCommandParser.Parse(rowCommand);
+
+            return command;
         }
     }
 }

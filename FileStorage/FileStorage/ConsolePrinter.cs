@@ -8,7 +8,7 @@ namespace FileStorage
         public void PrintUserInformation(UserInfoViewModel userInfo)
         {
             Console.WriteLine("\nlogin: {0}", userInfo.Login);
-            Console.WriteLine("creation date: {0}", userInfo.CreationDate);
+            Console.WriteLine("creation date: {0}", userInfo.CreationDate.ToString("yyyy-MM-dd"));
             Console.WriteLine("storage used: {0}MB\n", userInfo.UsedStorage);
         }
 

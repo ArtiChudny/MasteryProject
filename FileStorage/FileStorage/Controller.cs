@@ -6,10 +6,15 @@ using FileStorage.ViewModels;
 
 public class Controller
 {
-    ConsolePrinter consolePrinter;
+    private ConsolePrinter consolePrinter;
+    private UserService userService;
+    private StorageService storageService;
+
     public Controller(ConsolePrinter _consolePrinter)
     {
         consolePrinter = _consolePrinter;
+        userService = new UserService();
+        storageService = new StorageService();
     }
 
     public void ExecuteConsoleCommand(StorageCommand command)
@@ -21,18 +26,13 @@ public class Controller
                     ExecuteCommandGetUserInfo();
                     break;
                 }
-            case StorageCommands.Exit:
-                {
-                    ExitApplication();
-                    break;
-                }
         }
     }
 
     private void ExecuteCommandGetUserInfo()
     {
-        User user = UserService.GetUser();
-        StorageInfo storageInfo = StorageService.GetStorageInfo();
+        User user = userService.GetUser();
+        StorageInfo storageInfo = storageService.GetStorageInfo();
         UserInfoViewModel userInfo = new UserInfoViewModel
         {
             Login = user.Login,
@@ -42,10 +42,4 @@ public class Controller
 
         consolePrinter.PrintUserInformation(userInfo);
     }
-
-    public void ExitApplication()
-    {
-        consolePrinter.PrintExitMessage();
-    }
-
 }
