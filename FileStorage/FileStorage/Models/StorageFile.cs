@@ -7,7 +7,7 @@ namespace FileStorage.Models
     {
         public string FileName { get; set; }
         public string Extension { get; set; }
-        public int Size { get; set; }
+        public long Size { get; set; }
         public int DownloadsNumber { get; set; }
         public DateTime CreationDate { get; set; }
     }

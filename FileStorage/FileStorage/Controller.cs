@@ -6,6 +6,7 @@ using FileStorage.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 
 public class Controller
 {
@@ -36,6 +37,11 @@ public class Controller
                     ExecuteCommandFileUpload(command.Parameters);
                     break;
                 }
+            case StorageCommands.FileDownload:
+                {
+                    ExecuteCommandFileDownload(command.Parameters);
+                    break;
+                }
         }
     }
 
@@ -58,9 +64,23 @@ public class Controller
         string storagePath = ConfigurationManager.AppSettings["StoragePath"];
         if (parameters.Count == 0)
         {
-            throw new ApplicationException("NO PATH BLEAT");
+            throw new ApplicationException("You have to enter path to uploading file");
         }
         string filePath = parameters[0];
-        fileManager.MoveFileToDestinationPath(filePath, storagePath);
+        StorageFile storageFile = fileManager.MoveFileToDestinationPath(filePath, storagePath);
+        storageService.AddNewFile(storageFile);
+    }
+
+    private void ExecuteCommandFileDownload(List<string> parameters)
+    {
+        string storagePath = ConfigurationManager.AppSettings["StoragePath"];
+        if (parameters.Count == 0)
+        {
+            throw new ApplicationException("You have not entered the file.");
+        }
+        string fileName = parameters[0];
+        string destinationPath = parameters[1];
+        StorageFile storageFile = fileManager.MoveFileToDestinationPath(Path.Combine(storagePath, fileName), destinationPath);
+        storageService.IncreaseDownloadsCount(fileName);
     }
 }

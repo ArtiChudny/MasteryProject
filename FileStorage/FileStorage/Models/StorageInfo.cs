@@ -7,7 +7,7 @@ namespace FileStorage.Models
     public class StorageInfo
     {
         public int MaxStorage { get; set; }
-        public int UsedStorage { get; set; }
+        public long UsedStorage { get; set; }
         public DateTime CreationDate { get; set; }
         public List<StorageFile> StorageFiles { get; set; }
 

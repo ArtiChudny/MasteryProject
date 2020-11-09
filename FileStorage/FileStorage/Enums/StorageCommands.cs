@@ -4,6 +4,7 @@
     {
         UserInfo,
         FileUpload,
+        FileDownload,
         Exit
     }
 }

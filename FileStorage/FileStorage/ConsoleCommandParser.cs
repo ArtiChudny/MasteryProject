@@ -10,6 +10,7 @@ namespace FileStorage
         private const string UserInfoCommandName = "user info";
         private const string ExitCommandName = "exit";
         private const string FileUploadCommandName = "file upload";
+        private const string FileDownloadCommandName = "file download";
 
         public StorageCommand Parse(string rawCommand)
         {
@@ -32,6 +33,13 @@ namespace FileStorage
             {
                 storageCommand.CommandType = StorageCommands.FileUpload;
                 storageCommand.Parameters = GetParametersList(rawCommand, FileUploadCommandName);
+                return storageCommand;
+            }
+
+            if (rawCommand.StartsWith(FileDownloadCommandName))
+            {
+                storageCommand.CommandType = StorageCommands.FileDownload;
+                storageCommand.Parameters = GetParametersList(rawCommand, FileDownloadCommandName);
                 return storageCommand;
             }
 

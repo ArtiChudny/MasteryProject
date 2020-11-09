@@ -1,11 +1,12 @@
-﻿using System;
+﻿using FileStorage.Models;
+using System;
 using System.IO;
 
 namespace FileStorage
 {
     public class FileManager
     {
-        public void MoveFileToDestinationPath(string filePath, string destinationPath)
+        public StorageFile MoveFileToDestinationPath(string filePath, string destinationPath)
         {
             if (!File.Exists(filePath))
             {
@@ -14,6 +15,23 @@ namespace FileStorage
             string fullFilePath = Path.Combine(destinationPath, Path.GetFileName(filePath));
 
             File.Copy(filePath, fullFilePath);
+
+            return GetFileInfo(filePath);
+        }
+
+        public StorageFile GetFileInfo(string filePath)
+        {
+            var f = new FileInfo(filePath);
+            StorageFile storageFile = new StorageFile
+            {
+                CreationDate = f.CreationTime,
+                Extension = f.Extension,
+                FileName = f.Name,
+                Size = f.Length,
+                DownloadsNumber = 0
+            };
+
+            return storageFile;
         }
     }
 }
