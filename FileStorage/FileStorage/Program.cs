@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
 using FileStorage.Enums;
 using FileStorage.Models;
 using FileStorage.Services;
@@ -14,6 +16,8 @@ namespace FileStorage
             Controller controller = new Controller(consolePrinter);
             AuthService authService = new AuthService();
             ConsoleCommandParser consoleCommandParser = new ConsoleCommandParser();
+
+            CreateIfMissInitialDirectories();
 
             try
             {
@@ -84,6 +88,18 @@ namespace FileStorage
             }
 
             return consoleCommandParser.Parse(rowCommand);
+        }
+
+        private static void CreateIfMissInitialDirectories()
+        {
+            string storagePath = ConfigurationManager.AppSettings["StoragePath"];
+            string storageInfoPath = ConfigurationManager.AppSettings["StorageInfoPath"];
+
+            if (!Directory.Exists(storagePath))
+            {
+                Directory.CreateDirectory(storagePath);
+                Directory.CreateDirectory(Path.GetDirectoryName(storageInfoPath));
+            }
         }
     }
 }
