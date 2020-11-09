@@ -4,7 +4,13 @@ namespace FileStorage.Services
 {
     public class AuthService
     {
-        private UserService userService = new UserService();
+        private UserService userService;
+
+        public AuthService()
+        {
+            userService = new UserService();
+        }
+
         public bool IsAuthenticated(Credentials credentials)
         {
             User user = userService.GetUser();

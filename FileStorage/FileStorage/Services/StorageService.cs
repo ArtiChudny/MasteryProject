@@ -10,7 +10,7 @@ namespace FileStorage.Services
         {
             return new StorageInfo
             {
-                UsedStorage = 512,
+                UsedStorage = 0,
                 CreationDate = DateTime.Now
             };
         }

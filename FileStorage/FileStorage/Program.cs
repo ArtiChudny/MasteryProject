@@ -8,12 +8,12 @@ namespace FileStorage
 {
     class Program
     {
-        private static ConsolePrinter consolePrinter = new ConsolePrinter();
-
         static void Main(string[] args)
         {
+            ConsolePrinter consolePrinter = new ConsolePrinter();
             Controller controller = new Controller(consolePrinter);
             AuthService authService = new AuthService();
+
             try
             {
                 Dictionary<StorageFlags, string> flags = ConsoleFlagParser.Parse(args);
@@ -28,10 +28,10 @@ namespace FileStorage
                 {
                     try
                     {
-                        StorageCommand command = GetCommand();
+                        StorageCommand command = GetCommand(consolePrinter);
                         if (command.CommandType == StorageCommands.Exit)
                         {
-                             consolePrinter.PrintExitMessage();
+                            consolePrinter.PrintExitMessage();
                             break;
                         }
                         controller.ExecuteConsoleCommand(command);
@@ -72,13 +72,19 @@ namespace FileStorage
             }
         }
 
-        private static StorageCommand GetCommand()
+        private static StorageCommand GetCommand(ConsolePrinter consolePrinter)
         {
             StorageCommand command;
             ConsoleCommandParser consoleCommandParser = new ConsoleCommandParser();
 
             consolePrinter.PrintСommandWaitingIcon();
             string rowCommand = Console.ReadLine().ToLower().Trim();
+
+            if (rowCommand == string.Empty)
+            {
+                throw new ApplicationException("You have not entered a command.");    
+            }
+
             command = consoleCommandParser.Parse(rowCommand);
 
             return command;

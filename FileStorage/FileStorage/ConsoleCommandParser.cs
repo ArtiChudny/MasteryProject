@@ -26,27 +26,26 @@ namespace FileStorage
             {
                 storageCommand.CommandType = StorageCommands.UserInfo;
                 storageCommand.Parameters = GetParametersList(rawCommand, UserInfo);
+                return storageCommand;
             }
-            else if (rawCommand.StartsWith(Exit))
+
+            if (rawCommand.StartsWith(Exit))
             {
                 storageCommand.CommandType = StorageCommands.Exit;
-            }
-            else
-            {
-                throw new ApplicationException($"Wrong command: {rawCommand}.");
+                return storageCommand;
             }
 
-            return storageCommand;
+            throw new ApplicationException($"Wrong command: {rawCommand}.");
         }
 
-        private List<string> GetParametersList(string rawCommand, string commandType)
+        private List<string> GetParametersList(string rawCommand, string commandName)
         {
             List<string> parametersList = new List<string>();
-            string parametersString = rawCommand.Replace(commandType, string.Empty);
-            string[] parameters = parametersString.Split(" ");
+            string parametersString = rawCommand.Replace(commandName, string.Empty);
 
-            if (parameters.Length > 1)
+            if (parametersString != string.Empty)
             {
+                string[] parameters = parametersString.Split(" ");
                 for (int argIndex = 1; argIndex < parameters.Length; argIndex++)
                 {
                     parametersList.Add(parameters[argIndex]);
@@ -57,4 +56,5 @@ namespace FileStorage
         }
     }
 }
+
 

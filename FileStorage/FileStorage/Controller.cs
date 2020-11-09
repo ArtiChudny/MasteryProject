@@ -10,9 +10,9 @@ public class Controller
     private UserService userService;
     private StorageService storageService;
 
-    public Controller(ConsolePrinter _consolePrinter)
+    public Controller(ConsolePrinter consolePrinter)
     {
-        consolePrinter = _consolePrinter;
+        this.consolePrinter = consolePrinter;
         userService = new UserService();
         storageService = new StorageService();
     }
