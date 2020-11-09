@@ -7,8 +7,9 @@ namespace FileStorage.Services
 {
     public class StorageService
     {
-        BinaryFormatter formatter = new BinaryFormatter();
         string storageInfoPath = ConfigurationManager.AppSettings["StorageInfoPath"];
+        BinaryFormatter formatter = new BinaryFormatter();
+        
         public StorageInfo GetStorageInfo()
         {
             return DeserializeInfoFile(formatter);

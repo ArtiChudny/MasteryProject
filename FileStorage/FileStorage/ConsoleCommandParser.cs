@@ -9,6 +9,7 @@ namespace FileStorage
     {
         private const string UserInfoCommandName = "user info";
         private const string ExitCommandName = "exit";
+        private const string FileUploadCommandName = "file upload";
 
         public StorageCommand Parse(string rawCommand)
         {
@@ -27,18 +28,25 @@ namespace FileStorage
                 return storageCommand;
             }
 
+            if (rawCommand.StartsWith(FileUploadCommandName))
+            {
+                storageCommand.CommandType = StorageCommands.FileUpload;
+                storageCommand.Parameters = GetParametersList(rawCommand, FileUploadCommandName);
+                return storageCommand;
+            }
+
             throw new ApplicationException($"Wrong command: {rawCommand}.");
         }
 
         private List<string> GetParametersList(string rawCommand, string commandName)
         {
             List<string> parametersList = new List<string>();
-            string parametersString = rawCommand.Replace(commandName, string.Empty);
+            string parametersString = rawCommand.Replace(commandName, string.Empty).Trim();
 
             if (parametersString != string.Empty)
             {
                 string[] parameters = parametersString.Split(" ");
-                for (int argIndex = 1; argIndex < parameters.Length; argIndex++)
+                for (int argIndex = 0; argIndex < parameters.Length; argIndex++)
                 {
                     parametersList.Add(parameters[argIndex]);
                 }

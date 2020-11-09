@@ -3,6 +3,7 @@
     public enum StorageCommands
     {
         UserInfo,
+        FileUpload,
         Exit
     }
 }
