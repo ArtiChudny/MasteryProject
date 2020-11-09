@@ -7,29 +7,21 @@ namespace FileStorage
 {
     public class ConsoleCommandParser
     {
-        private const string UserInfo = "user info";
-        private const string Exit = "exit";
+        private const string UserInfoCommandName = "user info";
+        private const string ExitCommandName = "exit";
 
         public StorageCommand Parse(string rawCommand)
         {
-            StorageCommand command = new StorageCommand();
-            command = GetCommand(rawCommand);
-
-            return command;
-        }
-
-        private StorageCommand GetCommand(string rawCommand)
-        {
             StorageCommand storageCommand = new StorageCommand();
 
-            if (rawCommand.StartsWith(UserInfo))
+            if (rawCommand.StartsWith(UserInfoCommandName))
             {
                 storageCommand.CommandType = StorageCommands.UserInfo;
-                storageCommand.Parameters = GetParametersList(rawCommand, UserInfo);
+                storageCommand.Parameters = GetParametersList(rawCommand, UserInfoCommandName);
                 return storageCommand;
             }
 
-            if (rawCommand.StartsWith(Exit))
+            if (rawCommand.StartsWith(ExitCommandName))
             {
                 storageCommand.CommandType = StorageCommands.Exit;
                 return storageCommand;

@@ -13,6 +13,7 @@ namespace FileStorage
             ConsolePrinter consolePrinter = new ConsolePrinter();
             Controller controller = new Controller(consolePrinter);
             AuthService authService = new AuthService();
+            ConsoleCommandParser consoleCommandParser = new ConsoleCommandParser();
 
             try
             {
@@ -28,7 +29,7 @@ namespace FileStorage
                 {
                     try
                     {
-                        StorageCommand command = GetCommand(consolePrinter);
+                        StorageCommand command = GetCommand(consolePrinter, consoleCommandParser);
                         if (command.CommandType == StorageCommands.Exit)
                         {
                             consolePrinter.PrintExitMessage();
@@ -72,22 +73,17 @@ namespace FileStorage
             }
         }
 
-        private static StorageCommand GetCommand(ConsolePrinter consolePrinter)
+        private static StorageCommand GetCommand(ConsolePrinter consolePrinter, ConsoleCommandParser consoleCommandParser)
         {
-            StorageCommand command;
-            ConsoleCommandParser consoleCommandParser = new ConsoleCommandParser();
-
             consolePrinter.PrintСommandWaitingIcon();
             string rowCommand = Console.ReadLine().ToLower().Trim();
 
-            if (rowCommand == string.Empty)
+            if (string.IsNullOrWhiteSpace(rowCommand))
             {
-                throw new ApplicationException("You have not entered a command.");    
+                throw new ApplicationException("You have not entered a command.");
             }
 
-            command = consoleCommandParser.Parse(rowCommand);
-
-            return command;
+            return consoleCommandParser.Parse(rowCommand);
         }
     }
 }
