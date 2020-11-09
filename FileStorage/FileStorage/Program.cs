@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Dynamic;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using FileStorage.Enums;
 using FileStorage.Models;
 using FileStorage.Services;
@@ -99,6 +101,22 @@ namespace FileStorage
             {
                 Directory.CreateDirectory(storagePath);
                 Directory.CreateDirectory(Path.GetDirectoryName(storageInfoPath));
+            }
+            if (!File.Exists(storageInfoPath))
+            {
+                CreateNewStorageInfoFile();
+            }
+        }
+
+        private static void CreateNewStorageInfoFile()
+        {
+            string storageInfoPath = ConfigurationManager.AppSettings["StorageInfoPath"];
+           
+            using (FileStream fs = new FileStream(storageInfoPath, FileMode.OpenOrCreate))
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                StorageInfo storageInfo = new StorageInfo();
+                formatter.Serialize(fs, storageInfo);
             }
         }
     }
