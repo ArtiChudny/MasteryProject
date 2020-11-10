@@ -12,6 +12,19 @@ namespace FileStorage
             Console.WriteLine("storage used: {0}MB\n", userInfo.UsedStorage);
         }
 
+        public void PrintUploadSuccessful(FileUploadViewModel uploadViewModel)
+        {
+            Console.WriteLine("\nThe file '{0}' has been uploaded.",uploadViewModel.FilePath);
+            Console.WriteLine("- file name: '{0}'", uploadViewModel.FileName);
+            Console.WriteLine("- file size: '{0}'", uploadViewModel.FileSize);
+            Console.WriteLine("- extension: '{0}'\n", uploadViewModel.Extension);
+        }
+
+        public void PrintDownloadSuccessful(string fileName)
+        {
+            Console.WriteLine("\nThe file '{0}' has been downloaded\n", fileName);
+        }
+
         public void PrintAuthenticationSuccessful()
         {
             Console.WriteLine("You logged in.\n");

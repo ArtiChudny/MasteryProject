@@ -1,5 +1,4 @@
 ﻿using FileStorage.Models;
-using System;
 using System.Configuration;
 using System.IO;
 using System.Linq;
@@ -10,16 +9,16 @@ namespace FileStorage.Services
     public class StorageService
     {
         string storageInfoPath = ConfigurationManager.AppSettings["StorageInfoPath"];
-        BinaryFormatter formatter = new BinaryFormatter();
+        BinaryFormatter binaryFormatter = new BinaryFormatter();
 
         public StorageInfo GetStorageInfo()
         {
-            return DeserializeInfoFile();
+            return DeserializeStorageInfoFile();
         }
 
-        public void AddNewFile(StorageFile storageFile)
+        public void AddFileToStorage(StorageFile storageFile)
         {
-            StorageInfo storageInfo = DeserializeInfoFile();
+            StorageInfo storageInfo = DeserializeStorageInfoFile();
             storageInfo.UsedStorage += storageFile.Size;
             storageInfo.StorageFiles.Add(storageFile);
             SerializeStorageInfoFile(storageInfo);
@@ -27,26 +26,44 @@ namespace FileStorage.Services
 
         private void SerializeStorageInfoFile(StorageInfo storageInfo)
         {
-            using (FileStream fs = new FileStream(storageInfoPath, FileMode.Open))
+            using (FileStream fileStream = new FileStream(storageInfoPath, FileMode.OpenOrCreate))
             {
-                formatter.Serialize(fs, storageInfo);
+                binaryFormatter.Serialize(fileStream, storageInfo);
             }
         }
 
-        private StorageInfo DeserializeInfoFile()
+        private StorageInfo DeserializeStorageInfoFile()
         {
-            using (FileStream fs = new FileStream(storageInfoPath, FileMode.OpenOrCreate))
+            using (FileStream fileStream = new FileStream(storageInfoPath, FileMode.OpenOrCreate))
             {
-                StorageInfo storageInfo = (StorageInfo)formatter.Deserialize(fs);
+                StorageInfo storageInfo = (StorageInfo)binaryFormatter.Deserialize(fileStream);
 
                 return storageInfo;
             }
         }
 
-        internal void IncreaseDownloadsCount(string fileName)
+        internal void IncreaseDownloadsCounter(string fileName)
         {
-            StorageInfo storageInfo = DeserializeInfoFile();
+            StorageInfo storageInfo = DeserializeStorageInfoFile();
             storageInfo.StorageFiles.Where(f => f.FileName == fileName).First().DownloadsNumber++;
+            SerializeStorageInfoFile(storageInfo);
+        }
+
+        public bool IfStorageInfoFileExists()
+        {
+            if (File.Exists(storageInfoPath))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public void CreateStorageInfoFile()
+        { 
+            StorageInfo storageInfo = new StorageInfo();
             SerializeStorageInfoFile(storageInfo);
         }
     }

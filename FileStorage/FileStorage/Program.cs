@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using FileStorage.Enums;
 using FileStorage.Models;
 using FileStorage.Services;
@@ -13,12 +10,14 @@ namespace FileStorage
     {
         static void Main(string[] args)
         {
-            ConsolePrinter consolePrinter = new ConsolePrinter();
-            Controller controller = new Controller(consolePrinter);
             AuthService authService = new AuthService();
+            ConsolePrinter consolePrinter = new ConsolePrinter();
+            StorageService storageService = new StorageService();
+            FileService fileSerice = new FileService();
+            Controller controller = new Controller(consolePrinter, storageService, fileSerice);
             ConsoleCommandParser consoleCommandParser = new ConsoleCommandParser();
 
-            CreateIfMissInitialDirectories();
+            CreateIfMissIntitialFiles(storageService, fileSerice);
 
             try
             {
@@ -51,6 +50,7 @@ namespace FileStorage
             catch (Exception ex)
             {
                 consolePrinter.PrintErrorMessage(ex.Message);
+                Environment.Exit(-1);
             }
         }
 
@@ -91,32 +91,13 @@ namespace FileStorage
             return consoleCommandParser.Parse(rowCommand);
         }
 
-        private static void CreateIfMissInitialDirectories()
+        private static void CreateIfMissIntitialFiles(StorageService storageService, FileService fileSerice)
         {
-            string storagePath = ConfigurationManager.AppSettings["StoragePath"];
-            string storageInfoPath = ConfigurationManager.AppSettings["StorageInfoPath"];
-
-            if (!Directory.Exists(storagePath))
+            fileSerice.CreateIfMissInitialDirectories();
+            if (!storageService.IfStorageInfoFileExists())
             {
-                Directory.CreateDirectory(storagePath);
-                Directory.CreateDirectory(Path.GetDirectoryName(storageInfoPath));
-            }
-            if (!File.Exists(storageInfoPath))
-            {
-                CreateNewStorageInfoFile();
-            }
-        }
-
-        private static void CreateNewStorageInfoFile()
-        {
-            string storageInfoPath = ConfigurationManager.AppSettings["StorageInfoPath"];
-           
-            using (FileStream fs = new FileStream(storageInfoPath, FileMode.OpenOrCreate))
-            {
-                BinaryFormatter formatter = new BinaryFormatter();
-                StorageInfo storageInfo = new StorageInfo();
-                formatter.Serialize(fs, storageInfo);
-            }
+                storageService.CreateStorageInfoFile();
+            }           
         }
     }
 }

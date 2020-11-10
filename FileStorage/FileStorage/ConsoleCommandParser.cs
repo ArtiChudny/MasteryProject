@@ -53,10 +53,10 @@ namespace FileStorage
 
             if (parametersString != string.Empty)
             {
-                string[] parameters = parametersString.Split(" ");
+                string[] parameters = parametersString.Split(" \"");
                 for (int argIndex = 0; argIndex < parameters.Length; argIndex++)
                 {
-                    parametersList.Add(parameters[argIndex]);
+                    parametersList.Add(parameters[argIndex].Replace("\"",string.Empty));
                 }
             }
 

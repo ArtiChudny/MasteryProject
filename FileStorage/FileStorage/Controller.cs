@@ -5,22 +5,20 @@ using FileStorage.Services;
 using FileStorage.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
 
 public class Controller
 {
     private ConsolePrinter consolePrinter;
     private UserService userService;
     private StorageService storageService;
-    private FileManager fileManager;
+    private FileService fileService;
 
-    public Controller(ConsolePrinter consolePrinter)
+    public Controller(ConsolePrinter consolePrinter, StorageService storageService, FileService fileService)
     {
         this.consolePrinter = consolePrinter;
+        this.storageService = storageService;
+        this.fileService = fileService;
         userService = new UserService();
-        storageService = new StorageService();
-        fileManager = new FileManager();
     }
 
     public void ExecuteConsoleCommand(StorageCommand command)
@@ -61,26 +59,38 @@ public class Controller
 
     private void ExecuteCommandFileUpload(List<string> parameters)
     {
-        string storagePath = ConfigurationManager.AppSettings["StoragePath"];
         if (parameters.Count == 0)
         {
             throw new ApplicationException("You have to enter path to uploading file");
         }
+
         string filePath = parameters[0];
-        StorageFile storageFile = fileManager.MoveFileToDestinationPath(filePath, storagePath);
-        storageService.AddNewFile(storageFile);
+        StorageFile storageFile = fileService.UploadFileIntoStorage(filePath);
+        storageService.AddFileToStorage(storageFile);
+
+        FileUploadViewModel uploadViewModel = new FileUploadViewModel
+        {
+            FilePath = filePath,
+            FileName = storageFile.FileName,
+            FileSize = storageFile.Size.ToString(),
+            Extension = storageFile.Extension
+        };
+
+        consolePrinter.PrintUploadSuccessful(uploadViewModel);
     }
 
     private void ExecuteCommandFileDownload(List<string> parameters)
     {
-        string storagePath = ConfigurationManager.AppSettings["StoragePath"];
         if (parameters.Count == 0)
         {
             throw new ApplicationException("You have not entered the file.");
         }
+
         string fileName = parameters[0];
         string destinationPath = parameters[1];
-        StorageFile storageFile = fileManager.MoveFileToDestinationPath(Path.Combine(storagePath, fileName), destinationPath);
-        storageService.IncreaseDownloadsCount(fileName);
+        fileService.DownloadFileFromStorage(fileName, destinationPath);
+        storageService.IncreaseDownloadsCounter(fileName);
+
+        consolePrinter.PrintDownloadSuccessful(fileName);
     }
 }
