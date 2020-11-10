@@ -6,6 +6,7 @@
         FileUpload,
         FileDownload,
         FileMove,
+        FileRemove,
         Exit
     }
 }

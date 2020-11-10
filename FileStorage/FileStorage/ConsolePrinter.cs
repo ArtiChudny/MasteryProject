@@ -30,6 +30,11 @@ namespace FileStorage
             Console.WriteLine("\nThe file '{0}' has been moved to '{1}'\n", oldFileName, newFileName);
         }
 
+        public void PrintRemoveSuccessful(string fileName)
+        {
+            Console.WriteLine("\nThe file '{0}' has been removedd\n", fileName);
+        }
+
         public void PrintAuthenticationSuccessful()
         {
             Console.WriteLine("You logged in\n");

@@ -24,12 +24,21 @@ namespace FileStorage.Services
             SerializeStorageInfoFile(storageInfo);
         }
 
+        //need to do changing extension if it will changed on newFileName
         public void MoveFile(string oldFileName, string newFileName)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
             storageInfo.StorageFiles.Where(f => f.FileName == oldFileName).First().FileName = newFileName;
             SerializeStorageInfoFile(storageInfo);
-            //should to do changing extension here if it will change on command
+        }
+
+        public void RemoveFile(string fileName)
+        {
+            StorageInfo storageInfo = DeserializeStorageInfoFile();
+            StorageFile storageFile = storageInfo.StorageFiles.Where(f => f.FileName == fileName).First();
+            storageInfo.UsedStorage -= storageFile.Size;
+            storageInfo.StorageFiles.Remove(storageFile);
+            SerializeStorageInfoFile(storageInfo);
         }
 
         private void SerializeStorageInfoFile(StorageInfo storageInfo)

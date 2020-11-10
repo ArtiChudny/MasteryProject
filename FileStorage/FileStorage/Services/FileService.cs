@@ -71,6 +71,18 @@ namespace FileStorage
             File.Move(filePath, newFilePath);
         }
 
+        public void RemoveFile(string FileName)
+        {
+            string filePath = Path.Combine(storagePath, FileName);
+
+            if (!File.Exists(filePath))
+            {
+                throw new ApplicationException($"File {FileName} is not exists");
+            }
+
+            File.Delete(filePath);
+        }
+
         private StorageFile GetStorageFile(string filePath)
         {
             FileInfo fileInfo = new FileInfo(filePath);

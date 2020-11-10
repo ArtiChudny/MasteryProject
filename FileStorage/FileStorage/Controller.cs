@@ -45,6 +45,11 @@ public class Controller
                     ExecuteCommandFileMove(command.Parameters);
                     break;
                 }
+            case StorageCommands.FileRemove:
+                {
+                    ExecuteCommandFileRemove(command.Parameters);
+                    break;
+                }
         }
     }
 
@@ -115,5 +120,20 @@ public class Controller
         storageService.MoveFile(oldFileName, newFileName);
 
         consolePrinter.PrintMoveFileSuccessful(oldFileName, newFileName);
+    }
+
+    private void ExecuteCommandFileRemove(List<string> parameters)
+    {
+        if (parameters.Count == 0)
+        {
+            throw new ApplicationException("You have not entered parameters for this command");
+        }
+
+        string fileName = parameters[0];
+
+        fileService.RemoveFile(fileName);
+        storageService.RemoveFile(fileName);
+
+        consolePrinter.PrintRemoveSuccessful(fileName);
     }
 }
