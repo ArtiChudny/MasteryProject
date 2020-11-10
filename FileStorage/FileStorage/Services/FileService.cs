@@ -22,16 +22,15 @@ namespace FileStorage
             }
         }
 
-        public StorageFile UploadFileIntoStorage(string filePath)
+        public void UploadFileIntoStorage(string filePath)
         {
             if (!File.Exists(filePath))
             {
                 throw new ApplicationException($"Path {Path.GetFileName(filePath)} is not exists");
             }
+
             string fullDestinationPath = Path.Combine(storagePath, Path.GetFileName(filePath));
             File.Copy(filePath, fullDestinationPath);
-
-            return GetStorageFile(filePath);
         }
 
         public void DownloadFileFromStorage(string fileName, string destinationPath)
@@ -47,9 +46,10 @@ namespace FileStorage
             {
                 throw new ApplicationException($"Directory {destinationPath} is not exists");
             }
+
             string fullStorageFilePath = Path.Combine(storagePath, fileName);
-            string fullDestinationPath = Path.Combine(destinationPath, fileName);
-            File.Copy(fullStorageFilePath, fullDestinationPath);
+            string fullDestinationFilePath = Path.Combine(destinationPath, fileName);
+            File.Copy(fullStorageFilePath, fullDestinationFilePath);
         }
 
         public void MoveFile(string oldFileName, string newFileName)
@@ -83,9 +83,10 @@ namespace FileStorage
             File.Delete(filePath);
         }
 
-        private StorageFile GetStorageFile(string filePath)
+        public StorageFile GetStorageFile(string filePath)
         {
             FileInfo fileInfo = new FileInfo(filePath);
+
             StorageFile storageFile = new StorageFile
             {
                 CreationDate = fileInfo.CreationTime,

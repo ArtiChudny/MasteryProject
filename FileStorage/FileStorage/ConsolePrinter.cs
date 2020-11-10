@@ -9,7 +9,7 @@ namespace FileStorage
         {
             Console.WriteLine("\nlogin: {0}", userInfo.Login);
             Console.WriteLine("creation date: {0}", userInfo.CreationDate);
-            Console.WriteLine("storage used: {0}MB\n", userInfo.UsedStorage);
+            Console.WriteLine("storage used: {0}\n", userInfo.UsedStorage);
         }
 
         public void PrintUploadSuccessful(FileUploadViewModel uploadViewModel)
@@ -18,6 +18,16 @@ namespace FileStorage
             Console.WriteLine("- file name: '{0}'", uploadViewModel.FileName);
             Console.WriteLine("- file size: '{0}'", uploadViewModel.FileSize);
             Console.WriteLine("- extension: '{0}'\n", uploadViewModel.Extension);
+        }
+
+        public void PrintFileInfo(FileInfoViewModel fileInfoViewModel)
+        {
+            Console.WriteLine("\n- file name: '{0}'", fileInfoViewModel.FileName);
+            Console.WriteLine("- extension: '{0}'", fileInfoViewModel.Extension);
+            Console.WriteLine("- file size: '{0}'", fileInfoViewModel.FileSize);
+            Console.WriteLine("- creation date: '{0}'", fileInfoViewModel.CreationDate);
+            Console.WriteLine("- downloads number: '{0}'", fileInfoViewModel.DownloadsNumber);
+            Console.WriteLine("- login: '{0}'\n", fileInfoViewModel.Login);
         }
 
         public void PrintDownloadSuccessful(string fileName)
@@ -52,7 +62,7 @@ namespace FileStorage
 
         public void PrintExitMessage()
         {
-            Console.WriteLine("You have exit the application");
+            Console.WriteLine("You have been exit the application");
         }
     }
 }

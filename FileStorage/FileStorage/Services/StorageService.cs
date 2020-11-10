@@ -9,14 +9,46 @@ namespace FileStorage.Services
     public class StorageService
     {
         string storageInfoPath = ConfigurationManager.AppSettings["StorageInfoPath"];
-        BinaryFormatter binaryFormatter = new BinaryFormatter();
+        BinaryFormatter binaryFormatter;
+
+        public StorageService()
+        {
+            binaryFormatter = new BinaryFormatter();
+        }
 
         public StorageInfo GetStorageInfo()
         {
             return DeserializeStorageInfoFile();
         }
 
-        //need to checking possibility to adding because of max storage
+        public bool IsEnoughStorageSpace(long fileSize)
+        {
+            StorageInfo storageInfo = DeserializeStorageInfoFile();
+
+            if ((storageInfo.UsedStorage + fileSize) > storageInfo.MaxStorage)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        public bool IsFileSizeLessThanMaxSize(long fileSize)
+        {
+            StorageInfo storageInfo = DeserializeStorageInfoFile();
+
+            if (fileSize < storageInfo.MaxFileSize)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public void AddFileToStorage(StorageFile storageFile)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
@@ -25,11 +57,12 @@ namespace FileStorage.Services
             SerializeStorageInfoFile(storageInfo);
         }
 
-        //need to changing extension if it changed on newFileName
         public void MoveFile(string oldFileName, string newFileName)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
-            storageInfo.StorageFiles.Where(f => f.FileName == oldFileName).First().FileName = newFileName;
+            StorageFile storageFile = storageInfo.StorageFiles.Where(f => f.FileName == oldFileName).First();
+            storageFile.FileName = newFileName;
+            storageFile.Extension = Path.GetExtension(newFileName);
             SerializeStorageInfoFile(storageInfo);
         }
 
@@ -74,7 +107,7 @@ namespace FileStorage.Services
             SerializeStorageInfoFile(storageInfo);
         }
 
-        public bool IfStorageInfoFileExists()
+        public bool IsStorageInfoFileExists()
         {
             if (File.Exists(storageInfoPath))
             {

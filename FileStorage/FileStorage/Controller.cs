@@ -12,6 +12,7 @@ public class Controller
     private UserService userService;
     private StorageService storageService;
     private FileService fileService;
+    private Converter converter;
 
     public Controller(ConsolePrinter consolePrinter, StorageService storageService, FileService fileService)
     {
@@ -19,6 +20,7 @@ public class Controller
         this.storageService = storageService;
         this.fileService = fileService;
         userService = new UserService();
+        converter = new Converter();
     }
 
     public void ExecuteConsoleCommand(StorageCommand command)
@@ -66,8 +68,8 @@ public class Controller
         UserInfoViewModel userInfo = new UserInfoViewModel
         {
             Login = user.Login,
-            UsedStorage = storageInfo.UsedStorage,
-            CreationDate = storageInfo.CreationDate.ToString("yyyy-MM-dd")
+            UsedStorage = converter.GetSizeString(storageInfo.UsedStorage),
+            CreationDate = converter.GetDateString(storageInfo.CreationDate)
         };
 
         consolePrinter.PrintUserInformation(userInfo);
@@ -77,18 +79,30 @@ public class Controller
     {
         if (parameters.Count == 0)
         {
-            throw new ApplicationException("You have to enter path to uploading file");
+            throw new ApplicationException("You have to enter path to uploading the file");
         }
 
         string filePath = parameters[0];
-        StorageFile storageFile = fileService.UploadFileIntoStorage(filePath);
+        StorageFile storageFile = fileService.GetStorageFile(filePath);
+
+        if (!storageService.IsFileSizeLessThanMaxSize(storageFile.Size))
+        {
+            throw new ApplicationException("The file exceeds the maximum size");
+        }
+
+        if (!storageService.IsEnoughStorageSpace(storageFile.Size))
+        {
+            throw new ApplicationException("Not enough space in storage to upload the file");
+        }
+
+        fileService.UploadFileIntoStorage(filePath);
         storageService.AddFileToStorage(storageFile);
 
         FileUploadViewModel uploadViewModel = new FileUploadViewModel
         {
             FilePath = filePath,
             FileName = storageFile.FileName,
-            FileSize = storageFile.Size.ToString(),
+            FileSize = converter.GetSizeString(storageFile.Size),
             Extension = storageFile.Extension
         };
 
@@ -157,11 +171,12 @@ public class Controller
         {
             FileName = storageFile.FileName,
             Extension = storageFile.Extension,
-            CreationDate = storageFile.CreationDate.ToString(),
-            FileSize = storageFile.Size.ToString(),
-            DownloadsCount = storageFile.DownloadsNumber,
+            CreationDate = converter.GetDateString(storageFile.CreationDate),
+            FileSize = converter.GetSizeString(storageFile.Size),
+            DownloadsNumber = storageFile.DownloadsNumber,
             Login = user.Login
         };
 
+        consolePrinter.PrintFileInfo(fileInfoViewModel);
     }
 }

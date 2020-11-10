@@ -94,7 +94,7 @@ namespace FileStorage
         private static void CreateIfMissIntitialFiles(StorageService storageService, FileService fileSerice)
         {
             fileSerice.CreateIfMissInitialDirectories();
-            if (!storageService.IfStorageInfoFileExists())
+            if (!storageService.IsStorageInfoFileExists())
             {
                 storageService.CreateStorageInfoFile();
             }           
