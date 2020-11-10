@@ -6,6 +6,6 @@ namespace FileStorage.ViewModels
     {
         public string Login { get; set; }
         public long UsedStorage { get; set; }
-        public DateTime CreationDate { get; set; }
+        public string CreationDate { get; set; }
     }
 }

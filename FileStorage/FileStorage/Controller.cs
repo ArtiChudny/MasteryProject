@@ -50,6 +50,11 @@ public class Controller
                     ExecuteCommandFileRemove(command.Parameters);
                     break;
                 }
+            case StorageCommands.FileInfo:
+                {
+                    ExecuteCommandFileInfo(command.Parameters);
+                    break;
+                }
         }
     }
 
@@ -62,7 +67,7 @@ public class Controller
         {
             Login = user.Login,
             UsedStorage = storageInfo.UsedStorage,
-            CreationDate = storageInfo.CreationDate
+            CreationDate = storageInfo.CreationDate.ToString("yyyy-MM-dd")
         };
 
         consolePrinter.PrintUserInformation(userInfo);
@@ -135,5 +140,28 @@ public class Controller
         storageService.RemoveFile(fileName);
 
         consolePrinter.PrintRemoveSuccessful(fileName);
+    }
+
+    private void ExecuteCommandFileInfo(List<string> parameters)
+    {
+        if (parameters.Count == 0)
+        {
+            throw new ApplicationException("You have not entered parameters for this command");
+        }
+
+        string fileName = parameters[0];
+        StorageFile storageFile = storageService.GetFileInfo(fileName);
+        User user = userService.GetUser();
+
+        FileInfoViewModel fileInfoViewModel = new FileInfoViewModel
+        {
+            FileName = storageFile.FileName,
+            Extension = storageFile.Extension,
+            CreationDate = storageFile.CreationDate.ToString(),
+            FileSize = storageFile.Size.ToString(),
+            DownloadsCount = storageFile.DownloadsNumber,
+            Login = user.Login
+        };
+
     }
 }

@@ -13,6 +13,7 @@ namespace FileStorage
         private const string FileDownloadCommandName = "file download";
         private const string FileMoveCommandName = "file move";
         private const string FileRemoveCommandName = "file remove";
+        private const string FileInfoCommandName = "file info";
 
         public StorageCommand Parse(string rawCommand)
         {
@@ -59,6 +60,13 @@ namespace FileStorage
                 return storageCommand;
             }
 
+            if (rawCommand.StartsWith(FileInfoCommandName))
+            {
+                storageCommand.CommandType = StorageCommands.FileInfo;
+                storageCommand.Parameters = GetParametersList(rawCommand, FileInfoCommandName);
+                return storageCommand;
+            }
+
             throw new ApplicationException($"Wrong command: {rawCommand}.");
         }
 
@@ -73,7 +81,7 @@ namespace FileStorage
                 string[] parameters = parametersString.Split(" \"");
                 for (int argIndex = 0; argIndex < parameters.Length; argIndex++)
                 {
-                    parametersList.Add(parameters[argIndex].Trim().Replace("\"",string.Empty));
+                    parametersList.Add(parameters[argIndex].Trim().Replace("\"", string.Empty));
                 }
             }
 

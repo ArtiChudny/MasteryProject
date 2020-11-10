@@ -7,6 +7,7 @@
         FileDownload,
         FileMove,
         FileRemove,
+        FileInfo,
         Exit
     }
 }

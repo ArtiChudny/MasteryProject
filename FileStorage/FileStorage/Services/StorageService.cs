@@ -16,6 +16,7 @@ namespace FileStorage.Services
             return DeserializeStorageInfoFile();
         }
 
+        //need to checking possibility to adding because of max storage
         public void AddFileToStorage(StorageFile storageFile)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
@@ -24,7 +25,7 @@ namespace FileStorage.Services
             SerializeStorageInfoFile(storageInfo);
         }
 
-        //need to do changing extension if it will changed on newFileName
+        //need to changing extension if it changed on newFileName
         public void MoveFile(string oldFileName, string newFileName)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
@@ -39,6 +40,13 @@ namespace FileStorage.Services
             storageInfo.UsedStorage -= storageFile.Size;
             storageInfo.StorageFiles.Remove(storageFile);
             SerializeStorageInfoFile(storageInfo);
+        }
+
+        public StorageFile GetFileInfo(string fileName)
+        {
+            StorageInfo storageInfo = DeserializeStorageInfoFile();
+            StorageFile storageFile = storageInfo.StorageFiles.Where(f => f.FileName == fileName).First();
+            return storageFile;
         }
 
         private void SerializeStorageInfoFile(StorageInfo storageInfo)
@@ -79,7 +87,7 @@ namespace FileStorage.Services
         }
 
         public void CreateStorageInfoFile()
-        { 
+        {
             StorageInfo storageInfo = new StorageInfo();
             SerializeStorageInfoFile(storageInfo);
         }
