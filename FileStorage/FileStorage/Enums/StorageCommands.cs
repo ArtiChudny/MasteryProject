@@ -5,6 +5,7 @@
         UserInfo,
         FileUpload,
         FileDownload,
+        FileMove,
         Exit
     }
 }

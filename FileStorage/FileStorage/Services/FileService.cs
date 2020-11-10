@@ -10,6 +10,18 @@ namespace FileStorage
         string storagePath = ConfigurationManager.AppSettings["StoragePath"];
         string storageInfoPath = ConfigurationManager.AppSettings["StorageInfoPath"];
 
+        public void CreateIfMissInitialDirectories()
+        {
+            if (!Directory.Exists(storagePath))
+            {
+                Directory.CreateDirectory(storagePath);
+            }
+            if (!Directory.Exists(Path.GetDirectoryName(storageInfoPath)))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(storageInfoPath));
+            }
+        }
+
         public StorageFile UploadFileIntoStorage(string filePath)
         {
             if (!File.Exists(filePath))
@@ -22,7 +34,7 @@ namespace FileStorage
             return GetStorageFile(filePath);
         }
 
-        public void DownloadFileFromStorage(string fileName,string destinationPath)
+        public void DownloadFileFromStorage(string fileName, string destinationPath)
         {
             string filePath = Path.Combine(storagePath, fileName);
 
@@ -40,6 +52,25 @@ namespace FileStorage
             File.Copy(fullStorageFilePath, fullDestinationPath);
         }
 
+        public void MoveFile(string oldFileName, string newFileName)
+        {
+            string filePath = Path.Combine(storagePath, oldFileName);
+
+            if (!File.Exists(filePath))
+            {
+                throw new ApplicationException($"File {oldFileName} is not exists");
+            }
+
+            string newFilePath = Path.Combine(storagePath, newFileName);
+
+            if (File.Exists(newFilePath))
+            {
+                throw new ApplicationException($"File {newFileName} is already exist in storage");
+            }
+
+            File.Move(filePath, newFilePath);
+        }
+
         private StorageFile GetStorageFile(string filePath)
         {
             FileInfo fileInfo = new FileInfo(filePath);
@@ -53,18 +84,6 @@ namespace FileStorage
             };
 
             return storageFile;
-        }
-
-        public void CreateIfMissInitialDirectories()
-        {
-            if (!Directory.Exists(storagePath))
-            {
-                Directory.CreateDirectory(storagePath);
-            }
-            if (!Directory.Exists(Path.GetDirectoryName(storageInfoPath)))
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(storageInfoPath));
-            }
         }
     }
 }

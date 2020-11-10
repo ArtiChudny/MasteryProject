@@ -40,6 +40,11 @@ public class Controller
                     ExecuteCommandFileDownload(command.Parameters);
                     break;
                 }
+            case StorageCommands.FileMove:
+                {
+                    ExecuteCommandFileMove(command.Parameters);
+                    break;
+                }
         }
     }
 
@@ -47,6 +52,7 @@ public class Controller
     {
         User user = userService.GetUser();
         StorageInfo storageInfo = storageService.GetStorageInfo();
+
         UserInfoViewModel userInfo = new UserInfoViewModel
         {
             Login = user.Login,
@@ -83,14 +89,31 @@ public class Controller
     {
         if (parameters.Count == 0)
         {
-            throw new ApplicationException("You have not entered the file.");
+            throw new ApplicationException("You have not entered parameters for this command");
         }
 
         string fileName = parameters[0];
         string destinationPath = parameters[1];
+
         fileService.DownloadFileFromStorage(fileName, destinationPath);
         storageService.IncreaseDownloadsCounter(fileName);
 
         consolePrinter.PrintDownloadSuccessful(fileName);
+    }
+
+    private void ExecuteCommandFileMove(List<string> parameters)
+    {
+        if (parameters.Count == 0)
+        {
+            throw new ApplicationException("You have not entered parameters for this command");
+        }
+
+        string oldFileName = parameters[0];
+        string newFileName = parameters[1];
+
+        fileService.MoveFile(oldFileName, newFileName);
+        storageService.MoveFile(oldFileName, newFileName);
+
+        consolePrinter.PrintMoveFileSuccessful(oldFileName, newFileName);
     }
 }

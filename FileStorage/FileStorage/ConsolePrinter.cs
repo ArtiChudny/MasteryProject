@@ -14,7 +14,7 @@ namespace FileStorage
 
         public void PrintUploadSuccessful(FileUploadViewModel uploadViewModel)
         {
-            Console.WriteLine("\nThe file '{0}' has been uploaded.",uploadViewModel.FilePath);
+            Console.WriteLine("\nThe file '{0}' has been uploaded.", uploadViewModel.FilePath);
             Console.WriteLine("- file name: '{0}'", uploadViewModel.FileName);
             Console.WriteLine("- file size: '{0}'", uploadViewModel.FileSize);
             Console.WriteLine("- extension: '{0}'\n", uploadViewModel.Extension);
@@ -25,9 +25,14 @@ namespace FileStorage
             Console.WriteLine("\nThe file '{0}' has been downloaded\n", fileName);
         }
 
+        public void PrintMoveFileSuccessful(string oldFileName, string newFileName)
+        {
+            Console.WriteLine("\nThe file '{0}' has been moved to '{1}'\n", oldFileName, newFileName);
+        }
+
         public void PrintAuthenticationSuccessful()
         {
-            Console.WriteLine("You logged in.\n");
+            Console.WriteLine("You logged in\n");
         }
 
         public void PrintСommandWaitingIcon()

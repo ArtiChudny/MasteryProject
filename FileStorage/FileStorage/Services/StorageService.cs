@@ -24,6 +24,14 @@ namespace FileStorage.Services
             SerializeStorageInfoFile(storageInfo);
         }
 
+        public void MoveFile(string oldFileName, string newFileName)
+        {
+            StorageInfo storageInfo = DeserializeStorageInfoFile();
+            storageInfo.StorageFiles.Where(f => f.FileName == oldFileName).First().FileName = newFileName;
+            SerializeStorageInfoFile(storageInfo);
+            //should to do changing extension here if it will change on command
+        }
+
         private void SerializeStorageInfoFile(StorageInfo storageInfo)
         {
             using (FileStream fileStream = new FileStream(storageInfoPath, FileMode.OpenOrCreate))
