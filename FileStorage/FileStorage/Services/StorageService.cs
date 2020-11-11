@@ -82,6 +82,13 @@ namespace FileStorage.Services
             return storageFile;
         }
 
+        public byte[] GetStorageFileMD5Hash(string fileName)
+        {
+            StorageInfo storageInfo = DeserializeStorageInfoFile();
+            StorageFile storageFile = storageInfo.StorageFiles.Where(f => f.FileName == fileName).First();
+            return storageFile.Md5Hash;
+        }
+
         private void SerializeStorageInfoFile(StorageInfo storageInfo)
         {
             using (FileStream fileStream = new FileStream(storageInfoPath, FileMode.OpenOrCreate))

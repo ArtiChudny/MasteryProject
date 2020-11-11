@@ -77,7 +77,7 @@ public class Controller
 
     private void ExecuteCommandFileUpload(List<string> parameters)
     {
-        if (parameters.Count == 0)
+        if (parameters.Count < 1)
         {
             throw new ApplicationException("You have to enter path to uploading the file");
         }
@@ -106,12 +106,12 @@ public class Controller
             Extension = storageFile.Extension
         };
 
-        consolePrinter.PrintUploadSuccessful(uploadViewModel);
+        consolePrinter.PrintFileUploadedSuccessful(uploadViewModel);
     }
 
     private void ExecuteCommandFileDownload(List<string> parameters)
     {
-        if (parameters.Count == 0)
+        if (parameters.Count < 2)
         {
             throw new ApplicationException("You have not entered parameters for this command");
         }
@@ -122,12 +122,19 @@ public class Controller
         fileService.DownloadFileFromStorage(fileName, destinationPath);
         storageService.IncreaseDownloadsCounter(fileName);
 
-        consolePrinter.PrintDownloadSuccessful(fileName);
+        if (fileService.IsMd5HashMatch(fileName, storageService.GetStorageFileMD5Hash(fileName)))
+        {
+            consolePrinter.PrintFileDownloadedSuccessful(fileName);
+        }
+        else
+        {
+            consolePrinter.PrintFileHasChanged(fileName);
+        }
     }
 
     private void ExecuteCommandFileMove(List<string> parameters)
     {
-        if (parameters.Count == 0)
+        if (parameters.Count < 2)
         {
             throw new ApplicationException("You have not entered parameters for this command");
         }
@@ -138,29 +145,28 @@ public class Controller
         fileService.MoveFile(oldFileName, newFileName);
         storageService.MoveFile(oldFileName, newFileName);
 
-        consolePrinter.PrintMoveFileSuccessful(oldFileName, newFileName);
+        consolePrinter.PrintFileMovedSuccessful(oldFileName, newFileName);
     }
 
     private void ExecuteCommandFileRemove(List<string> parameters)
     {
-        if (parameters.Count == 0)
+        if (parameters.Count < 1)
         {
-            throw new ApplicationException("You have not entered parameters for this command");
+            throw new ApplicationException("You have not entered the file name");
         }
 
         string fileName = parameters[0];
-
         fileService.RemoveFile(fileName);
         storageService.RemoveFile(fileName);
 
-        consolePrinter.PrintRemoveSuccessful(fileName);
+        consolePrinter.PrintFileRemovedSuccessful(fileName);
     }
 
     private void ExecuteCommandFileInfo(List<string> parameters)
     {
-        if (parameters.Count == 0)
+        if (parameters.Count < 1)
         {
-            throw new ApplicationException("You have not entered parameters for this command");
+            throw new ApplicationException("You have not entered the file name");
         }
 
         string fileName = parameters[0];

@@ -12,7 +12,7 @@ namespace FileStorage
             Console.WriteLine("storage used: {0}\n", userInfo.UsedStorage);
         }
 
-        public void PrintUploadSuccessful(FileUploadViewModel uploadViewModel)
+        public void PrintFileUploadedSuccessful(FileUploadViewModel uploadViewModel)
         {
             Console.WriteLine("\nThe file '{0}' has been uploaded.", uploadViewModel.FilePath);
             Console.WriteLine("- file name: '{0}'", uploadViewModel.FileName);
@@ -30,17 +30,17 @@ namespace FileStorage
             Console.WriteLine("- login: '{0}'\n", fileInfoViewModel.Login);
         }
 
-        public void PrintDownloadSuccessful(string fileName)
+        public void PrintFileDownloadedSuccessful(string fileName)
         {
             Console.WriteLine("\nThe file '{0}' has been downloaded\n", fileName);
         }
 
-        public void PrintMoveFileSuccessful(string oldFileName, string newFileName)
+        public void PrintFileMovedSuccessful(string oldFileName, string newFileName)
         {
             Console.WriteLine("\nThe file '{0}' has been moved to '{1}'\n", oldFileName, newFileName);
         }
 
-        public void PrintRemoveSuccessful(string fileName)
+        public void PrintFileRemovedSuccessful(string fileName)
         {
             Console.WriteLine("\nThe file '{0}' has been removedd\n", fileName);
         }
@@ -63,6 +63,11 @@ namespace FileStorage
         public void PrintExitMessage()
         {
             Console.WriteLine("You have been exit the application");
+        }
+
+        internal void PrintFileHasChanged(string fileName)
+        {
+            Console.WriteLine("\n!The file '{0}' has been downloaded, but it is different from that was uploaded (has changed/damaged)", fileName);
         }
     }
 }

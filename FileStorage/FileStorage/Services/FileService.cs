@@ -2,6 +2,9 @@
 using System;
 using System.Configuration;
 using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace FileStorage
 {
@@ -71,13 +74,13 @@ namespace FileStorage
             File.Move(filePath, newFilePath);
         }
 
-        public void RemoveFile(string FileName)
+        public void RemoveFile(string fileName)
         {
-            string filePath = Path.Combine(storagePath, FileName);
+            string filePath = Path.Combine(storagePath, fileName);
 
             if (!File.Exists(filePath))
             {
-                throw new ApplicationException($"File {FileName} is not exists");
+                throw new ApplicationException($"File {fileName} is not exists");
             }
 
             File.Delete(filePath);
@@ -93,10 +96,36 @@ namespace FileStorage
                 Extension = fileInfo.Extension,
                 FileName = fileInfo.Name,
                 Size = fileInfo.Length,
-                DownloadsNumber = 0
+                DownloadsNumber = 0,
+                Md5Hash = GetMD5Hash(filePath)
             };
 
             return storageFile;
+        }
+
+        private byte[] GetMD5Hash(string filePath)
+        {
+            using (var md5 = MD5.Create())
+            {
+                using (var stream = File.OpenRead(filePath))
+                {
+                    return md5.ComputeHash(stream);
+                }
+            }
+        }
+
+        public bool IsMd5HashMatch(string fileName, byte[] storageFileMd5Hash)
+        {
+            string filePath = Path.Combine(storagePath, fileName);
+            byte[] fileMD5Hash = GetMD5Hash(filePath);
+            if (fileMD5Hash.SequenceEqual(storageFileMd5Hash))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
