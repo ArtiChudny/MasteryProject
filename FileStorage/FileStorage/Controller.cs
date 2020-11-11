@@ -12,7 +12,7 @@ public class Controller
     private UserService userService;
     private StorageService storageService;
     private FileService fileService;
-    private Converter converter;
+    private ViewModelConverter viewModelConverter;
 
     public Controller(ConsolePrinter consolePrinter, StorageService storageService, FileService fileService)
     {
@@ -20,7 +20,7 @@ public class Controller
         this.storageService = storageService;
         this.fileService = fileService;
         userService = new UserService();
-        converter = new Converter();
+        viewModelConverter = new ViewModelConverter();
     }
 
     public void ExecuteConsoleCommand(StorageCommand command)
@@ -65,13 +65,7 @@ public class Controller
         User user = userService.GetUser();
         StorageInfo storageInfo = storageService.GetStorageInfo();
 
-        UserInfoViewModel userInfo = new UserInfoViewModel
-        {
-            Login = user.Login,
-            UsedStorage = converter.GetSizeString(storageInfo.UsedStorage),
-            CreationDate = converter.GetDateString(storageInfo.CreationDate)
-        };
-
+        UserInfoViewModel userInfo = viewModelConverter.ConvertToUserInfoViewModel(user, storageInfo);
         consolePrinter.PrintUserInformation(userInfo);
     }
 
@@ -98,14 +92,7 @@ public class Controller
         fileService.UploadFileIntoStorage(filePath);
         storageService.AddFileToStorage(storageFile);
 
-        FileUploadViewModel uploadViewModel = new FileUploadViewModel
-        {
-            FilePath = filePath,
-            FileName = storageFile.FileName,
-            FileSize = converter.GetSizeString(storageFile.Size),
-            Extension = storageFile.Extension
-        };
-
+        FileUploadViewModel uploadViewModel = viewModelConverter.ConvertToFileUploadViewModel(filePath, storageFile);
         consolePrinter.PrintFileUploadedSuccessful(uploadViewModel);
     }
 
@@ -173,16 +160,7 @@ public class Controller
         StorageFile storageFile = storageService.GetFileInfo(fileName);
         User user = userService.GetUser();
 
-        FileInfoViewModel fileInfoViewModel = new FileInfoViewModel
-        {
-            FileName = storageFile.FileName,
-            Extension = storageFile.Extension,
-            CreationDate = converter.GetDateString(storageFile.CreationDate),
-            FileSize = converter.GetSizeString(storageFile.Size),
-            DownloadsNumber = storageFile.DownloadsNumber,
-            Login = user.Login
-        };
-
+        FileInfoViewModel fileInfoViewModel = viewModelConverter.ConvertToFileInfoViewModel(user, storageFile);
         consolePrinter.PrintFileInfo(fileInfoViewModel);
     }
 }
