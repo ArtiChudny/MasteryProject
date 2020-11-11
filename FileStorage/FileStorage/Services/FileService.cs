@@ -89,7 +89,7 @@ namespace FileStorage
         {
             FileInfo fileInfo = new FileInfo(filePath);
 
-            StorageFile storageFile = new StorageFile
+            return new StorageFile
             {
                 CreationDate = fileInfo.CreationTime,
                 Extension = fileInfo.Extension,
@@ -97,9 +97,7 @@ namespace FileStorage
                 Size = fileInfo.Length,
                 DownloadsNumber = 0,
                 Md5Hash = GetMD5Hash(filePath)
-            };
-
-            return storageFile;
+            }; 
         }
 
         private byte[] GetMD5Hash(string filePath)

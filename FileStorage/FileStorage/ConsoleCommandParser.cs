@@ -70,7 +70,6 @@ namespace FileStorage
             throw new ApplicationException($"Wrong command: {rawCommand}.");
         }
 
-        //need fixing with getting parameters if it will contains spaces on " "
         private List<string> GetParametersList(string rawCommand, string commandName)
         {
             List<string> parametersList = new List<string>();
