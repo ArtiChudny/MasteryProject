@@ -3,6 +3,7 @@ using FileStorage.Enums;
 using FileStorage.Models;
 using FileStorage.Services;
 using FileStorage.ViewModels;
+using FileStorage.Helpers;
 using System;
 using System.Collections.Generic;
 
@@ -10,17 +11,13 @@ public class Controller
 {
     private ConsolePrinter consolePrinter;
     private UserService userService;
-    private StorageService storageService;
-    private FileService fileService;
-    private ViewModelConverter viewModelConverter;
+    private StorageFileService storageFileService;
 
-    public Controller(ConsolePrinter consolePrinter, StorageService storageService, FileService fileService)
+    public Controller(ConsolePrinter consolePrinter, StorageFileService storageFileService)
     {
         this.consolePrinter = consolePrinter;
-        this.storageService = storageService;
-        this.fileService = fileService;
+        this.storageFileService = storageFileService;
         userService = new UserService();
-        viewModelConverter = new ViewModelConverter();
     }
 
     public void ExecuteConsoleCommand(StorageCommand command)
@@ -63,9 +60,15 @@ public class Controller
     private void ExecuteCommandGetUserInfo()
     {
         User user = userService.GetUser();
-        StorageInfo storageInfo = storageService.GetStorageInfo();
+        StorageInfo storageInfo = storageFileService.GetStorageInfo();
 
-        UserInfoViewModel userInfo = viewModelConverter.ConvertToUserInfoViewModel(user, storageInfo);
+        UserInfoViewModel userInfo = new UserInfoViewModel
+        {
+            Login = user.Login,
+            UsedStorage = ConvertingHelper.GetSizeString(storageInfo.UsedStorage),
+            CreationDate = ConvertingHelper.GetDateString(storageInfo.CreationDate)
+        };
+
         consolePrinter.PrintUserInformation(userInfo);
     }
 
@@ -77,22 +80,16 @@ public class Controller
         }
 
         string filePath = parameters[0];
-        StorageFile storageFile = fileService.GetStorageFile(filePath);
+        StorageFile storageFile = storageFileService.UploadStorageFile(filePath);
 
-        if (!storageService.IsFileSizeLessThanMaxSize(storageFile.Size))
+        FileUploadViewModel uploadViewModel = new FileUploadViewModel
         {
-            throw new ApplicationException("The file exceeds the maximum size");
-        }
+            FilePath = filePath,
+            FileName = storageFile.FileName,
+            FileSize = ConvertingHelper.GetSizeString(storageFile.Size),
+            Extension = storageFile.Extension
+        };
 
-        if (!storageService.IsEnoughStorageSpace(storageFile.Size))
-        {
-            throw new ApplicationException("Not enough space in storage to upload the file");
-        }
-
-        fileService.UploadFileIntoStorage(filePath);
-        storageService.AddFileToStorage(storageFile);
-
-        FileUploadViewModel uploadViewModel = viewModelConverter.ConvertToFileUploadViewModel(filePath, storageFile);
         consolePrinter.PrintFileUploadedSuccessful(uploadViewModel);
     }
 
@@ -105,18 +102,9 @@ public class Controller
 
         string fileName = parameters[0];
         string destinationPath = parameters[1];
+        storageFileService.DownloadStorageFile(fileName, destinationPath);
 
-        fileService.DownloadFileFromStorage(fileName, destinationPath);
-        storageService.IncreaseDownloadsCounter(fileName);
-
-        if (fileService.IsMd5HashMatch(fileName, storageService.GetStorageFileMD5Hash(fileName)))
-        {
-            consolePrinter.PrintFileDownloadedSuccessful(fileName);
-        }
-        else
-        {
-            consolePrinter.PrintFileHasChanged(fileName);
-        }
+        consolePrinter.PrintFileDownloadedSuccessful(fileName);
     }
 
     private void ExecuteCommandFileMove(List<string> parameters)
@@ -128,9 +116,7 @@ public class Controller
 
         string oldFileName = parameters[0];
         string newFileName = parameters[1];
-
-        fileService.MoveFile(oldFileName, newFileName);
-        storageService.MoveFile(oldFileName, newFileName);
+        storageFileService.MoveStorageFile(oldFileName, newFileName);
 
         consolePrinter.PrintFileMovedSuccessful(oldFileName, newFileName);
     }
@@ -143,8 +129,7 @@ public class Controller
         }
 
         string fileName = parameters[0];
-        fileService.RemoveFile(fileName);
-        storageService.RemoveFile(fileName);
+        storageFileService.RemoveStorageFile(fileName);
 
         consolePrinter.PrintFileRemovedSuccessful(fileName);
     }
@@ -157,10 +142,19 @@ public class Controller
         }
 
         string fileName = parameters[0];
-        StorageFile storageFile = storageService.GetFileInfo(fileName);
+        StorageFile storageFile = storageFileService.GetFileInfo(fileName);
         User user = userService.GetUser();
 
-        FileInfoViewModel fileInfoViewModel = viewModelConverter.ConvertToFileInfoViewModel(user, storageFile);
+        FileInfoViewModel fileInfoViewModel = new FileInfoViewModel
+        {
+            FileName = storageFile.FileName,
+            Extension = storageFile.Extension,
+            CreationDate = ConvertingHelper.GetDateString(storageFile.CreationDate),
+            FileSize = ConvertingHelper.GetSizeString(storageFile.Size),
+            DownloadsNumber = storageFile.DownloadsNumber,
+            Login = user.Login
+        };
+
         consolePrinter.PrintFileInfo(fileInfoViewModel);
     }
 }

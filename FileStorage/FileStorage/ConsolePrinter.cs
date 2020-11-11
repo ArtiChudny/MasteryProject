@@ -63,11 +63,6 @@ namespace FileStorage
         public void PrintExitMessage()
         {
             Console.WriteLine("You have been exit the application");
-        }
-
-        internal void PrintFileHasChanged(string fileName)
-        {
-            Console.WriteLine("\n!The file '{0}' has been downloaded, but it is different from that was uploaded (has changed/damaged)", fileName);
-        }
+        }       
     }
 }

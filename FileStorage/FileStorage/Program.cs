@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
 using FileStorage.Enums;
 using FileStorage.Models;
 using FileStorage.Services;
@@ -12,21 +14,22 @@ namespace FileStorage
         {
             AuthService authService = new AuthService();
             ConsolePrinter consolePrinter = new ConsolePrinter();
-            StorageService storageService = new StorageService();
-            FileService fileSerice = new FileService();
-            Controller controller = new Controller(consolePrinter, storageService, fileSerice);
+            StorageFileService storageFileService = new StorageFileService();
+            Controller controller = new Controller(consolePrinter, storageFileService);
             ConsoleCommandParser consoleCommandParser = new ConsoleCommandParser();
-
-            CreateIfMissIntitialFiles(storageService, fileSerice);
 
             try
             {
+                InitializeStorage(storageFileService);
+
                 Dictionary<StorageFlags, string> flags = ConsoleFlagParser.Parse(args);
                 Credentials credentials = GetCredentials(flags);
+
                 if (!authService.IsAuthenticated(credentials))
                 {
                     throw new ApplicationException("Incorrect login or password");
                 }
+
                 consolePrinter.PrintAuthenticationSuccessful();
 
                 while (true)
@@ -91,13 +94,17 @@ namespace FileStorage
             return consoleCommandParser.Parse(rowCommand);
         }
 
-        private static void CreateIfMissIntitialFiles(StorageService storageService, FileService fileSerice)
+        private static void InitializeStorage(StorageFileService storageFileService)
         {
-            fileSerice.CreateIfMissInitialDirectories();
-            if (!storageService.IsStorageInfoFileExists())
+            string storageFilesPath = ConfigurationManager.AppSettings["StoragePath"];
+            string storagePath = Path.GetDirectoryName(ConfigurationManager.AppSettings["StorageInfoPath"]);
+
+            if (!Directory.Exists(storagePath) || !Directory.Exists(storageFilesPath))
             {
-                storageService.CreateStorageInfoFile();
-            }           
+                throw new ApplicationException($"Missing storage directory '{Path.GetFullPath(storagePath)}' or files directory '{Path.GetFullPath(storageFilesPath)}'");
+            }
+
+            storageFileService.InitializeStorage();
         }
     }
 }
