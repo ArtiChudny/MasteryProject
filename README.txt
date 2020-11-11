@@ -6,7 +6,7 @@ password:	storagePassword
 
 Max size of file is 2GB
 Max capacity of storage is 5GB
-The storage folder "Storage" is located in the same directory as the executable file.
+You should to create folder "Storage" which is located in the same directory as the executable file, and create folder "Files" inside folder "Storage".
 
 Сurrently available commands:
 user info 					- getting information about user.
