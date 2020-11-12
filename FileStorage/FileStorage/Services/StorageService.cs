@@ -29,28 +29,12 @@ namespace FileStorage.Services
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
 
-            if ((storageInfo.UsedStorage + fileSize) > maxStorage)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            return (storageInfo.UsedStorage + fileSize) > maxStorage;
         }
 
         public bool IsFileSizeLessThanMaxSize(long fileSize)
         {
-            StorageInfo storageInfo = DeserializeStorageInfoFile();
-
-            if (fileSize < maxFileSize)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return fileSize < maxFileSize;
         }
 
         public void AddFileToStorage(StorageFile storageFile)
@@ -120,6 +104,13 @@ namespace FileStorage.Services
 
         public void InitializeStorage()
         {
+            string storagePath = Path.GetDirectoryName(storageInfoPath);
+
+            if (!Directory.Exists(storagePath))
+            {
+                throw new ApplicationException($"Missing path '{Path.GetFullPath(storagePath)}'");
+            }
+
             if (!File.Exists(storageInfoPath))
             {
                 StorageInfo storageInfo = new StorageInfo();

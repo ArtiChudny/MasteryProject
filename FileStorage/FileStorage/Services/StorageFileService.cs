@@ -8,10 +8,10 @@ namespace FileStorage.Services
         private StorageService storageService;
         private FileService fileService;
 
-        public StorageFileService()
+        public StorageFileService(StorageService storageService, FileService fileService)
         {
-            storageService = new StorageService();
-            fileService = new FileService();
+            this.storageService = storageService;
+            this.fileService = fileService;
         }
 
         public StorageInfo GetStorageInfo()
@@ -58,18 +58,12 @@ namespace FileStorage.Services
 
         public void DownloadStorageFile(string fileName, string destinationPath)
         {
-            fileService.DownloadFileFromStorage(fileName, destinationPath);
-            storageService.IncreaseDownloadsCounter(fileName);
-
             if (!fileService.IsMd5HashMatch(fileName, storageService.GetStorageFileMD5Hash(fileName)))
             {
                 throw new ApplicationException("File has been damaged or changed");
             }
-        }
-
-        public void InitializeStorage()
-        {
-            storageService.InitializeStorage();
+            fileService.DownloadFileFromStorage(fileName, destinationPath);
+            storageService.IncreaseDownloadsCounter(fileName);
         }
     }
 }

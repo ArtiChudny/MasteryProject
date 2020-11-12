@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
 using FileStorage.Enums;
 using FileStorage.Models;
 using FileStorage.Services;
@@ -14,14 +12,13 @@ namespace FileStorage
         {
             AuthService authService = new AuthService();
             ConsolePrinter consolePrinter = new ConsolePrinter();
-            StorageFileService storageFileService = new StorageFileService();
-            Controller controller = new Controller(consolePrinter, storageFileService);
+            StorageService storageService = new StorageService();
+            FileService fileService = new FileService();
+            Controller controller = new Controller(consolePrinter, storageService, fileService);
             ConsoleCommandParser consoleCommandParser = new ConsoleCommandParser();
-
             try
             {
-                InitializeStorage(storageFileService);
-
+                InitializeStorage(storageService, fileService);
                 Dictionary<StorageFlags, string> flags = ConsoleFlagParser.Parse(args);
                 Credentials credentials = GetCredentials(flags);
 
@@ -94,17 +91,10 @@ namespace FileStorage
             return consoleCommandParser.Parse(rowCommand);
         }
 
-        private static void InitializeStorage(StorageFileService storageFileService)
+        private static void InitializeStorage(StorageService storageService, FileService fileService)
         {
-            string storageFilesPath = ConfigurationManager.AppSettings["StoragePath"];
-            string storagePath = Path.GetDirectoryName(ConfigurationManager.AppSettings["StorageInfoPath"]);
-
-            if (!Directory.Exists(storagePath) || !Directory.Exists(storageFilesPath))
-            {
-                throw new ApplicationException($"Missing storage directory '{Path.GetFullPath(storagePath)}' or files directory '{Path.GetFullPath(storageFilesPath)}'");
-            }
-
-            storageFileService.InitializeStorage();
+            storageService.InitializeStorage();
+            fileService.InitializeFileStorage();
         }
     }
 }

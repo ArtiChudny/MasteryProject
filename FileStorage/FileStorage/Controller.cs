@@ -11,12 +11,16 @@ public class Controller
 {
     private ConsolePrinter consolePrinter;
     private UserService userService;
+    private StorageService storageService;
+    private FileService fileService;
     private StorageFileService storageFileService;
 
-    public Controller(ConsolePrinter consolePrinter, StorageFileService storageFileService)
+    public Controller(ConsolePrinter consolePrinter, StorageService storageService, FileService fileService)
     {
         this.consolePrinter = consolePrinter;
-        this.storageFileService = storageFileService;
+        this.storageService = storageService;
+        this.fileService = fileService;
+        storageFileService = new StorageFileService(storageService, fileService);
         userService = new UserService();
     }
 
@@ -72,7 +76,7 @@ public class Controller
         consolePrinter.PrintUserInformation(userInfo);
     }
 
-    private void ExecuteCommandFileUpload(List<string> parameters)
+    private void ExecuteCommandFileUpload(IList<string> parameters)
     {
         if (parameters.Count < 1)
         {
@@ -93,7 +97,7 @@ public class Controller
         consolePrinter.PrintFileUploadedSuccessful(uploadViewModel);
     }
 
-    private void ExecuteCommandFileDownload(List<string> parameters)
+    private void ExecuteCommandFileDownload(IList<string> parameters)
     {
         if (parameters.Count < 2)
         {
@@ -107,7 +111,7 @@ public class Controller
         consolePrinter.PrintFileDownloadedSuccessful(fileName);
     }
 
-    private void ExecuteCommandFileMove(List<string> parameters)
+    private void ExecuteCommandFileMove(IList<string> parameters)
     {
         if (parameters.Count < 2)
         {
@@ -121,7 +125,7 @@ public class Controller
         consolePrinter.PrintFileMovedSuccessful(oldFileName, newFileName);
     }
 
-    private void ExecuteCommandFileRemove(List<string> parameters)
+    private void ExecuteCommandFileRemove(IList<string> parameters)
     {
         if (parameters.Count < 1)
         {
@@ -134,7 +138,7 @@ public class Controller
         consolePrinter.PrintFileRemovedSuccessful(fileName);
     }
 
-    private void ExecuteCommandFileInfo(List<string> parameters)
+    private void ExecuteCommandFileInfo(IList<string> parameters)
     {
         if (parameters.Count < 1)
         {
@@ -142,6 +146,8 @@ public class Controller
         }
 
         string fileName = parameters[0];
+
+
         StorageFile storageFile = storageFileService.GetFileInfo(fileName);
         User user = userService.GetUser();
 

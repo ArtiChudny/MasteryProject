@@ -9,20 +9,7 @@ namespace FileStorage
 {
     public class FileService
     {
-        string storagePath = ConfigurationManager.AppSettings["StoragePath"];
-        string storageInfoPath = ConfigurationManager.AppSettings["StorageInfoPath"];
-
-        public void CreateIfMissInitialDirectories()
-        {
-            if (!Directory.Exists(storagePath))
-            {
-                Directory.CreateDirectory(storagePath);
-            }
-            if (!Directory.Exists(Path.GetDirectoryName(storageInfoPath)))
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(storageInfoPath));
-            }
-        }
+        string storageFilesPath = ConfigurationManager.AppSettings["StorageFilesPath"];
 
         public void UploadFileIntoStorage(string filePath)
         {
@@ -31,13 +18,13 @@ namespace FileStorage
                 throw new ApplicationException($"Path {Path.GetFileName(filePath)} is not exists");
             }
 
-            string fullDestinationPath = Path.Combine(storagePath, Path.GetFileName(filePath));
+            string fullDestinationPath = Path.Combine(storageFilesPath, Path.GetFileName(filePath));
             File.Copy(filePath, fullDestinationPath);
         }
 
         public void DownloadFileFromStorage(string fileName, string destinationPath)
         {
-            string filePath = Path.Combine(storagePath, fileName);
+            string filePath = Path.Combine(storageFilesPath, fileName);
 
             if (!File.Exists(filePath))
             {
@@ -49,21 +36,21 @@ namespace FileStorage
                 throw new ApplicationException($"Directory {destinationPath} is not exists");
             }
 
-            string fullStorageFilePath = Path.Combine(storagePath, fileName);
+            string fullStorageFilePath = Path.Combine(storageFilesPath, fileName);
             string fullDestinationFilePath = Path.Combine(destinationPath, fileName);
             File.Copy(fullStorageFilePath, fullDestinationFilePath);
         }
 
         public void MoveFile(string oldFileName, string newFileName)
         {
-            string filePath = Path.Combine(storagePath, oldFileName);
+            string filePath = Path.Combine(storageFilesPath, oldFileName);
 
             if (!File.Exists(filePath))
             {
                 throw new ApplicationException($"File {oldFileName} is not exists");
             }
 
-            string newFilePath = Path.Combine(storagePath, newFileName);
+            string newFilePath = Path.Combine(storageFilesPath, newFileName);
 
             if (File.Exists(newFilePath))
             {
@@ -75,7 +62,7 @@ namespace FileStorage
 
         public void RemoveFile(string fileName)
         {
-            string filePath = Path.Combine(storagePath, fileName);
+            string filePath = Path.Combine(storageFilesPath, fileName);
 
             if (!File.Exists(filePath))
             {
@@ -97,7 +84,7 @@ namespace FileStorage
                 Size = fileInfo.Length,
                 DownloadsNumber = 0,
                 Md5Hash = GetMD5Hash(filePath)
-            }; 
+            };
         }
 
         private byte[] GetMD5Hash(string filePath)
@@ -113,7 +100,7 @@ namespace FileStorage
 
         public bool IsMd5HashMatch(string fileName, byte[] storageFileMd5Hash)
         {
-            string filePath = Path.Combine(storagePath, fileName);
+            string filePath = Path.Combine(storageFilesPath, fileName);
             byte[] fileMD5Hash = GetMD5Hash(filePath);
             if (fileMD5Hash.SequenceEqual(storageFileMd5Hash))
             {
@@ -122,6 +109,14 @@ namespace FileStorage
             else
             {
                 return false;
+            }
+        }
+
+        public void InitializeFileStorage()
+        {
+            if (!Directory.Exists(storageFilesPath))
+            {
+                throw new ApplicationException($"Missing path '{Path.GetFullPath(storageFilesPath)}'");
             }
         }
     }
