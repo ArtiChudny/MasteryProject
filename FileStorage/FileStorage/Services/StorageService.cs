@@ -2,7 +2,6 @@
 using System;
 using System.Configuration;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace FileStorage.Services
@@ -37,12 +36,24 @@ namespace FileStorage.Services
             return fileSize < maxFileSize;
         }
 
-        public void AddFileToStorage(string fileName, StorageFile storageFile)
+        public StorageFile CreateNewStorageFile(string fileName, long fileSize, byte[] hash, DateTime creationDate)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
-            storageInfo.UsedStorage += storageFile.Size;
+            storageInfo.UsedStorage += fileSize;
+            StorageFile storageFile = new StorageFile
+            {
+                Id = Guid.NewGuid(),
+                CreationDate = creationDate,
+                Extension = Path.GetExtension(fileName),
+                Size = fileSize,
+                Hash = hash,
+                DownloadsNumber = 0
+            };
+
             storageInfo.Files.Add(fileName, storageFile);
             SerializeStorageInfoFile(storageInfo);
+
+            return storageFile;
         }
 
         public void MoveFile(string oldFileName, string newFileName)
@@ -67,7 +78,14 @@ namespace FileStorage.Services
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
 
-            return storageInfo.Files[fileName];
+            if (storageInfo.Files.ContainsKey(fileName))
+            {
+                return storageInfo.Files[fileName];
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public byte[] GetStorageFileHash(string fileName)
@@ -118,14 +136,7 @@ namespace FileStorage.Services
             }
         }
 
-        public bool IsFileExists(string fileName)
-        {
-            StorageInfo storageInfo = DeserializeStorageInfoFile();
-
-            return storageInfo.Files.ContainsKey(fileName);
-        }
-
-        public string GetFileGuid(string fileName)
+        public Guid GetFileGuid(string fileName)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
 

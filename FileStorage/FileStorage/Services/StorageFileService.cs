@@ -23,7 +23,7 @@ namespace FileStorage.Services
 
         public StorageFile GetFileInfo(string fileName)
         {
-            if (!storageService.IsFileExists(fileName))
+            if (storageService.GetFileInfo(fileName) == null)
             {
                 throw new ApplicationException($"File '{fileName}' is not exists");
             }
@@ -33,14 +33,14 @@ namespace FileStorage.Services
 
         public void RemoveStorageFile(string fileName)
         {
-            if (!storageService.IsFileExists(fileName))
+            if (storageService.GetFileInfo(fileName) == null)
             {
                 throw new ApplicationException($"File '{fileName}' is not exists");
             }
 
-            string fileGuid = storageService.GetFileGuid(fileName);
+            Guid fileGuid = storageService.GetFileGuid(fileName);
             storageService.RemoveFile(fileName);
-            fileService.RemoveFile(fileGuid);
+            fileService.RemoveFile(fileGuid.ToString());
         }
 
         public void MoveStorageFile(string oldFileName, string newFileName)
@@ -50,46 +50,45 @@ namespace FileStorage.Services
 
         public StorageFile UploadStorageFile(string filePath)
         {
-            StorageFile storageFile = fileService.GetStorageFile(filePath);
+            FileInfoModel fileInfo = fileService.GetStorageFile(filePath);
             string fileName = Path.GetFileName(filePath);
 
-            if (storageService.IsFileExists(fileName))
+            if (storageService.GetFileInfo(fileName) != null)
             {
                 throw new ApplicationException("A file with the same name already exists in the storage");
             }
 
-            if (!storageService.IsFileSizeLessThanMaxSize(storageFile.Size))
+            if (!storageService.IsFileSizeLessThanMaxSize(fileInfo.Size))
             {
                 throw new ApplicationException("The file exceeds the maximum size");
             }
 
-            if (!storageService.IsEnoughStorageSpace(storageFile.Size))
+            if (!storageService.IsEnoughStorageSpace(fileInfo.Size))
             {
                 throw new ApplicationException("Not enough space in the storage to upload the file");
             }
 
-            storageService.AddFileToStorage(fileName, storageFile);
-            fileService.UploadFileIntoStorage(filePath, storageFile.Id);
-           
+            StorageFile storageFile = storageService.CreateNewStorageFile(fileName, fileInfo.Size, fileInfo.Hash, fileInfo.CreationDate);
+            fileService.UploadFileIntoStorage(filePath, storageFile.Id.ToString()) ;
 
             return storageFile;
         }
 
         public void DownloadStorageFile(string fileName, string destinationPath)
         {
-            if (!storageService.IsFileExists(fileName))
+            if (storageService.GetFileInfo(fileName) == null)
             {
                 throw new ApplicationException($"File {fileName} is not exists");
             }
 
-            string fileGuid = storageService.GetFileGuid(fileName);
+            StorageFile storageFile = storageService.GetFileInfo(fileName);
 
-            if (!fileService.IsHashMatch(fileGuid, storageService.GetStorageFileHash(fileName)))
+            if (!fileService.IsHashMatch(storageFile.Id.ToString(), storageFile.Hash))
             {
                 throw new ApplicationException("The file has been damaged or changed");
             }
 
-            fileService.DownloadFileFromStorage(fileName, fileGuid, destinationPath);
+            fileService.DownloadFileFromStorage(fileName, storageFile.Id.ToString(), destinationPath);
             storageService.IncreaseDownloadsCounter(fileName);
         }
     }

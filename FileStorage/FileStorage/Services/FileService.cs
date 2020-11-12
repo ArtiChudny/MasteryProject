@@ -22,14 +22,14 @@ namespace FileStorage
             File.Copy(filePath, fullDestinationPath);
         }
 
-        public void DownloadFileFromStorage(string fileName, string guid, string destinationPath)
+        public void DownloadFileFromStorage(string fileName, string storageFileName, string destinationPath)
         {
             if (!Directory.Exists(destinationPath))
             {
                 throw new ApplicationException($"Directory {destinationPath} is not exists");
             }
 
-            string fullStorageFilePath = Path.Combine(storageFilesPath, guid);
+            string fullStorageFilePath = Path.Combine(storageFilesPath, storageFileName);
             string fullDestinationFilePath = Path.Combine(destinationPath, fileName);
             File.Copy(fullStorageFilePath, fullDestinationFilePath);
         }
@@ -53,9 +53,9 @@ namespace FileStorage
             File.Move(filePath, newFilePath);
         }
 
-        public void RemoveFile(string guid)
+        public void RemoveFile(string fileName)
         {
-            string filePath = Path.Combine(storageFilesPath, guid);
+            string filePath = Path.Combine(storageFilesPath, fileName);
 
             if (!File.Exists(filePath))
             {
@@ -65,17 +65,14 @@ namespace FileStorage
             File.Delete(filePath);
         }
 
-        public StorageFile GetStorageFile(string filePath)
+        public FileInfoModel GetStorageFile(string filePath)
         {
             FileInfo fileInfo = new FileInfo(filePath);
 
-            return new StorageFile
+            return new FileInfoModel
             {
-                Id = Guid.NewGuid().ToString(),
                 CreationDate = fileInfo.CreationTime,
-                Extension = fileInfo.Extension,
                 Size = fileInfo.Length,
-                DownloadsNumber = 0,
                 Hash = GetHash(filePath)
             };
         }
@@ -91,11 +88,11 @@ namespace FileStorage
             }
         }
 
-        public bool IsHashMatch(string fileGuid, byte[] storageFileMd5Hash)
+        public bool IsHashMatch(string fileName, byte[] storageFileHash)
         {
-            string filePath = Path.Combine(storageFilesPath, fileGuid);
-            byte[] fileMD5Hash = GetHash(filePath);
-            if (fileMD5Hash.SequenceEqual(storageFileMd5Hash))
+            string filePath = Path.Combine(storageFilesPath, fileName);
+            byte[] fileHash = GetHash(filePath);
+            if (fileHash.SequenceEqual(storageFileHash))
             {
                 return true;
             }
