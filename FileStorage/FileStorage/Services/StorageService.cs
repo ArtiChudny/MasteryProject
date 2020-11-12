@@ -70,11 +70,11 @@ namespace FileStorage.Services
             return storageInfo.Files[fileName];
         }
 
-        public byte[] GetStorageFileMD5Hash(string fileName)
+        public byte[] GetStorageFileHash(string fileName)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
 
-            return storageInfo.Files[fileName].Md5Hash;
+            return storageInfo.Files[fileName].Hash;
         }
 
         private void SerializeStorageInfoFile(StorageInfo storageInfo)
@@ -129,7 +129,7 @@ namespace FileStorage.Services
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
 
-            return storageInfo.Files[fileName].Guid;
+            return storageInfo.Files[fileName].Id;
         }
     }
 }

@@ -68,8 +68,9 @@ namespace FileStorage.Services
                 throw new ApplicationException("Not enough space in the storage to upload the file");
             }
 
-            fileService.UploadFileIntoStorage(filePath, storageFile.Guid);
             storageService.AddFileToStorage(fileName, storageFile);
+            fileService.UploadFileIntoStorage(filePath, storageFile.Id);
+           
 
             return storageFile;
         }
@@ -83,7 +84,7 @@ namespace FileStorage.Services
 
             string fileGuid = storageService.GetFileGuid(fileName);
 
-            if (!fileService.IsMd5HashMatch(fileGuid, storageService.GetStorageFileMD5Hash(fileName)))
+            if (!fileService.IsHashMatch(fileGuid, storageService.GetStorageFileHash(fileName)))
             {
                 throw new ApplicationException("The file has been damaged or changed");
             }

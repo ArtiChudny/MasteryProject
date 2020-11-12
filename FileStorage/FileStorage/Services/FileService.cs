@@ -71,16 +71,16 @@ namespace FileStorage
 
             return new StorageFile
             {
-                Guid = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid().ToString(),
                 CreationDate = fileInfo.CreationTime,
                 Extension = fileInfo.Extension,
                 Size = fileInfo.Length,
                 DownloadsNumber = 0,
-                Md5Hash = GetMD5Hash(filePath)
+                Hash = GetHash(filePath)
             };
         }
 
-        private byte[] GetMD5Hash(string filePath)
+        private byte[] GetHash(string filePath)
         {
             using (var md5 = MD5.Create())
             {
@@ -91,10 +91,10 @@ namespace FileStorage
             }
         }
 
-        public bool IsMd5HashMatch(string fileGuid, byte[] storageFileMd5Hash)
+        public bool IsHashMatch(string fileGuid, byte[] storageFileMd5Hash)
         {
             string filePath = Path.Combine(storageFilesPath, fileGuid);
-            byte[] fileMD5Hash = GetMD5Hash(filePath);
+            byte[] fileMD5Hash = GetHash(filePath);
             if (fileMD5Hash.SequenceEqual(storageFileMd5Hash))
             {
                 return true;
