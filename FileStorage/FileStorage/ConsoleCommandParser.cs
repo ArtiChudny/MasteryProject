@@ -18,49 +18,50 @@ namespace FileStorage
         public StorageCommand Parse(string rawCommand)
         {
             StorageCommand storageCommand = new StorageCommand();
+            string lowerRawCommand = rawCommand.ToLower();
 
-            if (rawCommand.StartsWith(UserInfoCommandName))
+            if (lowerRawCommand.StartsWith(UserInfoCommandName))
             {
                 storageCommand.CommandType = StorageCommands.UserInfo;
                 storageCommand.Parameters = GetParametersList(rawCommand, UserInfoCommandName);
                 return storageCommand;
             }
 
-            if (rawCommand.StartsWith(ExitCommandName))
+            if (lowerRawCommand.StartsWith(ExitCommandName))
             {
                 storageCommand.CommandType = StorageCommands.Exit;
                 return storageCommand;
             }
 
-            if (rawCommand.StartsWith(FileUploadCommandName))
+            if (lowerRawCommand.StartsWith(FileUploadCommandName))
             {
                 storageCommand.CommandType = StorageCommands.FileUpload;
                 storageCommand.Parameters = GetParametersList(rawCommand, FileUploadCommandName);
                 return storageCommand;
             }
 
-            if (rawCommand.StartsWith(FileDownloadCommandName))
+            if (lowerRawCommand.StartsWith(FileDownloadCommandName))
             {
                 storageCommand.CommandType = StorageCommands.FileDownload;
                 storageCommand.Parameters = GetParametersList(rawCommand, FileDownloadCommandName);
                 return storageCommand;
             }
 
-            if (rawCommand.StartsWith(FileMoveCommandName))
+            if (lowerRawCommand.StartsWith(FileMoveCommandName))
             {
                 storageCommand.CommandType = StorageCommands.FileMove;
                 storageCommand.Parameters = GetParametersList(rawCommand, FileMoveCommandName);
                 return storageCommand;
             }
 
-            if (rawCommand.StartsWith(FileRemoveCommandName))
+            if (lowerRawCommand.StartsWith(FileRemoveCommandName))
             {
                 storageCommand.CommandType = StorageCommands.FileRemove;
                 storageCommand.Parameters = GetParametersList(rawCommand, FileRemoveCommandName);
                 return storageCommand;
             }
 
-            if (rawCommand.StartsWith(FileInfoCommandName))
+            if (lowerRawCommand.StartsWith(FileInfoCommandName))
             {
                 storageCommand.CommandType = StorageCommands.FileInfo;
                 storageCommand.Parameters = GetParametersList(rawCommand, FileInfoCommandName);

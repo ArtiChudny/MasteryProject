@@ -29,7 +29,7 @@ namespace FileStorage.Services
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
 
-            return (storageInfo.UsedStorage + fileSize) > maxStorage;
+            return (storageInfo.UsedStorage + fileSize) < maxStorage;
         }
 
         public bool IsFileSizeLessThanMaxSize(long fileSize)
@@ -37,44 +37,44 @@ namespace FileStorage.Services
             return fileSize < maxFileSize;
         }
 
-        public void AddFileToStorage(StorageFile storageFile)
+        public void AddFileToStorage(string fileName, StorageFile storageFile)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
             storageInfo.UsedStorage += storageFile.Size;
-            storageInfo.Files.Add(storageFile);
+            storageInfo.Files.Add(fileName, storageFile);
             SerializeStorageInfoFile(storageInfo);
         }
 
         public void MoveFile(string oldFileName, string newFileName)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
-            StorageFile storageFile = storageInfo.Files.Where(f => f.FileName == oldFileName).First();
-            storageFile.FileName = newFileName;
+            StorageFile storageFile = storageInfo.Files[oldFileName];
+            storageInfo.Files.Remove(oldFileName);
             storageFile.Extension = Path.GetExtension(newFileName);
+            storageInfo.Files.Add(newFileName, storageFile);
             SerializeStorageInfoFile(storageInfo);
         }
 
         public void RemoveFile(string fileName)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
-            StorageFile storageFile = storageInfo.Files.Where(f => f.FileName == fileName).First();
-            storageInfo.UsedStorage -= storageFile.Size;
-            storageInfo.Files.Remove(storageFile);
+            storageInfo.UsedStorage -= storageInfo.Files[fileName].Size;
+            storageInfo.Files.Remove(fileName);
             SerializeStorageInfoFile(storageInfo);
         }
 
         public StorageFile GetFileInfo(string fileName)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
-            StorageFile storageFile = storageInfo.Files.Where(f => f.FileName == fileName).First();
-            return storageFile;
+
+            return storageInfo.Files[fileName];
         }
 
         public byte[] GetStorageFileMD5Hash(string fileName)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
-            StorageFile storageFile = storageInfo.Files.Where(f => f.FileName == fileName).First();
-            return storageFile.Md5Hash;
+
+            return storageInfo.Files[fileName].Md5Hash;
         }
 
         private void SerializeStorageInfoFile(StorageInfo storageInfo)
@@ -98,7 +98,7 @@ namespace FileStorage.Services
         public void IncreaseDownloadsCounter(string fileName)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
-            storageInfo.Files.Where(f => f.FileName == fileName).First().DownloadsNumber++;
+            storageInfo.Files[fileName].DownloadsNumber++;
             SerializeStorageInfoFile(storageInfo);
         }
 
@@ -116,6 +116,20 @@ namespace FileStorage.Services
                 StorageInfo storageInfo = new StorageInfo();
                 SerializeStorageInfoFile(storageInfo);
             }
+        }
+
+        public bool IsFileExists(string fileName)
+        {
+            StorageInfo storageInfo = DeserializeStorageInfoFile();
+
+            return storageInfo.Files.ContainsKey(fileName);
+        }
+
+        public string GetFileGuid(string fileName)
+        {
+            StorageInfo storageInfo = DeserializeStorageInfoFile();
+
+            return storageInfo.Files[fileName].Guid;
         }
     }
 }

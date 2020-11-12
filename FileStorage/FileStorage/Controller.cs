@@ -6,6 +6,7 @@ using FileStorage.ViewModels;
 using FileStorage.Helpers;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 public class Controller
 {
@@ -89,7 +90,7 @@ public class Controller
         FileUploadViewModel uploadViewModel = new FileUploadViewModel
         {
             FilePath = filePath,
-            FileName = storageFile.FileName,
+            FileName = Path.GetFileName(filePath),
             FileSize = ConvertingHelper.GetSizeString(storageFile.Size),
             Extension = storageFile.Extension
         };
@@ -153,7 +154,7 @@ public class Controller
 
         FileInfoViewModel fileInfoViewModel = new FileInfoViewModel
         {
-            FileName = storageFile.FileName,
+            FileName = fileName,
             Extension = storageFile.Extension,
             CreationDate = ConvertingHelper.GetDateString(storageFile.CreationDate),
             FileSize = ConvertingHelper.GetSizeString(storageFile.Size),

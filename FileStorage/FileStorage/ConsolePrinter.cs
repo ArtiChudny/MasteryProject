@@ -42,7 +42,7 @@ namespace FileStorage
 
         public void PrintFileRemovedSuccessful(string fileName)
         {
-            Console.WriteLine("\nThe file '{0}' has been removedd\n", fileName);
+            Console.WriteLine("\nThe file '{0}' has been removed\n", fileName);
         }
 
         public void PrintAuthenticationSuccessful()

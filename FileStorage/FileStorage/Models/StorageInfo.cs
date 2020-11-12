@@ -8,13 +8,13 @@ namespace FileStorage.Models
     {
         public long UsedStorage { get; set; }
         public DateTime CreationDate { get; set; }
-        public IList<StorageFile> Files { get; set; }
+        public IDictionary<string, StorageFile> Files { get; set; }
 
         public StorageInfo()
         {
             UsedStorage = 0;
             CreationDate = DateTime.Today;
-            Files = new List<StorageFile>();
+            Files = new Dictionary<string, StorageFile>();
         }
     }
 }

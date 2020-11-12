@@ -1,5 +1,7 @@
 ﻿using FileStorage.Models;
 using System;
+using System.IO;
+using System.Runtime.Serialization;
 
 namespace FileStorage.Services
 {
@@ -21,24 +23,40 @@ namespace FileStorage.Services
 
         public StorageFile GetFileInfo(string fileName)
         {
+            if (!storageService.IsFileExists(fileName))
+            {
+                throw new ApplicationException($"File '{fileName}' is not exists");
+            }
+
             return storageService.GetFileInfo(fileName);
         }
 
         public void RemoveStorageFile(string fileName)
         {
-            fileService.RemoveFile(fileName);
+            if (!storageService.IsFileExists(fileName))
+            {
+                throw new ApplicationException($"File '{fileName}' is not exists");
+            }
+
+            string fileGuid = storageService.GetFileGuid(fileName);
             storageService.RemoveFile(fileName);
+            fileService.RemoveFile(fileGuid);
         }
 
         public void MoveStorageFile(string oldFileName, string newFileName)
         {
-            fileService.MoveFile(oldFileName, newFileName);
             storageService.MoveFile(oldFileName, newFileName);
         }
 
         public StorageFile UploadStorageFile(string filePath)
         {
             StorageFile storageFile = fileService.GetStorageFile(filePath);
+            string fileName = Path.GetFileName(filePath);
+
+            if (storageService.IsFileExists(fileName))
+            {
+                throw new ApplicationException("A file with the same name already exists in the storage");
+            }
 
             if (!storageService.IsFileSizeLessThanMaxSize(storageFile.Size))
             {
@@ -47,22 +65,30 @@ namespace FileStorage.Services
 
             if (!storageService.IsEnoughStorageSpace(storageFile.Size))
             {
-                throw new ApplicationException("Not enough space in storage to upload the file");
+                throw new ApplicationException("Not enough space in the storage to upload the file");
             }
 
-            fileService.UploadFileIntoStorage(filePath);
-            storageService.AddFileToStorage(storageFile);
+            fileService.UploadFileIntoStorage(filePath, storageFile.Guid);
+            storageService.AddFileToStorage(fileName, storageFile);
 
             return storageFile;
         }
 
         public void DownloadStorageFile(string fileName, string destinationPath)
         {
-            if (!fileService.IsMd5HashMatch(fileName, storageService.GetStorageFileMD5Hash(fileName)))
+            if (!storageService.IsFileExists(fileName))
             {
-                throw new ApplicationException("File has been damaged or changed");
+                throw new ApplicationException($"File {fileName} is not exists");
             }
-            fileService.DownloadFileFromStorage(fileName, destinationPath);
+
+            string fileGuid = storageService.GetFileGuid(fileName);
+
+            if (!fileService.IsMd5HashMatch(fileGuid, storageService.GetStorageFileMD5Hash(fileName)))
+            {
+                throw new ApplicationException("The file has been damaged or changed");
+            }
+
+            fileService.DownloadFileFromStorage(fileName, fileGuid, destinationPath);
             storageService.IncreaseDownloadsCounter(fileName);
         }
     }

@@ -11,32 +11,25 @@ namespace FileStorage
     {
         string storageFilesPath = ConfigurationManager.AppSettings["StorageFilesPath"];
 
-        public void UploadFileIntoStorage(string filePath)
+        public void UploadFileIntoStorage(string filePath, string guid)
         {
             if (!File.Exists(filePath))
             {
-                throw new ApplicationException($"Path {Path.GetFileName(filePath)} is not exists");
+                throw new ApplicationException($"File with such directory '{Path.GetFileName(filePath)}' is not exists");
             }
 
-            string fullDestinationPath = Path.Combine(storageFilesPath, Path.GetFileName(filePath));
+            string fullDestinationPath = Path.Combine(storageFilesPath, guid);
             File.Copy(filePath, fullDestinationPath);
         }
 
-        public void DownloadFileFromStorage(string fileName, string destinationPath)
+        public void DownloadFileFromStorage(string fileName, string guid, string destinationPath)
         {
-            string filePath = Path.Combine(storageFilesPath, fileName);
-
-            if (!File.Exists(filePath))
-            {
-                throw new ApplicationException($"File {fileName} is not exists");
-            }
-
             if (!Directory.Exists(destinationPath))
             {
                 throw new ApplicationException($"Directory {destinationPath} is not exists");
             }
 
-            string fullStorageFilePath = Path.Combine(storageFilesPath, fileName);
+            string fullStorageFilePath = Path.Combine(storageFilesPath, guid);
             string fullDestinationFilePath = Path.Combine(destinationPath, fileName);
             File.Copy(fullStorageFilePath, fullDestinationFilePath);
         }
@@ -60,13 +53,13 @@ namespace FileStorage
             File.Move(filePath, newFilePath);
         }
 
-        public void RemoveFile(string fileName)
+        public void RemoveFile(string guid)
         {
-            string filePath = Path.Combine(storageFilesPath, fileName);
+            string filePath = Path.Combine(storageFilesPath, guid);
 
             if (!File.Exists(filePath))
             {
-                throw new ApplicationException($"File {fileName} is not exists");
+                throw new ApplicationException($"File is not exists");
             }
 
             File.Delete(filePath);
@@ -78,9 +71,9 @@ namespace FileStorage
 
             return new StorageFile
             {
+                Guid = Guid.NewGuid().ToString(),
                 CreationDate = fileInfo.CreationTime,
                 Extension = fileInfo.Extension,
-                FileName = fileInfo.Name,
                 Size = fileInfo.Length,
                 DownloadsNumber = 0,
                 Md5Hash = GetMD5Hash(filePath)
@@ -98,9 +91,9 @@ namespace FileStorage
             }
         }
 
-        public bool IsMd5HashMatch(string fileName, byte[] storageFileMd5Hash)
+        public bool IsMd5HashMatch(string fileGuid, byte[] storageFileMd5Hash)
         {
-            string filePath = Path.Combine(storageFilesPath, fileName);
+            string filePath = Path.Combine(storageFilesPath, fileGuid);
             byte[] fileMD5Hash = GetMD5Hash(filePath);
             if (fileMD5Hash.SequenceEqual(storageFileMd5Hash))
             {

@@ -81,7 +81,7 @@ namespace FileStorage
         private static StorageCommand GetCommand(ConsolePrinter consolePrinter, ConsoleCommandParser consoleCommandParser)
         {
             consolePrinter.PrintСommandWaitingIcon();
-            string rowCommand = Console.ReadLine().ToLower().Trim();
+            string rowCommand = Console.ReadLine().Trim();
 
             if (string.IsNullOrWhiteSpace(rowCommand))
             {
