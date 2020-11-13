@@ -10,19 +10,23 @@ namespace FileStorage
     {
         static void Main(string[] args)
         {
-            ConsolePrinter consolePrinter = new ConsolePrinter();
-            Controller controller = new Controller(consolePrinter);
             AuthService authService = new AuthService();
+            ConsolePrinter consolePrinter = new ConsolePrinter();
+            StorageService storageService = new StorageService();
+            FileService fileService = new FileService();
+            Controller controller = new Controller(consolePrinter, storageService, fileService);
             ConsoleCommandParser consoleCommandParser = new ConsoleCommandParser();
-
             try
             {
+                InitializeStorage(storageService, fileService);
                 Dictionary<StorageFlags, string> flags = ConsoleFlagParser.Parse(args);
                 Credentials credentials = GetCredentials(flags);
+
                 if (!authService.IsAuthenticated(credentials))
                 {
                     throw new ApplicationException("Incorrect login or password");
                 }
+
                 consolePrinter.PrintAuthenticationSuccessful();
 
                 while (true)
@@ -46,6 +50,7 @@ namespace FileStorage
             catch (Exception ex)
             {
                 consolePrinter.PrintErrorMessage(ex.Message);
+                Environment.Exit(-1);
             }
         }
 
@@ -76,7 +81,7 @@ namespace FileStorage
         private static StorageCommand GetCommand(ConsolePrinter consolePrinter, ConsoleCommandParser consoleCommandParser)
         {
             consolePrinter.PrintСommandWaitingIcon();
-            string rowCommand = Console.ReadLine().ToLower().Trim();
+            string rowCommand = Console.ReadLine().Trim();
 
             if (string.IsNullOrWhiteSpace(rowCommand))
             {
@@ -84,6 +89,12 @@ namespace FileStorage
             }
 
             return consoleCommandParser.Parse(rowCommand);
+        }
+
+        private static void InitializeStorage(StorageService storageService, FileService fileService)
+        {
+            storageService.InitializeStorage();
+            fileService.InitializeFileStorage();
         }
     }
 }
