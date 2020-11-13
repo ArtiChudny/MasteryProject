@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using FileStorage.Enums;
 using FileStorage.Models;
 
@@ -14,6 +15,7 @@ namespace FileStorage
         private const string FileMoveCommandName = "file move";
         private const string FileRemoveCommandName = "file remove";
         private const string FileInfoCommandName = "file info";
+        private const string FileExportCommandName = "file export";
 
         public StorageCommand Parse(string rawCommand)
         {

@@ -8,6 +8,7 @@
         FileMove,
         FileRemove,
         FileInfo,
+        FileExport,
         Exit
     }
 }
