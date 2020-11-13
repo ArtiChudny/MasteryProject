@@ -9,7 +9,7 @@ namespace FileStorage
 {
     public class FileService
     {
-        string storageFilesPath = ConfigurationManager.AppSettings["StorageFilesPath"];
+        private string storageFilesPath = ConfigurationManager.AppSettings["StorageFilesPath"];
 
         public void UploadFileIntoStorage(string filePath, string guid)
         {

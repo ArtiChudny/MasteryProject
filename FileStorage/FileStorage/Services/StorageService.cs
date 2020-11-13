@@ -8,9 +8,9 @@ namespace FileStorage.Services
 {
     public class StorageService
     {
-        string storageInfoPath = ConfigurationManager.AppSettings["StorageInfoPath"];
-        long maxStorage = Convert.ToInt64(ConfigurationManager.AppSettings["MaxStorage"]);
-        long maxFileSize = Convert.ToInt64(ConfigurationManager.AppSettings["MaxFileSize"]);
+        private string storageInfoPath = ConfigurationManager.AppSettings["StorageInfoPath"];
+        private long maxStorage = Convert.ToInt64(ConfigurationManager.AppSettings["MaxStorage"]);
+        private long maxFileSize = Convert.ToInt64(ConfigurationManager.AppSettings["MaxFileSize"]);
 
         BinaryFormatter binaryFormatter;
 
@@ -134,13 +134,6 @@ namespace FileStorage.Services
                 StorageInfo storageInfo = new StorageInfo();
                 SerializeStorageInfoFile(storageInfo);
             }
-        }
-
-        public Guid GetFileGuid(string fileName)
-        {
-            StorageInfo storageInfo = DeserializeStorageInfoFile();
-
-            return storageInfo.Files[fileName].Id;
         }
     }
 }

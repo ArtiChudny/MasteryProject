@@ -1,7 +1,6 @@
 ﻿using FileStorage.Models;
 using System;
 using System.IO;
-using System.Runtime.Serialization;
 
 namespace FileStorage.Services
 {
@@ -23,24 +22,28 @@ namespace FileStorage.Services
 
         public StorageFile GetFileInfo(string fileName)
         {
-            if (storageService.GetFileInfo(fileName) == null)
+            StorageFile storageFile = storageService.GetFileInfo(fileName);
+
+            if (storageFile == null)
             {
                 throw new ApplicationException($"File '{fileName}' is not exists");
             }
 
-            return storageService.GetFileInfo(fileName);
+            return storageFile;
         }
 
         public void RemoveStorageFile(string fileName)
         {
-            if (storageService.GetFileInfo(fileName) == null)
+            StorageFile storageFile = storageService.GetFileInfo(fileName);
+
+            if (storageFile == null)
             {
                 throw new ApplicationException($"File '{fileName}' is not exists");
             }
 
-            Guid fileGuid = storageService.GetFileGuid(fileName);
+            string storageFileName = storageFile.Id.ToString();
             storageService.RemoveFile(fileName);
-            fileService.RemoveFile(fileGuid.ToString());
+            fileService.RemoveFile(storageFileName);
         }
 
         public void MoveStorageFile(string oldFileName, string newFileName)
@@ -69,26 +72,28 @@ namespace FileStorage.Services
             }
 
             StorageFile storageFile = storageService.CreateNewStorageFile(fileName, fileInfo.Size, fileInfo.Hash, fileInfo.CreationDate);
-            fileService.UploadFileIntoStorage(filePath, storageFile.Id.ToString()) ;
+            string storageFileName = storageFile.Id.ToString();
+            fileService.UploadFileIntoStorage(filePath, storageFileName);
 
             return storageFile;
         }
 
         public void DownloadStorageFile(string fileName, string destinationPath)
         {
-            if (storageService.GetFileInfo(fileName) == null)
-            {
-                throw new ApplicationException($"File {fileName} is not exists");
-            }
-
             StorageFile storageFile = storageService.GetFileInfo(fileName);
+
+            if (storageFile == null)
+            {
+                throw new ApplicationException($"File '{fileName}' is not exists");
+            }
 
             if (!fileService.IsHashMatch(storageFile.Id.ToString(), storageFile.Hash))
             {
                 throw new ApplicationException("The file has been damaged or changed");
             }
 
-            fileService.DownloadFileFromStorage(fileName, storageFile.Id.ToString(), destinationPath);
+            string storageFileName = storageFile.Id.ToString();
+            fileService.DownloadFileFromStorage(fileName, storageFileName, destinationPath);
             storageService.IncreaseDownloadsCounter(fileName);
         }
     }

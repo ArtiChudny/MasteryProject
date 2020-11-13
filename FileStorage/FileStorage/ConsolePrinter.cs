@@ -63,6 +63,6 @@ namespace FileStorage
         public void PrintExitMessage()
         {
             Console.WriteLine("You have been exit the application");
-        }       
+        }
     }
 }
