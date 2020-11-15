@@ -71,6 +71,13 @@ namespace FileStorage
                 return storageCommand;
             }
 
+            if (lowerRawCommand.StartsWith(FileExportCommandName))
+            {
+                storageCommand.CommandType = StorageCommands.FileExport;
+                storageCommand.Options = GetOptions(rawCommand, FileExportCommandName);
+                return storageCommand;
+            }
+
             throw new ApplicationException($"Wrong command: {rawCommand}.");
         }
 

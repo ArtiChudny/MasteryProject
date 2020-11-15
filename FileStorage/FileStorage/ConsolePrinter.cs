@@ -64,5 +64,14 @@ namespace FileStorage
         {
             Console.WriteLine("You have been exit the application");
         }
+
+        public void PrintExportFormats(string[] formats)
+        {
+            Console.WriteLine();
+            foreach (var format in formats)
+            {
+                Console.WriteLine("- {0}", format);
+            }
+        }
     }
 }

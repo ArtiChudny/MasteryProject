@@ -16,6 +16,7 @@ namespace FileStorage
             FileService fileService = new FileService();
             Controller controller = new Controller(consolePrinter, storageService, fileService);
             ConsoleCommandParser consoleCommandParser = new ConsoleCommandParser();
+
             try
             {
                 InitializeStorage(storageService, fileService);

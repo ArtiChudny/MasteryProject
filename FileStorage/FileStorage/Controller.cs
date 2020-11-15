@@ -58,6 +58,11 @@ public class Controller
                     ExecuteCommandFileInfo(command.Options);
                     break;
                 }
+            case StorageCommands.FileExport:
+                {
+                    ExecuteCommandFileExport(command.Options);
+                    break;
+                }
         }
     }
 
@@ -162,5 +167,18 @@ public class Controller
         };
 
         consolePrinter.PrintFileInfo(fileInfoViewModel);
+    }
+
+    private void ExecuteCommandFileExport(Options options)
+    {
+        string[] formats = { "json", "xml" };
+
+        if (options.Parameters.Count == 0)
+        {
+            if (options.Flags.ContainsKey(StorageFlags.Info))
+            {
+                consolePrinter.PrintExportFormats(formats);
+            }
+        }
     }
 }

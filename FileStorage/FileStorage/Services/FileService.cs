@@ -4,6 +4,8 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text.Json;
+using System.Xml.Serialization;
 
 namespace FileStorage
 {
@@ -107,6 +109,44 @@ namespace FileStorage
             if (!Directory.Exists(storageFilesPath))
             {
                 throw new ApplicationException($"Missing path '{Path.GetFullPath(storageFilesPath)}'");
+            }
+        }
+
+        public void ExportFile(object storageInfo, string destinationPath, string format = "json")
+        {
+            switch (format)
+            {
+                case "json":
+                    {
+                        ExportFileToJSON(storageInfo, destinationPath);
+                        break;
+                    }
+                case "xml":
+                    {
+                        ExportFileToXML(storageInfo, destinationPath);
+                        break;
+                    }
+                default:
+                    {
+                        throw new ApplicationException($"Unknown format {format}");
+                    }
+            }
+        }
+
+        private void ExportFileToXML(object storageInfo, string destinationPath)
+        {
+            using (FileStream fileStream = new FileStream(destinationPath, FileMode.OpenOrCreate))
+            {
+                XmlSerializer formatter = new XmlSerializer(typeof(StorageInfo));
+                formatter.Serialize(fileStream, storageInfo);
+            }
+        }
+
+        private void ExportFileToJSON(object storageInfo, string destinationPath)
+        {
+            using (FileStream fileStream = new FileStream(destinationPath, FileMode.OpenOrCreate))
+            {
+                JsonSerializer.SerializeAsync(fileStream, storageInfo);
             }
         }
     }
