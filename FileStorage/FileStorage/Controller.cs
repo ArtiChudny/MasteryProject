@@ -5,7 +5,6 @@ using FileStorage.Services;
 using FileStorage.ViewModels;
 using FileStorage.Helpers;
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 public class Controller
@@ -36,27 +35,27 @@ public class Controller
                 }
             case StorageCommands.FileUpload:
                 {
-                    ExecuteCommandFileUpload(command.Parameters);
+                    ExecuteCommandFileUpload(command.Options);
                     break;
                 }
             case StorageCommands.FileDownload:
                 {
-                    ExecuteCommandFileDownload(command.Parameters);
+                    ExecuteCommandFileDownload(command.Options);
                     break;
                 }
             case StorageCommands.FileMove:
                 {
-                    ExecuteCommandFileMove(command.Parameters);
+                    ExecuteCommandFileMove(command.Options);
                     break;
                 }
             case StorageCommands.FileRemove:
                 {
-                    ExecuteCommandFileRemove(command.Parameters);
+                    ExecuteCommandFileRemove(command.Options);
                     break;
                 }
             case StorageCommands.FileInfo:
                 {
-                    ExecuteCommandFileInfo(command.Parameters);
+                    ExecuteCommandFileInfo(command.Options);
                     break;
                 }
         }
@@ -77,14 +76,14 @@ public class Controller
         consolePrinter.PrintUserInformation(userInfo);
     }
 
-    private void ExecuteCommandFileUpload(IList<string> parameters)
+    private void ExecuteCommandFileUpload(Options options)
     {
-        if (parameters.Count < 1)
+        if (options.Parameters.Count < 1)
         {
             throw new ApplicationException("You have to enter path to uploading the file");
         }
 
-        string filePath = parameters[0];
+        string filePath = options.Parameters[0];
         StorageFile storageFile = storageFileService.UploadStorageFile(filePath);
 
         FileUploadViewModel uploadViewModel = new FileUploadViewModel
@@ -98,55 +97,55 @@ public class Controller
         consolePrinter.PrintFileUploadedSuccessful(uploadViewModel);
     }
 
-    private void ExecuteCommandFileDownload(IList<string> parameters)
+    private void ExecuteCommandFileDownload(Options options)
     {
-        if (parameters.Count < 2)
+        if (options.Parameters.Count < 2)
         {
             throw new ApplicationException("You have not entered parameters for this command");
         }
 
-        string fileName = parameters[0];
-        string destinationPath = parameters[1];
+        string fileName = options.Parameters[0];
+        string destinationPath = options.Parameters[1];
         storageFileService.DownloadStorageFile(fileName, destinationPath);
 
         consolePrinter.PrintFileDownloadedSuccessful(fileName);
     }
 
-    private void ExecuteCommandFileMove(IList<string> parameters)
+    private void ExecuteCommandFileMove(Options options)
     {
-        if (parameters.Count < 2)
+        if (options.Parameters.Count < 2)
         {
             throw new ApplicationException("You have not entered parameters for this command");
         }
 
-        string oldFileName = parameters[0];
-        string newFileName = parameters[1];
+        string oldFileName = options.Parameters[0];
+        string newFileName = options.Parameters[1];
         storageFileService.MoveStorageFile(oldFileName, newFileName);
 
         consolePrinter.PrintFileMovedSuccessful(oldFileName, newFileName);
     }
 
-    private void ExecuteCommandFileRemove(IList<string> parameters)
+    private void ExecuteCommandFileRemove(Options options)
     {
-        if (parameters.Count < 1)
+        if (options.Parameters.Count < 1)
         {
             throw new ApplicationException("You have not entered the file name");
         }
 
-        string fileName = parameters[0];
+        string fileName = options.Parameters[0];
         storageFileService.RemoveStorageFile(fileName);
 
         consolePrinter.PrintFileRemovedSuccessful(fileName);
     }
 
-    private void ExecuteCommandFileInfo(IList<string> parameters)
+    private void ExecuteCommandFileInfo(Options options)
     {
-        if (parameters.Count < 1)
+        if (options.Parameters.Count < 1)
         {
             throw new ApplicationException("You have not entered the file name");
         }
 
-        string fileName = parameters[0];
+        string fileName = options.Parameters[0];
 
 
         StorageFile storageFile = storageFileService.GetFileInfo(fileName);

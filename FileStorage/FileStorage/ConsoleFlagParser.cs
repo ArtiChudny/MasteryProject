@@ -33,7 +33,7 @@ namespace FileStorage
             return flagsValues;
         }
 
-        private static StorageFlags GetFlag(string flagName)
+        public static StorageFlags GetFlag(string flagName)
         {
             switch (flagName)
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using FileStorage.Enums;
 using FileStorage.Models;
@@ -25,7 +26,7 @@ namespace FileStorage
             if (lowerRawCommand.StartsWith(UserInfoCommandName))
             {
                 storageCommand.CommandType = StorageCommands.UserInfo;
-                storageCommand.Parameters = GetParametersList(rawCommand, UserInfoCommandName);
+                storageCommand.Options = GetOptions(rawCommand, UserInfoCommandName);
                 return storageCommand;
             }
 
@@ -38,58 +39,77 @@ namespace FileStorage
             if (lowerRawCommand.StartsWith(FileUploadCommandName))
             {
                 storageCommand.CommandType = StorageCommands.FileUpload;
-                storageCommand.Parameters = GetParametersList(rawCommand, FileUploadCommandName);
+                storageCommand.Options = GetOptions(rawCommand, FileUploadCommandName);
                 return storageCommand;
             }
 
             if (lowerRawCommand.StartsWith(FileDownloadCommandName))
             {
                 storageCommand.CommandType = StorageCommands.FileDownload;
-                storageCommand.Parameters = GetParametersList(rawCommand, FileDownloadCommandName);
+                storageCommand.Options = GetOptions(rawCommand, FileDownloadCommandName);
                 return storageCommand;
             }
 
             if (lowerRawCommand.StartsWith(FileMoveCommandName))
             {
                 storageCommand.CommandType = StorageCommands.FileMove;
-                storageCommand.Parameters = GetParametersList(rawCommand, FileMoveCommandName);
+                storageCommand.Options = GetOptions(rawCommand, FileMoveCommandName);
                 return storageCommand;
             }
 
             if (lowerRawCommand.StartsWith(FileRemoveCommandName))
             {
                 storageCommand.CommandType = StorageCommands.FileRemove;
-                storageCommand.Parameters = GetParametersList(rawCommand, FileRemoveCommandName);
+                storageCommand.Options = GetOptions(rawCommand, FileRemoveCommandName);
                 return storageCommand;
             }
 
             if (lowerRawCommand.StartsWith(FileInfoCommandName))
             {
                 storageCommand.CommandType = StorageCommands.FileInfo;
-                storageCommand.Parameters = GetParametersList(rawCommand, FileInfoCommandName);
+                storageCommand.Options = GetOptions(rawCommand, FileInfoCommandName);
                 return storageCommand;
             }
 
             throw new ApplicationException($"Wrong command: {rawCommand}.");
         }
 
-        private List<string> GetParametersList(string rawCommand, string commandName)
+        private Options GetOptions(string rawCommand, string commandName)
         {
-            List<string> parametersList = new List<string>();
             string parametersString = rawCommand.Replace(commandName, string.Empty).Trim();
+            string regPattern = @"""([\w\s\/.]*)""|(-?-?[\w.]*)";
 
-            if (parametersString != string.Empty)
+            List<string> parametersList = Regex.Matches(parametersString, regPattern).Cast<Match>().Select(m => m.Value).ToList();
+            parametersList.RemoveAll(item => item == string.Empty);
+
+            Options options = new Options();
+
+            for (int i = 0; i < parametersList.Count; i++)
             {
-                string[] parameters = parametersString.Split(" \"");
-                for (int argIndex = 0; argIndex < parameters.Length; argIndex++)
+                if (parametersList[i].StartsWith("--"))
                 {
-                    parametersList.Add(parameters[argIndex].Trim().Replace("\"", string.Empty));
+                    StorageFlags flag = ConsoleFlagParser.GetFlag(parametersList[i]);
+                    string flagValue = string.Empty;
+
+                    if (i + 1 < parametersList.Count)
+                    {
+                        if (!parametersList[i + 1].StartsWith("--"))
+                        {
+                            flagValue = parametersList[i + 1];
+                            i++;
+                        }
+                    }
+
+                    options.Flags.Add(flag, flagValue);
+                }
+                else
+                {
+                    string parameter = parametersList[i].Replace("\"", string.Empty).Trim();
+                    options.Parameters.Add(parameter);
                 }
             }
 
-            return parametersList;
+            return options;
         }
     }
 }
-
-
