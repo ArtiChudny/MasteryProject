@@ -18,6 +18,7 @@ namespace FileStorage
         private const string FileRemoveCommandName = "file remove";
         private const string FileInfoCommandName = "file info";
         private const string FileExportCommandName = "file export";
+        private const string FlagIndicator = "--";
 
         public ConsoleCommandParser(ConsoleFlagParser consoleFlagParser)
         {
@@ -97,27 +98,17 @@ namespace FileStorage
 
             Options options = new Options();
 
-            for (int i = 0; i < parametersList.Count; i++)
+            for (int listIndex = 0; listIndex < parametersList.Count; listIndex++)
             {
-                if (parametersList[i].StartsWith("--"))
+                if (parametersList[listIndex].StartsWith(FlagIndicator))
                 {
-                    StorageFlags flag = consoleFlagParser.GetFlag(parametersList[i]);
-                    string flagValue = string.Empty;
-
-                    if (i + 1 < parametersList.Count)
-                    {
-                        if (!parametersList[i + 1].StartsWith("--"))
-                        {
-                            flagValue = parametersList[i + 1];
-                            i++;
-                        }
-                    }
-
-                    options.Flags.Add(flag, flagValue);
+                    string[] flags = parametersList.GetRange(listIndex, parametersList.Count - listIndex).ToArray();
+                    options.Flags = consoleFlagParser.Parse(flags);
+                    break;
                 }
                 else
                 {
-                    string parameter = parametersList[i].Replace("\"", string.Empty).Trim();
+                    string parameter = parametersList[listIndex].Replace("\"", string.Empty).Trim();
                     options.Parameters.Add(parameter);
                 }
             }

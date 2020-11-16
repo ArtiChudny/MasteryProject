@@ -1,4 +1,5 @@
 ﻿using FileStorage.Models;
+using FileStorage.Constants;
 using System;
 using System.Configuration;
 using System.IO;
@@ -6,7 +7,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Xml.Serialization;
-using System.Threading.Tasks;
 
 namespace FileStorage
 {
@@ -113,23 +113,30 @@ namespace FileStorage
             }
         }
 
-        public void ExportFile(object serializableObject, string destinationPath, string format)
+        public void ExportFile(SerializableStorageInfo storageInfo, string destinationPath, string format)
         {
+            string directoryPath = Path.GetDirectoryName(destinationPath);
+
+            if (!Directory.Exists(directoryPath))
+            {
+                throw new ApplicationException($"Directory {directoryPath} is not exists");
+            }
+
             if (string.IsNullOrWhiteSpace(format))
             {
-                format = "json";
+                format = FileFormats.Json;
             }
 
             switch (format)
             {
-                case "json":
+                case FileFormats.Json:
                     {
-                        ExportFileToJSON(serializableObject, destinationPath);
+                        ExportFileToJSON(storageInfo, destinationPath);
                         break;
                     }
-                case "xml":
+                case FileFormats.Xml:
                     {
-                        ExportFileToXML(serializableObject, destinationPath);
+                        ExportFileToXML(storageInfo, destinationPath);
                         break;
                     }
                 default:
@@ -139,21 +146,19 @@ namespace FileStorage
             }
         }
 
-        private void ExportFileToXML(object serializableObject, string destinationPath)
+        private void ExportFileToXML(SerializableStorageInfo storageInfo, string destinationPath)
         {
             using (FileStream fileStream = new FileStream(destinationPath, FileMode.OpenOrCreate))
             {
-                XmlSerializer formatter = new XmlSerializer(serializableObject.GetType());
-                formatter.Serialize(fileStream, serializableObject);
+                XmlSerializer formatter = new XmlSerializer(storageInfo.GetType());
+                formatter.Serialize(fileStream, storageInfo);
             }
         }
 
-        private async void ExportFileToJSON(object serializableObject, string destinationPath)
-        {   
-            using (FileStream fileStream = new FileStream(destinationPath, FileMode.OpenOrCreate))
-            {
-               await JsonSerializer.SerializeAsync(fileStream, serializableObject, serializableObject.GetType());
-            }
+        private void ExportFileToJSON(SerializableStorageInfo storageInfo, string destinationPath)
+        {
+            string jsonString = JsonSerializer.Serialize(storageInfo);
+            File.WriteAllText(destinationPath, jsonString);
         }
     }
 }

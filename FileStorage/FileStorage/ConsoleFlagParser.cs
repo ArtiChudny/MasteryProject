@@ -6,11 +6,11 @@ namespace FileStorage
 {
     public class ConsoleFlagParser
     {
+        private const string FlagIndicator = "--";
         private const string LoginFlag = "--l";
         private const string PasswordFlag = "--p";
         private const string FormatFlag = "--format";
         private const string InfoFlag = "--info";
-
 
         public Dictionary<StorageFlags, string> Parse(string[] args)
         {
@@ -19,9 +19,10 @@ namespace FileStorage
             {
                 StorageFlags flag = GetFlag(args[argIndex]);
                 string value = string.Empty;
-                if ((argIndex + 1) < args.Length)
+                if (((argIndex + 1) < args.Length)&& (!args[argIndex + 1].StartsWith(FlagIndicator)))
                 {
                     value = args[argIndex + 1];
+                    argIndex++;
                 }
                 if (flagsValues.ContainsKey(flag))
                 {
@@ -30,7 +31,6 @@ namespace FileStorage
                 else
                 {
                     flagsValues.Add(flag, value);
-                    argIndex++;
                 }
             }
             return flagsValues;
