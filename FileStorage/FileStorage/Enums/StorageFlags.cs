@@ -3,6 +3,8 @@
     public enum StorageFlags
     {
         Password,
-        Login
+        Login,
+        Info,
+        Format
     }
 }

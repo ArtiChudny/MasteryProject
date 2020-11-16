@@ -15,11 +15,13 @@ namespace FileStorage
             StorageService storageService = new StorageService();
             FileService fileService = new FileService();
             Controller controller = new Controller(consolePrinter, storageService, fileService);
-            ConsoleCommandParser consoleCommandParser = new ConsoleCommandParser();
+            ConsoleFlagParser consoleFlagParser = new ConsoleFlagParser();
+            ConsoleCommandParser consoleCommandParser = new ConsoleCommandParser(consoleFlagParser);
+
             try
             {
                 InitializeStorage(storageService, fileService);
-                Dictionary<StorageFlags, string> flags = ConsoleFlagParser.Parse(args);
+                Dictionary<StorageFlags, string> flags = consoleFlagParser.Parse(args);
                 Credentials credentials = GetCredentials(flags);
 
                 if (!authService.IsAuthenticated(credentials))

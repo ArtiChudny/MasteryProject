@@ -9,11 +9,15 @@ Max capacity of storage is 5GB
 You should to create folder "Storage" which is located in the same directory as the executable file, and create folder "Files" inside folder "Storage".
 
 Сurrently available commands:
-user info 					- getting information about user.
-file upload "filePath" 				- upload file into your storage
-file download "fileName" "destinationPath" 	- download file from your repository to destination path
-file move "oldFileName" "newFileName"		- rename your file in storage
-file remove "fileName"				- delete file from storage
-file info "fileName" 				- getting information about file into storage
+user info 						- getting information about user.
+file upload "filePath" 					- upload file into your storage
+file download "fileName" "destinationPath" 		- download file from your repository to destination path
+file move "oldFileName" "newFileName"			- rename your file in storage
+file remove "fileName"					- delete file from storage
+file info "fileName" 					- getting information about file into storage
+file export --info					- getting list of available export formats
+file export "path\file.format" 				- export meta-information about the storage in some format (json is default without using flag --format)
+				--format json			
+				--format xml	
 
 !!!Use quotes "" for command parameters!!!

@@ -1,9 +1,12 @@
 ﻿using FileStorage.Models;
+using FileStorage.Constants;
 using System;
 using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text.Json;
+using System.Xml.Serialization;
 
 namespace FileStorage
 {
@@ -108,6 +111,54 @@ namespace FileStorage
             {
                 throw new ApplicationException($"Missing path '{Path.GetFullPath(storageFilesPath)}'");
             }
+        }
+
+        public void ExportFile(SerializableStorageInfo storageInfo, string destinationPath, string format)
+        {
+            string directoryPath = Path.GetDirectoryName(destinationPath);
+
+            if (!Directory.Exists(directoryPath))
+            {
+                throw new ApplicationException($"Directory {directoryPath} is not exists");
+            }
+
+            if (string.IsNullOrWhiteSpace(format))
+            {
+                format = FileFormats.Json;
+            }
+
+            switch (format)
+            {
+                case FileFormats.Json:
+                    {
+                        ExportFileToJSON(storageInfo, destinationPath);
+                        break;
+                    }
+                case FileFormats.Xml:
+                    {
+                        ExportFileToXML(storageInfo, destinationPath);
+                        break;
+                    }
+                default:
+                    {
+                        throw new ApplicationException($"Unknown format {format}");
+                    }
+            }
+        }
+
+        private void ExportFileToXML(SerializableStorageInfo storageInfo, string destinationPath)
+        {
+            using (FileStream fileStream = new FileStream(destinationPath, FileMode.OpenOrCreate))
+            {
+                XmlSerializer formatter = new XmlSerializer(storageInfo.GetType());
+                formatter.Serialize(fileStream, storageInfo);
+            }
+        }
+
+        private void ExportFileToJSON(SerializableStorageInfo storageInfo, string destinationPath)
+        {
+            string jsonString = JsonSerializer.Serialize(storageInfo);
+            File.WriteAllText(destinationPath, jsonString);
         }
     }
 }

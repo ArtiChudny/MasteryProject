@@ -2,7 +2,7 @@
   "profiles": {
     "FileStorage": {
       "commandName": "Project",
-      "commandLineArgs": "--p storagePassword --l storageUser"
+      "commandLineArgs": "--p storagePassword  --l storageUser"
     }
   }
 }
