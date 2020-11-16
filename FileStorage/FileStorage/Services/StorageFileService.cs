@@ -1,4 +1,5 @@
-﻿using FileStorage.Models;
+﻿using FileStorage.Helpers;
+using FileStorage.Models;
 using System;
 using System.IO;
 
@@ -95,6 +96,13 @@ namespace FileStorage.Services
             string storageFileName = storageFile.Id.ToString();
             fileService.DownloadFileFromStorage(fileName, storageFileName, destinationPath);
             storageService.IncreaseDownloadsCounter(fileName);
+        }
+
+        public void ExportFile(string destinationPath, string format)
+        {
+            StorageInfo storageInfo = storageService.GetStorageInfo();
+            SerializableStorageInfo serializableStorageInfo = ConvertingHelper.GetSerializableStorageInfo(storageInfo);
+            fileService.ExportFile(serializableStorageInfo, destinationPath, format);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace FileStorage.Models
     {
         public long UsedStorage { get; set; }
         public DateTime CreationDate { get; set; }
-        public IDictionary<string, StorageFile> Files { get; set; }
+        public Dictionary<string, StorageFile> Files { get; set; }
 
         public StorageInfo()
         {

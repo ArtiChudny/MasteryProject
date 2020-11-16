@@ -6,7 +6,7 @@ namespace FileStorage.Models
     public class Options
     {
         public IList<string> Parameters { get; set; }
-        public IDictionary<StorageFlags, string> Flags { get; set; }
+        public Dictionary<StorageFlags, string> Flags { get; set; }
 
         public Options()
         {

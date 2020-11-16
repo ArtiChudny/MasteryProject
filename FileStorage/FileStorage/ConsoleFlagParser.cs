@@ -4,7 +4,7 @@ using FileStorage.Enums;
 
 namespace FileStorage
 {
-    public static class ConsoleFlagParser
+    public class ConsoleFlagParser
     {
         private const string LoginFlag = "--l";
         private const string PasswordFlag = "--p";
@@ -12,7 +12,7 @@ namespace FileStorage
         private const string InfoFlag = "--info";
 
 
-        public static Dictionary<StorageFlags, string> Parse(string[] args)
+        public Dictionary<StorageFlags, string> Parse(string[] args)
         {
             Dictionary<StorageFlags, string> flagsValues = new Dictionary<StorageFlags, string>();
             for (int argIndex = 0; argIndex < args.Length; argIndex++)
@@ -36,7 +36,7 @@ namespace FileStorage
             return flagsValues;
         }
 
-        public static StorageFlags GetFlag(string flagName)
+        public StorageFlags GetFlag(string flagName)
         {
             switch (flagName)
             {

@@ -179,6 +179,25 @@ public class Controller
             {
                 consolePrinter.PrintExportFormats(formats);
             }
+            else
+            {
+                throw new ApplicationException("You have not entered parameters or flags for this command");
+            }
+        }
+
+        if (options.Parameters.Count == 1)
+        {
+            string destinationPath = options.Parameters[0];
+            string format = String.Empty;
+
+            if (options.Flags.ContainsKey(StorageFlags.Format))
+            {
+                format = options.Flags[StorageFlags.Format];
+            }
+
+            storageFileService.ExportFile(destinationPath, format);
+
+            consolePrinter.PrintExportSuccessfull(destinationPath);
         }
     }
 }

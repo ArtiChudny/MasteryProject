@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Xml.Serialization;
+using System.Threading.Tasks;
 
 namespace FileStorage
 {
@@ -112,18 +113,23 @@ namespace FileStorage
             }
         }
 
-        public void ExportFile(object storageInfo, string destinationPath, string format = "json")
+        public void ExportFile(object serializableObject, string destinationPath, string format)
         {
+            if (string.IsNullOrWhiteSpace(format))
+            {
+                format = "json";
+            }
+
             switch (format)
             {
                 case "json":
                     {
-                        ExportFileToJSON(storageInfo, destinationPath);
+                        ExportFileToJSON(serializableObject, destinationPath);
                         break;
                     }
                 case "xml":
                     {
-                        ExportFileToXML(storageInfo, destinationPath);
+                        ExportFileToXML(serializableObject, destinationPath);
                         break;
                     }
                 default:
@@ -133,20 +139,20 @@ namespace FileStorage
             }
         }
 
-        private void ExportFileToXML(object storageInfo, string destinationPath)
+        private void ExportFileToXML(object serializableObject, string destinationPath)
         {
             using (FileStream fileStream = new FileStream(destinationPath, FileMode.OpenOrCreate))
             {
-                XmlSerializer formatter = new XmlSerializer(typeof(StorageInfo));
-                formatter.Serialize(fileStream, storageInfo);
+                XmlSerializer formatter = new XmlSerializer(serializableObject.GetType());
+                formatter.Serialize(fileStream, serializableObject);
             }
         }
 
-        private void ExportFileToJSON(object storageInfo, string destinationPath)
-        {
+        private async void ExportFileToJSON(object serializableObject, string destinationPath)
+        {   
             using (FileStream fileStream = new FileStream(destinationPath, FileMode.OpenOrCreate))
             {
-                JsonSerializer.SerializeAsync(fileStream, storageInfo);
+               await JsonSerializer.SerializeAsync(fileStream, serializableObject, serializableObject.GetType());
             }
         }
     }

@@ -9,6 +9,7 @@ namespace FileStorage
 {
     public class ConsoleCommandParser
     {
+        private ConsoleFlagParser consoleFlagParser;
         private const string UserInfoCommandName = "user info";
         private const string ExitCommandName = "exit";
         private const string FileUploadCommandName = "file upload";
@@ -17,6 +18,11 @@ namespace FileStorage
         private const string FileRemoveCommandName = "file remove";
         private const string FileInfoCommandName = "file info";
         private const string FileExportCommandName = "file export";
+
+        public ConsoleCommandParser(ConsoleFlagParser consoleFlagParser)
+        {
+            this.consoleFlagParser = consoleFlagParser;
+        }
 
         public StorageCommand Parse(string rawCommand)
         {
@@ -84,9 +90,9 @@ namespace FileStorage
         private Options GetOptions(string rawCommand, string commandName)
         {
             string parametersString = rawCommand.Replace(commandName, string.Empty).Trim();
-            string regPattern = @"""([\w\s\/.]*)""|(-?-?[\w.]*)";
+            string regPattern = @"(""[\w\s\\\/:.]*"")|(-?-?[\w.]*)";
 
-            List<string> parametersList = Regex.Matches(parametersString, regPattern).Cast<Match>().Select(m => m.Value).ToList();
+            List<string> parametersList = Regex.Matches(parametersString, regPattern, RegexOptions.Multiline).Cast<Match>().Select(m => m.Value).ToList();
             parametersList.RemoveAll(item => item == string.Empty);
 
             Options options = new Options();
@@ -95,7 +101,7 @@ namespace FileStorage
             {
                 if (parametersList[i].StartsWith("--"))
                 {
-                    StorageFlags flag = ConsoleFlagParser.GetFlag(parametersList[i]);
+                    StorageFlags flag = consoleFlagParser.GetFlag(parametersList[i]);
                     string flagValue = string.Empty;
 
                     if (i + 1 < parametersList.Count)

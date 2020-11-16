@@ -72,6 +72,12 @@ namespace FileStorage
             {
                 Console.WriteLine("- {0}", format);
             }
+            Console.WriteLine();
+        }
+
+        internal void PrintExportSuccessfull(string destinationPath)
+        {
+            Console.WriteLine("The meta-information has been exported, path = \"{0}\"", destinationPath);
         }
     }
 }
