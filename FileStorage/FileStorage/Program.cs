@@ -1,46 +1,52 @@
 ﻿using System;
 using System.Collections.Generic;
-using FileStorage.Enums;
-using FileStorage.Models;
-using FileStorage.Services;
+using FileStorage.BLL;
+using FileStorage.BLL.Interfaces;
+using FileStorage.ConsoleUI.ConsoleUtils;
+using FileStorage.ConsoleUI.ConsoleUtils.Interfaces;
+using FileStorage.DAL.Repositories;
+using FileStorage.DAL.Repositories.Interfaces;
+using FileStorage.ConsoleUI.Enums;
+using FileStorage.ConsoleUI.Models;
 
-namespace FileStorage
+namespace FileStorage.ConsoleUI
 {
     class Program
     {
         static void Main(string[] args)
         {
-            AuthService authService = new AuthService();
-            ConsolePrinter consolePrinter = new ConsolePrinter();
-            StorageService storageService = new StorageService();
-            FileService fileService = new FileService();
-            Controller controller = new Controller(consolePrinter, storageService, fileService);
+            IUserRepository userRepository = new UserRepository();
+            IFileRepository fileRepository = new FileRepository();
+            IStorageRepository storageRepository = new StorageRepository();
+            IConsolePrinter consolePrinter = new ConsolePrinter();
+
+            IAuthService authService = new AuthService(userRepository);
+            IUserService userService = new UserService(userRepository);
+            IStorageFileService storageFileService = new StorageFileService(storageRepository, fileRepository);
+
+            Controller controller = new Controller(storageFileService, userService, consolePrinter);
             ConsoleFlagParser consoleFlagParser = new ConsoleFlagParser();
             ConsoleCommandParser consoleCommandParser = new ConsoleCommandParser(consoleFlagParser);
 
             try
             {
-                InitializeStorage(storageService, fileService);
+                storageFileService.InitializeStorage();
                 Dictionary<StorageFlags, string> flags = consoleFlagParser.Parse(args);
                 Credentials credentials = GetCredentials(flags);
 
-                if (!authService.IsAuthenticated(credentials))
+                if (!authService.IsAuthenticated(credentials.Login, credentials.Password))
                 {
                     throw new ApplicationException("Incorrect login or password");
                 }
-
+                
                 consolePrinter.PrintAuthenticationSuccessful();
-
-                while (true)
+                
+                StorageCommand command = new StorageCommand();
+                while (command.CommandType != StorageCommands.Exit)
                 {
                     try
                     {
-                        StorageCommand command = GetCommand(consolePrinter, consoleCommandParser);
-                        if (command.CommandType == StorageCommands.Exit)
-                        {
-                            consolePrinter.PrintExitMessage();
-                            break;
-                        }
+                        command = GetCommand(consoleCommandParser, consolePrinter);
                         controller.ExecuteConsoleCommand(command);
                     }
                     catch (Exception ex)
@@ -80,7 +86,7 @@ namespace FileStorage
             }
         }
 
-        private static StorageCommand GetCommand(ConsolePrinter consolePrinter, ConsoleCommandParser consoleCommandParser)
+        private static StorageCommand GetCommand(ConsoleCommandParser consoleCommandParser, IConsolePrinter consolePrinter)
         {
             consolePrinter.PrintСommandWaitingIcon();
             string rowCommand = Console.ReadLine().Trim();
@@ -91,12 +97,6 @@ namespace FileStorage
             }
 
             return consoleCommandParser.Parse(rowCommand);
-        }
-
-        private static void InitializeStorage(StorageService storageService, FileService fileService)
-        {
-            storageService.InitializeStorage();
-            fileService.InitializeFileStorage();
         }
     }
 }

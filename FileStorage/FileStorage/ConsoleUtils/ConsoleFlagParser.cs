@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using FileStorage.Enums;
+using FileStorage.ConsoleUI.Enums;
 
-namespace FileStorage
+namespace FileStorage.ConsoleUI.ConsoleUtils
 {
     public class ConsoleFlagParser
     {

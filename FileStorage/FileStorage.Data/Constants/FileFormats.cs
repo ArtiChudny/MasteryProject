@@ -1,4 +1,4 @@
-﻿namespace FileStorage.Constants
+﻿namespace FileStorage.DAL.Constants
 {
     public static class FileFormats
     {

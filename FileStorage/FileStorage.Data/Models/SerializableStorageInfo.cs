@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace FileStorage.Models
+namespace FileStorage.DAL.Models
 {
     [Serializable]
     public class SerializableStorageInfo

@@ -1,9 +1,10 @@
-﻿using System.Configuration;
-using FileStorage.Models;
+﻿using FileStorage.DAL.Models;
+using FileStorage.DAL.Repositories.Interfaces;
+using System.Configuration;
 
-namespace FileStorage.Services
+namespace FileStorage.DAL.Repositories
 {
-    public class UserService
+    public class UserRepository : IUserRepository
     {
         public User GetUser()
         {

@@ -1,4 +1,4 @@
-﻿namespace FileStorage.Models
+﻿namespace FileStorage.DAL.Models
 {
     public class User
     {

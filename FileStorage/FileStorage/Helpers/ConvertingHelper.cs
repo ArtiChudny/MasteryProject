@@ -1,7 +1,6 @@
 ﻿using System;
-using FileStorage.Models;
 
-namespace FileStorage.Helpers
+namespace FileStorage.ConsoleUI.Helpers
 {
     public static class ConvertingHelper
     {
@@ -49,26 +48,6 @@ namespace FileStorage.Helpers
             double MbSize = Math.Round((double)size / 1024 / 1024 / 1024, 2);
 
             return $"{MbSize}GB";
-        }
-
-        public static SerializableStorageInfo GetSerializableStorageInfo(StorageInfo storageInfo)
-        {
-            SerializableStorageInfo serializableStorageInfo = new SerializableStorageInfo();
-            serializableStorageInfo.CreationDate = storageInfo.CreationDate;
-            serializableStorageInfo.UsedStorage = storageInfo.UsedStorage;
-
-            foreach (var file in storageInfo.Files)
-            {
-                KeyValue pair = new KeyValue
-                {
-                    Key = file.Key,
-                    Value = file.Value
-                };
-
-                serializableStorageInfo.Files.Add(pair);
-            }
-
-            return serializableStorageInfo;
         }
     }
 }

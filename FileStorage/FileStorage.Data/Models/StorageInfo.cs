@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace FileStorage.Models
+namespace FileStorage.DAL.Models
 {
     [Serializable]
     public class StorageInfo
@@ -12,7 +12,6 @@ namespace FileStorage.Models
 
         public StorageInfo()
         {
-            UsedStorage = 0;
             CreationDate = DateTime.Today;
             Files = new Dictionary<string, StorageFile>();
         }

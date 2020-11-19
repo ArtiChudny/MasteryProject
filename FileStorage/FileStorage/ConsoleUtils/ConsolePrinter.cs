@@ -1,9 +1,10 @@
 ﻿using System;
-using FileStorage.ViewModels;
+using FileStorage.ConsoleUI.ConsoleUtils.Interfaces;
+using FileStorage.ConsoleUI.ViewModels;
 
-namespace FileStorage
+namespace FileStorage.ConsoleUI.ConsoleUtils
 {
-    public class ConsolePrinter
+    public class ConsolePrinter : IConsolePrinter
     {
         public void PrintUserInformation(UserInfoViewModel userInfo)
         {
@@ -75,7 +76,7 @@ namespace FileStorage
             Console.WriteLine();
         }
 
-        internal void PrintExportSuccessfull(string destinationPath)
+        public void PrintExportSuccessfull(string destinationPath)
         {
             Console.WriteLine("The meta-information has been exported, path = \"{0}\"", destinationPath);
         }

@@ -1,28 +1,25 @@
-﻿using FileStorage;
-using FileStorage.Enums;
-using FileStorage.Models;
-using FileStorage.Constants;
-using FileStorage.Services;
-using FileStorage.ViewModels;
-using FileStorage.Helpers;
+﻿using FileStorage.ConsoleUI.Enums;
+using FileStorage.ConsoleUI.Models;
+using FileStorage.ConsoleUI.ViewModels;
+using FileStorage.ConsoleUI.Helpers;
 using System;
 using System.IO;
+using FileStorage.DAL.Models;
+using FileStorage.BLL.Interfaces;
+using FileStorage.DAL.Constants;
+using FileStorage.ConsoleUI.ConsoleUtils.Interfaces;
 
 public class Controller
 {
-    private ConsolePrinter consolePrinter;
-    private UserService userService;
-    private StorageService storageService;
-    private FileService fileService;
-    private StorageFileService storageFileService;
+    private IUserService userService;
+    private IConsolePrinter consolePrinter;
+    private IStorageFileService storageFileService;
 
-    public Controller(ConsolePrinter consolePrinter, StorageService storageService, FileService fileService)
+    public Controller(IStorageFileService storageFileService, IUserService userService, IConsolePrinter consolePrinter)
     {
+        this.storageFileService = storageFileService;
+        this.userService = userService;
         this.consolePrinter = consolePrinter;
-        this.storageService = storageService;
-        this.fileService = fileService;
-        storageFileService = new StorageFileService(storageService, fileService);
-        userService = new UserService();
     }
 
     public void ExecuteConsoleCommand(StorageCommand command)

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using FileStorage.Enums;
-using FileStorage.Models;
+using FileStorage.ConsoleUI.Enums;
+using FileStorage.ConsoleUI.Models;
 
-namespace FileStorage
+namespace FileStorage.ConsoleUI.ConsoleUtils
 {
     public class ConsoleCommandParser
     {
@@ -91,7 +91,7 @@ namespace FileStorage
         private Options GetOptions(string rawCommand, string commandName)
         {
             string parametersString = rawCommand.Replace(commandName, string.Empty).Trim();
-            string regPattern = @"(""[\w\s\\\/:.]*"")|(-?-?[\w.]*)";
+            string regPattern = @"(""[\w\s\\\/:.-]*"")|(-?-?[\w.]*)";
 
             List<string> parametersList = Regex.Matches(parametersString, regPattern, RegexOptions.Multiline).Cast<Match>().Select(m => m.Value).ToList();
             parametersList.RemoveAll(item => item == string.Empty);

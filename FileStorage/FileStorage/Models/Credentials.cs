@@ -1,4 +1,4 @@
-﻿namespace FileStorage.Models
+﻿namespace FileStorage.ConsoleUI.Models
 {
     public class Credentials
     {

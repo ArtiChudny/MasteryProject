@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FileStorage.Models
+namespace FileStorage.DAL.Models
 {
     [Serializable]
     public class StorageFile
