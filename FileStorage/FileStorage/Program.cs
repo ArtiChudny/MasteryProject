@@ -1,33 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using FileStorage.BLL;
 using FileStorage.BLL.Interfaces;
 using FileStorage.ConsoleUI.ConsoleUtils;
 using FileStorage.ConsoleUI.ConsoleUtils.Interfaces;
-using FileStorage.DAL.Repositories;
-using FileStorage.DAL.Repositories.Interfaces;
 using FileStorage.ConsoleUI.Enums;
 using FileStorage.ConsoleUI.Models;
+using FileStorage.ConsoleUI.IoC;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FileStorage.ConsoleUI
 {
     class Program
     {
+        public static IServiceProvider container = new DependencyContainer().GetContainer();
+
         static void Main(string[] args)
         {
-            IUserRepository userRepository = new UserRepository();
-            IFileRepository fileRepository = new FileRepository();
-            IStorageRepository storageRepository = new StorageRepository();
-            IConsolePrinter consolePrinter = new ConsolePrinter();
+            ConsolePrinter consolePrinter = container.GetService<IConsolePrinter>(); ;
+            IAuthService authService = container.GetService<IAuthService>();
+            IStorageFileService storageFileService = container.GetService<IStorageFileService>();
+            Controller controller = container.GetService<Controller>();
 
-            IAuthService authService = new AuthService(userRepository);
-            IUserService userService = new UserService(userRepository);
-            IStorageFileService storageFileService = new StorageFileService(storageRepository, fileRepository);
-
-            Controller controller = new Controller(storageFileService, userService, consolePrinter);
             ConsoleFlagParser consoleFlagParser = new ConsoleFlagParser();
             ConsoleCommandParser consoleCommandParser = new ConsoleCommandParser(consoleFlagParser);
-
+              
             try
             {
                 storageFileService.InitializeStorage();
@@ -38,9 +34,9 @@ namespace FileStorage.ConsoleUI
                 {
                     throw new ApplicationException("Incorrect login or password");
                 }
-                
+
                 consolePrinter.PrintAuthenticationSuccessful();
-                
+
                 StorageCommand command = new StorageCommand();
                 while (command.CommandType != StorageCommands.Exit)
                 {
