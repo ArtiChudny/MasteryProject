@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using System;
+using System.Configuration;
 
 namespace FileStorage.ConsoleUI.IoC
 {
@@ -25,8 +26,9 @@ namespace FileStorage.ConsoleUI.IoC
             container.AddTransient<IConsolePrinter, ConsolePrinter>();
             container.AddTransient<Controller>();
             
+            string logPath = ConfigurationManager.AppSettings["LogPath"];
             LoggerConfiguration serilogLogger = new LoggerConfiguration();
-            serilogLogger.WriteTo.File("log.txt");
+            serilogLogger.WriteTo.File(logPath);
             container.AddLogging(builder =>
             {
                 builder.SetMinimumLevel(LogLevel.Information);
