@@ -7,23 +7,25 @@ using FileStorage.ConsoleUI.Enums;
 using FileStorage.ConsoleUI.Models;
 using FileStorage.ConsoleUI.IoC;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using FileStorage.ConsoleUI.Helpers;
 
 namespace FileStorage.ConsoleUI
 {
-    class Program
+    public class Program
     {
-        public static IServiceProvider container = new DependencyContainer().GetContainer();
+        private static readonly IServiceProvider Container = new DependencyContainer().GetContainer();
 
         static void Main(string[] args)
         {
-            ConsolePrinter consolePrinter = container.GetService<IConsolePrinter>(); ;
-            IAuthService authService = container.GetService<IAuthService>();
-            IStorageFileService storageFileService = container.GetService<IStorageFileService>();
-            Controller controller = container.GetService<Controller>();
-
+            ILogger<Program> logger = Container.GetService<ILogger<Program>>();
+            IConsolePrinter consolePrinter = Container.GetService<IConsolePrinter>();
+            IAuthService authService = Container.GetService<IAuthService>();
+            IStorageFileService storageFileService = Container.GetService<IStorageFileService>();
+            Controller controller = Container.GetService<Controller>();
             ConsoleFlagParser consoleFlagParser = new ConsoleFlagParser();
             ConsoleCommandParser consoleCommandParser = new ConsoleCommandParser(consoleFlagParser);
-              
+
             try
             {
                 storageFileService.InitializeStorage();
@@ -36,24 +38,29 @@ namespace FileStorage.ConsoleUI
                 }
 
                 consolePrinter.PrintAuthenticationSuccessful();
-
                 StorageCommand command = new StorageCommand();
+
                 while (command.CommandType != StorageCommands.Exit)
                 {
                     try
                     {
+
                         command = GetCommand(consoleCommandParser, consolePrinter);
                         controller.ExecuteConsoleCommand(command);
                     }
                     catch (Exception ex)
                     {
+                        string logMessage = ConvertingHelper.GetLogMessage(ex.Message, ex.StackTrace);
+                        logger.LogError(logMessage);
                         consolePrinter.PrintErrorMessage(ex.Message);
                     }
                 }
             }
             catch (Exception ex)
             {
-                consolePrinter.PrintErrorMessage(ex.Message);
+                string logMessage = ConvertingHelper.GetLogMessage(ex.Message, ex.StackTrace);
+                logger.LogError(logMessage);
+                consolePrinter.PrintErrorMessage(logMessage);
                 Environment.Exit(-1);
             }
         }

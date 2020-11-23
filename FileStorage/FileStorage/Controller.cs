@@ -8,18 +8,21 @@ using FileStorage.DAL.Models;
 using FileStorage.BLL.Interfaces;
 using FileStorage.DAL.Constants;
 using FileStorage.ConsoleUI.ConsoleUtils.Interfaces;
+using Microsoft.Extensions.Logging;
 
 public class Controller
 {
     private IUserService userService;
     private IConsolePrinter consolePrinter;
     private IStorageFileService storageFileService;
+    private ILogger<Controller> logger;
 
-    public Controller(IStorageFileService storageFileService, IUserService userService, IConsolePrinter consolePrinter)
+    public Controller(IStorageFileService storageFileService, IUserService userService, IConsolePrinter consolePrinter, ILogger<Controller> logger)
     {
         this.storageFileService = storageFileService;
         this.userService = userService;
         this.consolePrinter = consolePrinter;
+        this.logger = logger;
     }
 
     public void ExecuteConsoleCommand(StorageCommand command)
@@ -97,6 +100,7 @@ public class Controller
                 Extension = storageFile.Extension
             };
 
+            LogInformationMessage($"File \"{filePath}\" has been uploaded");
             consolePrinter.PrintFileUploadedSuccessful(uploadViewModel);
         }
     }
@@ -109,6 +113,7 @@ public class Controller
             string destinationPath = options.Parameters[1];
             storageFileService.DownloadStorageFile(fileName, destinationPath);
 
+            LogInformationMessage($"File \"{fileName}\" has been downloaded to {destinationPath}");
             consolePrinter.PrintFileDownloadedSuccessful(fileName);
         }
     }
@@ -121,6 +126,7 @@ public class Controller
             string newFileName = options.Parameters[1];
             storageFileService.MoveStorageFile(oldFileName, newFileName);
 
+            LogInformationMessage($"File \"{oldFileName}\" has been moved to {newFileName}");
             consolePrinter.PrintFileMovedSuccessful(oldFileName, newFileName);
         }
     }
@@ -132,6 +138,7 @@ public class Controller
             string fileName = options.Parameters[0];
             storageFileService.RemoveStorageFile(fileName);
 
+            LogInformationMessage($"File \"{fileName}\" has been removed");
             consolePrinter.PrintFileRemovedSuccessful(fileName);
         }
     }
@@ -188,6 +195,7 @@ public class Controller
 
                 storageFileService.ExportFile(destinationPath, format);
 
+                LogInformationMessage($"Meta-info file has been exported to \"{destinationPath}\"");
                 consolePrinter.PrintExportSuccessfull(destinationPath);
             }
         }
@@ -206,5 +214,11 @@ public class Controller
         }
 
         return true;
+    }
+
+    private void LogInformationMessage(string message)
+    {
+        string logMessage = ConvertingHelper.GetLogMessage(message, string.Empty);
+        logger.LogInformation(logMessage);
     }
 }

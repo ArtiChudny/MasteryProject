@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Threading;
 
 namespace FileStorage.ConsoleUI.Helpers
 {
@@ -48,6 +50,14 @@ namespace FileStorage.ConsoleUI.Helpers
             double MbSize = Math.Round((double)size / 1024 / 1024 / 1024, 2);
 
             return $"{MbSize}GB";
+        }
+
+        public static string GetLogMessage(string message, string stackTrace)
+        {
+            int processId = Process.GetCurrentProcess().Id;
+            int threadId = Thread.CurrentThread.ManagedThreadId;
+
+            return $"{message}; ProcessId:{processId} ; ThreadId:{threadId}; {stackTrace}";
         }
     }
 }

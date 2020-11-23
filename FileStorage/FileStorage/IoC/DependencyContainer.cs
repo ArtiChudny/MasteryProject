@@ -5,16 +5,17 @@ using FileStorage.ConsoleUI.ConsoleUtils.Interfaces;
 using FileStorage.DAL.Repositories;
 using FileStorage.DAL.Repositories.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 
 namespace FileStorage.ConsoleUI.IoC
 {
     public class DependencyContainer
     {
-        public  IServiceProvider GetContainer()
+        public IServiceProvider GetContainer()
         {
             ServiceCollection container = new ServiceCollection();
-
             container.AddTransient<IFileRepository, FileRepository>();
             container.AddTransient<IStorageRepository, StorageRepository>();
             container.AddTransient<IUserRepository, UserRepository>();
@@ -23,6 +24,15 @@ namespace FileStorage.ConsoleUI.IoC
             container.AddTransient<IAuthService, AuthService>();
             container.AddTransient<IConsolePrinter, ConsolePrinter>();
             container.AddTransient<Controller>();
+            
+            LoggerConfiguration serilogLogger = new LoggerConfiguration();
+            serilogLogger.WriteTo.File("log.txt");
+            container.AddLogging(builder =>
+            {
+                builder.SetMinimumLevel(LogLevel.Information);
+                builder.AddSerilog(serilogLogger.CreateLogger(), true);
+            }
+            );
 
             return container.BuildServiceProvider();
         }
