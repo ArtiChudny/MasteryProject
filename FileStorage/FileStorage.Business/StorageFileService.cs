@@ -100,7 +100,7 @@ namespace FileStorage.BLL
             storageProvider.IncreaseDownloadsCounter(fileName);
         }
 
-        public void ExportFile(string destinationPath, string format)
+        public void ExportStorageInfoFile(string destinationPath, string format)
         {
             StorageInfo storageInfo = storageProvider.GetStorageInfo();
             SerializableStorageInfo serializableStorageInfo = ConvertingHelper.GetSerializableStorageInfo(storageInfo);
@@ -111,6 +111,11 @@ namespace FileStorage.BLL
         {
             storageProvider.InitializeStorage();
             fileProvider.InitializeFileStorage();
+        }
+
+        public void CreateStorageDirectory(string destinationPath, string directoryName)
+        {
+            storageProvider.CreateDirectory(destinationPath, directoryName);
         }
     }
 }

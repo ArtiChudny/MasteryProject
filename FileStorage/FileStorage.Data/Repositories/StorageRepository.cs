@@ -135,5 +135,48 @@ namespace FileStorage.DAL.Repositories
                 return storageInfo;
             }
         }
+
+        public void CreateDirectory(string path, string directoryName)
+        {
+            StorageInfo storageInfo = DeserializeStorageInfoFile();
+            StorageDirectory parentDirectory = GetDirectoryByPath(storageInfo, path);
+
+            if (parentDirectory.SubDirectory != null)
+            {
+                throw new ApplicationException($"There is directory already exists at the path '{path}'");
+            }
+
+            parentDirectory.SubDirectory = new StorageDirectory()
+            {
+                Name = directoryName,
+                ParentId = parentDirectory.Name
+            };
+
+            SerializeStorageInfoFile(storageInfo);
+        }
+
+        private StorageDirectory GetDirectoryByPath(StorageInfo storageInfo, string path)
+        {
+            string[] directoriesArray = path.Replace("/", " ").Trim().Split(" ");
+            StorageDirectory storageDirectory = null;
+
+            for (int arrayIndex = 0; arrayIndex < directoriesArray.Length; arrayIndex++)
+            {
+                if (arrayIndex == 0 && storageInfo.InitialDirectory.Name == directoriesArray[0])
+                {
+                    storageDirectory = storageInfo.InitialDirectory;
+                }
+                else if (arrayIndex != 0 && storageDirectory.SubDirectory.Name == directoriesArray[arrayIndex])
+                {
+                    storageDirectory = storageDirectory.SubDirectory;
+                }
+                else
+                {
+                    throw new ApplicationException($"The path '{path}' doesn't exist");
+                }
+            }
+
+            return storageDirectory;
+        }
     }
 }

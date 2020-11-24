@@ -64,6 +64,11 @@ public class Controller
                     ExecuteCommandFileExport(command.Options);
                     break;
                 }
+            case StorageCommands.DirectoryCreate:
+                {
+                    ExecuteCommandDirectoryCreate(command.Options);
+                    break;
+                }
         }
     }
 
@@ -193,11 +198,21 @@ public class Controller
                     format = options.Flags[StorageFlags.Format];
                 }
 
-                storageFileService.ExportFile(destinationPath, format);
+                storageFileService.ExportStorageInfoFile(destinationPath, format);
 
                 LogInformationMessage($"Meta-info file has been exported to \"{destinationPath}\"");
                 consolePrinter.PrintExportSuccessfull(destinationPath);
             }
+        }
+    }
+
+    private void ExecuteCommandDirectoryCreate(Options options)
+    {
+        if (IsContainsRequiredNumberParameters(2, 2, options.Parameters.Count))
+        {
+            string destinationPath = options.Parameters[0];
+            string directoryName = options.Parameters[1];
+            storageFileService.CreateStorageDirectory(destinationPath, directoryName);
         }
     }
 

@@ -10,6 +10,7 @@
         FileRemove,
         FileInfo,
         FileExport,
+        DirectoryCreate,
         Exit
     }
 }

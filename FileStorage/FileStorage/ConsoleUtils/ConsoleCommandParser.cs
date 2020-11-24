@@ -18,6 +18,7 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
         private const string FileRemoveCommandName = "file remove";
         private const string FileInfoCommandName = "file info";
         private const string FileExportCommandName = "file export";
+        private const string DirectoryCreateCommandName = "directory create";
         private const string FlagIndicator = "--";
 
         public ConsoleCommandParser(ConsoleFlagParser consoleFlagParser)
@@ -82,6 +83,13 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
             {
                 storageCommand.CommandType = StorageCommands.FileExport;
                 storageCommand.Options = GetOptions(rawCommand, FileExportCommandName);
+                return storageCommand;
+            }
+
+            if (lowerRawCommand.StartsWith(DirectoryCreateCommandName))
+            {
+                storageCommand.CommandType = StorageCommands.DirectoryCreate;
+                storageCommand.Options = GetOptions(rawCommand, DirectoryCreateCommandName);
                 return storageCommand;
             }
 

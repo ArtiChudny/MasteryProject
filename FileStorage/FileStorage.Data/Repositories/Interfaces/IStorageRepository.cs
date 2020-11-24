@@ -15,5 +15,6 @@ namespace FileStorage.DAL.Repositories.Interfaces
         bool IsFileSizeLessThanMaxSize(long fileSize);
         void MoveFile(string oldFileName, string newFileName);
         void RemoveFile(string fileName);
+        void CreateDirectory(string path, string directoryName);
     }
 }
