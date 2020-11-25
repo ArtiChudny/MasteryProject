@@ -166,6 +166,7 @@ namespace FileStorage.DAL.Repositories
                 {
                     storageDirectory = storageInfo.InitialDirectory;
                 }
+                //TODO: Possible NullReferenceException (storageDirectory)
                 else if (arrayIndex != 0 && storageDirectory.SubDirectory.Name == directoriesArray[arrayIndex])
                 {
                     storageDirectory = storageDirectory.SubDirectory;

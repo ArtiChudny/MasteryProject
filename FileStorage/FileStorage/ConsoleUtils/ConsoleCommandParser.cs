@@ -101,6 +101,7 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
             string parametersString = rawCommand.Replace(commandName, string.Empty).Trim();
             string regPattern = @"(""[\w\s\\\/:.-]*"")|(-?-?[\w.]*)";
 
+            //TODO: No need to use Cast<Match> here, it's redundant
             List<string> parametersList = Regex.Matches(parametersString, regPattern, RegexOptions.Multiline).Cast<Match>().Select(m => m.Value).ToList();
             parametersList.RemoveAll(item => item == string.Empty);
 
