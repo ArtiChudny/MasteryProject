@@ -109,7 +109,7 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
             string parametersString = rawCommand.Replace(commandName, string.Empty).Trim();
             string regPattern = @"(""[\w\s\\\/:.-]*"")|(-?-?[\w.]*)";
 
-            List<string> parametersList = Regex.Matches(parametersString, regPattern, RegexOptions.Multiline).Cast<Match>().Select(m => m.Value).ToList();
+            List<string> parametersList = Regex.Matches(parametersString, regPattern, RegexOptions.Multiline).Select(m => m.Value).ToList();
             parametersList.RemoveAll(item => item == string.Empty);
 
             Options options = new Options();

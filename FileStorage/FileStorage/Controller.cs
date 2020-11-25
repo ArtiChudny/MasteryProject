@@ -27,6 +27,8 @@ public class Controller
 
     public void ExecuteConsoleCommand(StorageCommand command)
     {
+        //TODO: Investigate Command pattern and implement it here. We need to remove ugly switch.
+
         switch (command.CommandType)
         {
             case StorageCommands.UserInfo:
@@ -97,7 +99,10 @@ public class Controller
 
     private void ExecuteCommandFileUpload(Options options)
     {
-        if (IsContainsRequiredNumberParameters(1, 1, options.Parameters.Count))
+        //TODO: 1, 1 looks like magic numbers...
+
+
+        if (IsContainsRequiredNumberParameters(:1, 1, options.Parameters.Count))
         {
             string filePath = options.Parameters[0];
             StorageFile storageFile = storageFileService.UploadStorageFile(filePath);

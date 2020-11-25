@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace FileStorage.ConsoleUI.ViewModels
+﻿namespace FileStorage.ConsoleUI.ViewModels
 {
     public class UserInfoViewModel
     {

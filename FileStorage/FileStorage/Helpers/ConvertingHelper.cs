@@ -40,13 +40,15 @@ namespace FileStorage.ConsoleUI.Helpers
 
         public static string GetMbString(long size)
         {
+            //TODO: local variables should start with lower case letter
             double MbSize = Math.Round((double)size / 1024 / 1024, 2);
 
             return $"{MbSize}MB";
         }
 
         public static string GetGbString(long size)
-        {
+
+        {    //TODO: local variables should start with lower case letter
             double MbSize = Math.Round((double)size / 1024 / 1024 / 1024, 2);
 
             return $"{MbSize}GB";

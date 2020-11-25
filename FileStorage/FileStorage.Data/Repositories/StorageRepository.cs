@@ -173,6 +173,7 @@ namespace FileStorage.DAL.Repositories
                 {
                     storageDirectory = storageInfo.InitialDirectory;
                 }
+                //TODO: Possible NullReferenceException (storageDirectory)
                 else if (arrayIndex != 0 && storageDirectory.Directories.ContainsKey(directoriesList[arrayIndex]))
                 {
                     storageDirectory = storageDirectory.Directories[directoriesList[arrayIndex]];

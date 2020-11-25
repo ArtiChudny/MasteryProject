@@ -67,6 +67,8 @@ namespace FileStorage.ConsoleUI
 
         private static Credentials GetCredentials(Dictionary<StorageFlags, string> flags)
         {
+            //TODO: NO NEED TO USE ELSE CONDITION HERE, YOU CAN JUST THROW EXCEPTION AFTER IF
+
             if (IsContainLoginPassword(flags))
             {
                 return new Credentials(flags[StorageFlags.Login], flags[StorageFlags.Password]);
@@ -79,6 +81,8 @@ namespace FileStorage.ConsoleUI
 
         private static bool IsContainLoginPassword(Dictionary<StorageFlags, string> flags)
         {
+            //TODO: USE TERNARY OPERATOR HERE.
+
             if (flags.ContainsKey(StorageFlags.Login) && flags.ContainsKey(StorageFlags.Password))
             {
                 return true;
@@ -92,6 +96,8 @@ namespace FileStorage.ConsoleUI
         private static StorageCommand GetCommand(ConsoleCommandParser consoleCommandParser, IConsolePrinter consolePrinter)
         {
             consolePrinter.PrintСommandWaitingIcon();
+
+            //TODO: POTENTIAL NullReferenceException. Ypu have to check response from client before you execute trim function
             string rowCommand = Console.ReadLine().Trim();
 
             if (string.IsNullOrWhiteSpace(rowCommand))

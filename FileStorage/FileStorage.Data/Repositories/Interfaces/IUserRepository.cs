@@ -4,6 +4,6 @@ namespace FileStorage.DAL.Repositories.Interfaces
 {
     public interface IUserRepository
     {
-        public User GetUser();
+        User GetUser();
     }
 }
