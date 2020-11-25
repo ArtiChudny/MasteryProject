@@ -69,6 +69,11 @@ public class Controller
                     ExecuteCommandDirectoryCreate(command.Options);
                     break;
                 }
+            case StorageCommands.DirectoryMove:
+                {
+                    ExecuteCommandDirectoryMove(command.Options);
+                    break;
+                }
         }
     }
 
@@ -200,7 +205,7 @@ public class Controller
 
                 storageFileService.ExportStorageInfoFile(destinationPath, format);
 
-                LogInformationMessage($"Meta-info file has been exported to \"{destinationPath}\"");
+                LogInformationMessage($"Meta-info file has been exported to '{destinationPath}'");
                 consolePrinter.PrintExportSuccessfull(destinationPath);
             }
         }
@@ -213,6 +218,22 @@ public class Controller
             string destinationPath = options.Parameters[0];
             string directoryName = options.Parameters[1];
             storageFileService.CreateStorageDirectory(destinationPath, directoryName);
+
+            LogInformationMessage($"Directory {directoryName} has been succesfully created at the path '{destinationPath}'");
+            consolePrinter.PrintCreateDirectorySuccessfull(destinationPath, directoryName);
+        }
+    }
+
+    private void ExecuteCommandDirectoryMove(Options options)
+    {
+        if (IsContainsRequiredNumberParameters(2, 2, options.Parameters.Count))
+        {
+            string oldPath = options.Parameters[0];
+            string newPath = options.Parameters[1];
+            storageFileService.MoveStorageDirectory(oldPath, newPath);
+
+            LogInformationMessage($"Directory {oldPath} has been succesfully moved to the path '{newPath}");
+            consolePrinter.PrintMoveDirectorySuccessfull(oldPath, newPath);
         }
     }
 

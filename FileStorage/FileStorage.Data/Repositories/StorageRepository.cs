@@ -1,8 +1,10 @@
 ﻿using FileStorage.DAL.Models;
 using FileStorage.DAL.Repositories.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace FileStorage.DAL.Repositories
@@ -139,44 +141,80 @@ namespace FileStorage.DAL.Repositories
         public void CreateDirectory(string path, string directoryName)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
-            StorageDirectory parentDirectory = GetDirectoryByPath(storageInfo, path);
+            StorageDirectory parentDirectory = GetDirectoryByPath(storageInfo, GetDirectoriesList(path));
 
-            if (parentDirectory.SubDirectory != null)
+            if (parentDirectory.Directories.ContainsKey(directoryName))
             {
-                throw new ApplicationException($"There is directory already exists at the path '{path}'");
+                throw new ApplicationException($"The directory {directoryName} is already exists at the path '{path}'");
             }
 
-            parentDirectory.SubDirectory = new StorageDirectory()
+            parentDirectory.Directories.Add(directoryName, new StorageDirectory()
             {
                 Name = directoryName,
                 ParentId = parentDirectory.Name
-            };
+            });
 
             SerializeStorageInfoFile(storageInfo);
         }
 
-        private StorageDirectory GetDirectoryByPath(StorageInfo storageInfo, string path)
+
+        private List<string> GetDirectoriesList(string path)
         {
-            string[] directoriesArray = path.Replace("/", " ").Trim().Split(" ");
+            return path.Replace("/", " ").Trim().Split(" ").ToList();
+        }
+
+        private StorageDirectory GetDirectoryByPath(StorageInfo storageInfo, List<string> directoriesList)
+        {
             StorageDirectory storageDirectory = null;
 
-            for (int arrayIndex = 0; arrayIndex < directoriesArray.Length; arrayIndex++)
+            for (int arrayIndex = 0; arrayIndex < directoriesList.Count; arrayIndex++)
             {
-                if (arrayIndex == 0 && storageInfo.InitialDirectory.Name == directoriesArray[0])
+                if (arrayIndex == 0 && storageInfo.InitialDirectory.Name == directoriesList[0])
                 {
                     storageDirectory = storageInfo.InitialDirectory;
                 }
-                else if (arrayIndex != 0 && storageDirectory.SubDirectory.Name == directoriesArray[arrayIndex])
+                else if (arrayIndex != 0 && storageDirectory.Directories.ContainsKey(directoriesList[arrayIndex]))
                 {
-                    storageDirectory = storageDirectory.SubDirectory;
+                    storageDirectory = storageDirectory.Directories[directoriesList[arrayIndex]];
                 }
                 else
                 {
-                    throw new ApplicationException($"The path '{path}' doesn't exist");
+                    throw new ApplicationException($"The path doesn't exist");
                 }
             }
 
             return storageDirectory;
+        }
+
+        public void MoveDirectory(string oldPath, string newPath)
+        {
+            StorageInfo storageInfo = DeserializeStorageInfoFile();
+            //Getting old directory
+            List<string> oldDirectoryPath = GetDirectoriesList(oldPath);
+            StorageDirectory movableDirectory = GetDirectoryByPath(storageInfo, oldDirectoryPath);
+            //Getting old parent directory
+            oldDirectoryPath.Remove(oldDirectoryPath.Last());
+            StorageDirectory oldParentDirectory = GetDirectoryByPath(storageInfo, oldDirectoryPath);
+            oldParentDirectory.Directories.Remove(movableDirectory.Name);
+            //Getting new directory name
+            List<string> newDirectoryPath = GetDirectoriesList(newPath);
+            string newDirName = newDirectoryPath.Last();
+            movableDirectory.Name = newDirName;
+            //Getting new parent directory and adding new directory into it
+            newDirectoryPath.Remove(newDirectoryPath.Last());
+            StorageDirectory newParentDirectory = GetDirectoryByPath(storageInfo, newDirectoryPath);
+            movableDirectory.ParentId = newParentDirectory.Name;
+
+            if (newParentDirectory.Directories.ContainsKey(newDirName))
+            {
+                throw new InvalidOperationException($"The directory {newDirName} is already exists at the path '{newPath}'");
+            }
+            else
+            {
+                newParentDirectory.Directories.Add(newDirName, movableDirectory);
+            }
+
+            SerializeStorageInfoFile(storageInfo);
         }
     }
 }

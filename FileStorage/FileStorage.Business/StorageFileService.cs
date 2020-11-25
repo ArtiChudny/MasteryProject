@@ -7,7 +7,7 @@ using System.IO;
 
 namespace FileStorage.BLL
 {
-    public class StorageFileService: IStorageFileService
+    public class StorageFileService : IStorageFileService
     {
         private IStorageRepository storageProvider;
         private IFileRepository fileProvider;
@@ -116,6 +116,11 @@ namespace FileStorage.BLL
         public void CreateStorageDirectory(string destinationPath, string directoryName)
         {
             storageProvider.CreateDirectory(destinationPath, directoryName);
+        }
+
+        public void MoveStorageDirectory(string oldPath, string newPath)
+        {
+            storageProvider.MoveDirectory(oldPath, newPath);
         }
     }
 }

@@ -16,5 +16,6 @@ namespace FileStorage.DAL.Repositories.Interfaces
         void MoveFile(string oldFileName, string newFileName);
         void RemoveFile(string fileName);
         void CreateDirectory(string path, string directoryName);
+        void MoveDirectory(string oldPath, string newPath);
     }
 }

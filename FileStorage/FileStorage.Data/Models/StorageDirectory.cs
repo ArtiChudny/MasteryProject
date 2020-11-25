@@ -11,13 +11,14 @@ namespace FileStorage.DAL.Models
         public DateTime ModificationDate { get; set; }
         public string ParentId { get; set; }
         public Dictionary<string, StorageFile> Files { get; set; }
-        public StorageDirectory SubDirectory { get; set; }
+        public Dictionary<string, StorageDirectory> Directories { get; set; }
 
         public StorageDirectory()
         {
             Files = new Dictionary<string, StorageFile>();
+            Directories = new Dictionary<string, StorageDirectory>();
             CreationDate = DateTime.Now;
-            ModificationDate = DateTime.Today;
+            ModificationDate = DateTime.Now;
         }
     }
 }

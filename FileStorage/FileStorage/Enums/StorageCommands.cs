@@ -11,6 +11,7 @@
         FileInfo,
         FileExport,
         DirectoryCreate,
+        DirectoryMove,
         Exit
     }
 }

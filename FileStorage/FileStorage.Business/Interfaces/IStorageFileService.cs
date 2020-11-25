@@ -13,5 +13,6 @@ namespace FileStorage.BLL.Interfaces
         void DownloadStorageFile(string fileName, string destinationPath);
         void ExportStorageInfoFile(string destinationPath, string format);
         void CreateStorageDirectory(string destinationPath, string directoryName);
+        void MoveStorageDirectory(string oldPath, string newPath);
     }
 }

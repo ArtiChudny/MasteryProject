@@ -16,5 +16,7 @@ namespace FileStorage.ConsoleUI.ConsoleUtils.Interfaces
         void PrintExitMessage();
         void PrintExportFormats(string[] formats);
         void PrintExportSuccessfull(string destinationPath);
+        void PrintCreateDirectorySuccessfull(string destinationPath, string directoryName);
+        void PrintMoveDirectorySuccessfull(string oldPath, string newPath);
     }
 }
