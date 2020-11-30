@@ -1,7 +1,7 @@
-﻿using FileStorage.ConsoleUI.Enums;
+﻿using FileStorage.BLL.Enums;
 using System.Collections.Generic;
 
-namespace FileStorage.ConsoleUI.Models
+namespace FileStorage.BLL.Models
 {
     public class Options
     {

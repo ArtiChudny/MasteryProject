@@ -1,34 +1,29 @@
-﻿using FileStorage.ConsoleUI.Enums;
-using FileStorage.ConsoleUI.Models;
-using FileStorage.ConsoleUI.ViewModels;
+﻿using FileStorage.ConsoleUI.ViewModels;
 using FileStorage.ConsoleUI.Helpers;
-using System;
-using System.IO;
-using FileStorage.DAL.Models;
-using FileStorage.BLL.Interfaces;
-using FileStorage.DAL.Constants;
 using FileStorage.ConsoleUI.ConsoleUtils.Interfaces;
 using Microsoft.Extensions.Logging;
+using MediatR;
+using FileStorage.BLL.Queries;
+using FileStorage.BLL.Models;
+using FileStorage.BLL.Commands;
+using System.IO;
+using FileStorage.BLL.Enums;
 
 public class Controller
 {
-    private IUserService userService;
-    private IConsolePrinter consolePrinter;
-    private IStorageFileService storageFileService;
-    private ILogger<Controller> logger;
+    private readonly IConsolePrinter _consolePrinter;
+    private readonly ILogger<Controller> _logger;
+    private readonly IMediator _mediator;
 
-    public Controller(IStorageFileService storageFileService, IUserService userService, IConsolePrinter consolePrinter, ILogger<Controller> logger)
+    public Controller(IConsolePrinter consolePrinter, ILogger<Controller> logger, IMediator mediator)
     {
-        this.storageFileService = storageFileService;
-        this.userService = userService;
-        this.consolePrinter = consolePrinter;
-        this.logger = logger;
+        _consolePrinter = consolePrinter;
+        _logger = logger;
+        _mediator = mediator;
     }
 
     public void ExecuteConsoleCommand(StorageCommand command)
     {
-        //TODO: Investigate Command pattern and implement it here. We need to remove ugly switch.
-
         switch (command.CommandType)
         {
             case StorageCommands.UserInfo:
@@ -81,185 +76,121 @@ public class Controller
 
     private void ExecuteCommandGetUserInfo(Options options)
     {
-        if (IsContainsRequiredNumberParameters(0, 0, options.Parameters.Count))
+        var query = new GetUserInfoQuery(options);
+        var result = _mediator.Send(query).Result;
+
+        var userInfoViewModel = new UserInfoViewModel
         {
-            User user = userService.GetUser();
-            StorageInfo storageInfo = storageFileService.GetStorageInfo();
+            CreationDate = ConvertingHelper.GetDateString(result.CreationDate),
+            Login = result.Login,
+            UsedStorage = ConvertingHelper.GetSizeString(result.UsedStorage)
+        };
 
-            UserInfoViewModel userInfo = new UserInfoViewModel
-            {
-                Login = user.Login,
-                UsedStorage = ConvertingHelper.GetSizeString(storageInfo.UsedStorage),
-                CreationDate = ConvertingHelper.GetDateString(storageInfo.CreationDate)
-            };
-
-            consolePrinter.PrintUserInformation(userInfo);
-        }
+        _consolePrinter.PrintUserInformation(userInfoViewModel);
     }
 
     private void ExecuteCommandFileUpload(Options options)
     {
-        //TODO: 1, 1 looks like magic numbers...
+        var command = new FileUploadCommand(options);
+        var result = _mediator.Send(command).Result;
 
-
-        if (IsContainsRequiredNumberParameters(:1, 1, options.Parameters.Count))
+        FileUploadViewModel uploadViewModel = new FileUploadViewModel
         {
-            string filePath = options.Parameters[0];
-            StorageFile storageFile = storageFileService.UploadStorageFile(filePath);
+            FilePath = command.FilePath,
+            FileName = Path.GetFileName(command.FilePath),
+            FileSize = ConvertingHelper.GetSizeString(result.Size),
+            Extension = result.Extension
+        };
 
-            FileUploadViewModel uploadViewModel = new FileUploadViewModel
-            {
-                FilePath = filePath,
-                FileName = Path.GetFileName(filePath),
-                FileSize = ConvertingHelper.GetSizeString(storageFile.Size),
-                Extension = storageFile.Extension
-            };
-
-            LogInformationMessage($"File \"{filePath}\" has been uploaded");
-            consolePrinter.PrintFileUploadedSuccessful(uploadViewModel);
-        }
+        LogInformationMessage($"File \"{command.FilePath}\" has been uploaded");
+        _consolePrinter.PrintFileUploadedSuccessful(uploadViewModel);
     }
 
     private void ExecuteCommandFileDownload(Options options)
     {
-        if (IsContainsRequiredNumberParameters(2, 2, options.Parameters.Count))
-        {
-            string fileName = options.Parameters[0];
-            string destinationPath = options.Parameters[1];
-            storageFileService.DownloadStorageFile(fileName, destinationPath);
+        var command = new FileDownloadCommand(options);
+        _mediator.Send(command);
 
-            LogInformationMessage($"File \"{fileName}\" has been downloaded to {destinationPath}");
-            consolePrinter.PrintFileDownloadedSuccessful(fileName);
-        }
+        LogInformationMessage($"File \"{command.FileName}\" has been downloaded to {command.DestinationPath}");
+        _consolePrinter.PrintFileDownloadedSuccessful(command.FileName);
     }
 
     private void ExecuteCommandFileMove(Options options)
     {
-        if (IsContainsRequiredNumberParameters(2, 2, options.Parameters.Count))
-        {
-            string oldFileName = options.Parameters[0];
-            string newFileName = options.Parameters[1];
-            storageFileService.MoveStorageFile(oldFileName, newFileName);
+        var command = new FileMoveCommand(options);
+        _mediator.Send(command);
 
-            LogInformationMessage($"File \"{oldFileName}\" has been moved to {newFileName}");
-            consolePrinter.PrintFileMovedSuccessful(oldFileName, newFileName);
-        }
+        LogInformationMessage($"File \"{command.OldFileName}\" has been moved to {command.NewFileName}");
+        _consolePrinter.PrintFileMovedSuccessful(command.OldFileName, command.NewFileName);
     }
 
     private void ExecuteCommandFileRemove(Options options)
     {
-        if (IsContainsRequiredNumberParameters(1, 1, options.Parameters.Count))
-        {
-            string fileName = options.Parameters[0];
-            storageFileService.RemoveStorageFile(fileName);
+        var command = new FileRemoveCommand(options);
+        _mediator.Send(command);
 
-            LogInformationMessage($"File \"{fileName}\" has been removed");
-            consolePrinter.PrintFileRemovedSuccessful(fileName);
-        }
+        LogInformationMessage($"File \"{command.FileName}\" has been removed");
+        _consolePrinter.PrintFileRemovedSuccessful(command.FileName);
     }
 
     private void ExecuteCommandFileInfo(Options options)
     {
-        if (IsContainsRequiredNumberParameters(1, 1, options.Parameters.Count))
+        var query = new GetFileInfoQuery(options);
+        var result = _mediator.Send(query).Result;
+
+        FileInfoViewModel fileInfoViewModel = new FileInfoViewModel
         {
-            string fileName = options.Parameters[0];
-            StorageFile storageFile = storageFileService.GetFileInfo(fileName);
-            User user = userService.GetUser();
+            FileName = result.FileName,
+            Extension = result.Extension,
+            CreationDate = ConvertingHelper.GetDateString(result.CreationDate),
+            FileSize = ConvertingHelper.GetSizeString(result.FileSize),
+            DownloadsNumber = result.DownloadsNumber,
+            Login = result.Login
+        };
 
-            FileInfoViewModel fileInfoViewModel = new FileInfoViewModel
-            {
-                FileName = fileName,
-                Extension = storageFile.Extension,
-                CreationDate = ConvertingHelper.GetDateString(storageFile.CreationDate),
-                FileSize = ConvertingHelper.GetSizeString(storageFile.Size),
-                DownloadsNumber = storageFile.DownloadsNumber,
-                Login = user.Login
-            };
-
-            consolePrinter.PrintFileInfo(fileInfoViewModel);
-        }
+        _consolePrinter.PrintFileInfo(fileInfoViewModel);
     }
 
     private void ExecuteCommandFileExport(Options options)
     {
-        if (IsContainsRequiredNumberParameters(0, 1, options.Parameters.Count))
+        if (options.Parameters.Count == 0)
         {
-            string[] formats = { FileFormats.Json, FileFormats.Xml };
+            var query = new GetFileExportFormatsQuery(options);
+            var result = _mediator.Send(query).Result;
+            _consolePrinter.PrintExportFormats(result);
+        }
 
-            if (options.Parameters.Count == 0)
-            {
-                if (options.Flags.ContainsKey(StorageFlags.Info))
-                {
-                    consolePrinter.PrintExportFormats(formats);
-                }
-                else
-                {
-                    throw new ApplicationException("You have not entered parameters or flags for this command");
-                }
-            }
+        if (options.Parameters.Count == 1)
+        {
+            var command = new FileExportCommand(options);
+            _mediator.Send(command);
 
-            if (options.Parameters.Count == 1)
-            {
-                string destinationPath = options.Parameters[0];
-                string format = String.Empty;
-
-                if (options.Flags.ContainsKey(StorageFlags.Format))
-                {
-                    format = options.Flags[StorageFlags.Format];
-                }
-
-                storageFileService.ExportStorageInfoFile(destinationPath, format);
-
-                LogInformationMessage($"Meta-info file has been exported to '{destinationPath}'");
-                consolePrinter.PrintExportSuccessfull(destinationPath);
-            }
+            LogInformationMessage($"Meta-info file has been exported to '{command.DestinationPath}'");
+            _consolePrinter.PrintExportSuccessfull(command.DestinationPath);
         }
     }
 
     private void ExecuteCommandDirectoryCreate(Options options)
     {
-        if (IsContainsRequiredNumberParameters(2, 2, options.Parameters.Count))
-        {
-            string destinationPath = options.Parameters[0];
-            string directoryName = options.Parameters[1];
-            storageFileService.CreateStorageDirectory(destinationPath, directoryName);
+        var command = new DirectoryCreateCommand(options);
+        _mediator.Send(command);
 
-            LogInformationMessage($"Directory {directoryName} has been succesfully created at the path '{destinationPath}'");
-            consolePrinter.PrintCreateDirectorySuccessfull(destinationPath, directoryName);
-        }
+        LogInformationMessage($"Directory {command.DirectoryName} has been succesfully created at the path '{command.DestinationPath}'");
+        _consolePrinter.PrintCreateDirectorySuccessfull(command.DestinationPath, command.DirectoryName);
     }
 
     private void ExecuteCommandDirectoryMove(Options options)
     {
-        if (IsContainsRequiredNumberParameters(2, 2, options.Parameters.Count))
-        {
-            string oldPath = options.Parameters[0];
-            string newPath = options.Parameters[1];
-            storageFileService.MoveStorageDirectory(oldPath, newPath);
+        var command = new DirectoryMoveCommand(options);
+        _mediator.Send(command);
 
-            LogInformationMessage($"Directory {oldPath} has been succesfully moved to the path '{newPath}");
-            consolePrinter.PrintMoveDirectorySuccessfull(oldPath, newPath);
-        }
-    }
-
-    private bool IsContainsRequiredNumberParameters(int minCount, int maxCount, int parametersCount)
-    {
-        if (parametersCount > maxCount)
-        {
-            throw new ApplicationException("Too much parameters for this command");
-        }
-
-        if (parametersCount < minCount)
-        {
-            throw new ApplicationException("You have not entered required parameters for this command");
-        }
-
-        return true;
+        LogInformationMessage($"Directory {command.OldPath} has been succesfully moved to the path '{command.NewPath}");
+        _consolePrinter.PrintMoveDirectorySuccessfull(command.OldPath, command.NewPath);
     }
 
     private void LogInformationMessage(string message)
     {
         string logMessage = ConvertingHelper.GetLogMessage(message, string.Empty);
-        logger.LogInformation(logMessage);
+        _logger.LogInformation(logMessage);
     }
 }

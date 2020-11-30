@@ -33,25 +33,23 @@ namespace FileStorage.ConsoleUI.Helpers
 
         public static string GetKbString(long size)
         {
-            double MbSize = Math.Round((double)size / 1024, 2);
+            var kbSize = Math.Round((double)size / 1024, 2);
 
-            return $"{MbSize}KB";
+            return $"{kbSize}KB";
         }
 
-        public static string GetMbString(long size)
+        private static string GetMbString(long size)
         {
-            //TODO: local variables should start with lower case letter
-            double MbSize = Math.Round((double)size / 1024 / 1024, 2);
+            var mbSize = Math.Round((double)size / 1024 / 1024, 2);
 
-            return $"{MbSize}MB";
+            return $"{mbSize}MB";
         }
 
-        public static string GetGbString(long size)
+        private static string GetGbString(long size)
+        {
+            var gbSize = Math.Round((double)size / 1024 / 1024 / 1024, 2);
 
-        {    //TODO: local variables should start with lower case letter
-            double MbSize = Math.Round((double)size / 1024 / 1024 / 1024, 2);
-
-            return $"{MbSize}GB";
+            return $"{gbSize}GB";
         }
 
         public static string GetLogMessage(string message, string stackTrace)

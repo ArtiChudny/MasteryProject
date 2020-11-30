@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using FileStorage.ConsoleUI.Enums;
+using FileStorage.BLL.Enums;
 
 namespace FileStorage.ConsoleUI.ConsoleUtils
 {
@@ -19,7 +19,7 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
             {
                 StorageFlags flag = GetFlag(args[argIndex]);
                 string value = string.Empty;
-                if (((argIndex + 1) < args.Length)&& (!args[argIndex + 1].StartsWith(FlagIndicator)))
+                if (((argIndex + 1) < args.Length) && (!args[argIndex + 1].StartsWith(FlagIndicator)))
                 {
                     value = args[argIndex + 1];
                     argIndex++;

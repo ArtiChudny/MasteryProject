@@ -1,6 +1,6 @@
-﻿using FileStorage.ConsoleUI.Enums;
+﻿using FileStorage.BLL.Enums;
 
-namespace FileStorage.ConsoleUI.Models
+namespace FileStorage.BLL.Models
 {
     public class StorageCommand
     {

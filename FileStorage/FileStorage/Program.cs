@@ -1,50 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
-using FileStorage.BLL.Interfaces;
 using FileStorage.ConsoleUI.ConsoleUtils;
 using FileStorage.ConsoleUI.ConsoleUtils.Interfaces;
-using FileStorage.ConsoleUI.Enums;
 using FileStorage.ConsoleUI.Models;
 using FileStorage.ConsoleUI.IoC;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using FileStorage.ConsoleUI.Helpers;
+using FileStorage.BLL.Enums;
+using MediatR;
+using FileStorage.BLL.Commands;
+using FileStorage.BLL.Queries;
+using FileStorage.BLL.Models;
 
 namespace FileStorage.ConsoleUI
 {
     public class Program
     {
-        private static readonly IServiceProvider Container = new DependencyContainer().GetContainer();
+        private static readonly IServiceProvider _container = new DependencyContainer().GetContainer();
 
         static void Main(string[] args)
         {
-            ILogger<Program> logger = Container.GetService<ILogger<Program>>();
-            IConsolePrinter consolePrinter = Container.GetService<IConsolePrinter>();
-            IAuthService authService = Container.GetService<IAuthService>();
-            IStorageFileService storageFileService = Container.GetService<IStorageFileService>();
-            Controller controller = Container.GetService<Controller>();
-            ConsoleFlagParser consoleFlagParser = new ConsoleFlagParser();
-            ConsoleCommandParser consoleCommandParser = new ConsoleCommandParser(consoleFlagParser);
+            var logger = _container.GetService<ILogger<Program>>();
+            var consolePrinter = _container.GetService<IConsolePrinter>();
+            var controller = _container.GetService<Controller>();
+            var mediator = _container.GetService<IMediator>();
+            var consoleFlagParser = new ConsoleFlagParser();
+            var consoleCommandParser = new ConsoleCommandParser(consoleFlagParser);
 
             try
             {
-                storageFileService.InitializeStorage();
-                Dictionary<StorageFlags, string> flags = consoleFlagParser.Parse(args);
-                Credentials credentials = GetCredentials(flags);
+                mediator.Send(new InitializeStorageCommand());
+                
+                var flags = consoleFlagParser.Parse(args);
+                var credentials = GetCredentials(flags);
+                var authQuery = new IsAuthenticatedQuery(credentials.Login, credentials.Password);
 
-                if (!authService.IsAuthenticated(credentials.Login, credentials.Password))
+                if (!mediator.Send(authQuery).Result)
                 {
-                    throw new ApplicationException("Incorrect login or password");
+                    throw new ArgumentException("Incorrect login or password");
                 }
 
                 consolePrinter.PrintAuthenticationSuccessful();
-                StorageCommand command = new StorageCommand();
+                var command = new StorageCommand();
 
                 while (command.CommandType != StorageCommands.Exit)
                 {
                     try
                     {
-
                         command = GetCommand(consoleCommandParser, consolePrinter);
                         controller.ExecuteConsoleCommand(command);
                     }
@@ -67,45 +70,30 @@ namespace FileStorage.ConsoleUI
 
         private static Credentials GetCredentials(Dictionary<StorageFlags, string> flags)
         {
-            //TODO: NO NEED TO USE ELSE CONDITION HERE, YOU CAN JUST THROW EXCEPTION AFTER IF
-
             if (IsContainLoginPassword(flags))
             {
                 return new Credentials(flags[StorageFlags.Login], flags[StorageFlags.Password]);
             }
-            else
-            {
-                throw new ApplicationException("You have to enter your login and password. Use --l for login and --p for password.");
-            }
+
+            throw new ArgumentException("You have to enter your login and password. Use --l for login and --p for password.");
         }
 
         private static bool IsContainLoginPassword(Dictionary<StorageFlags, string> flags)
         {
-            //TODO: USE TERNARY OPERATOR HERE.
-
-            if (flags.ContainsKey(StorageFlags.Login) && flags.ContainsKey(StorageFlags.Password))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return flags.ContainsKey(StorageFlags.Login) && flags.ContainsKey(StorageFlags.Password);
         }
 
         private static StorageCommand GetCommand(ConsoleCommandParser consoleCommandParser, IConsolePrinter consolePrinter)
         {
             consolePrinter.PrintСommandWaitingIcon();
-
-            //TODO: POTENTIAL NullReferenceException. Ypu have to check response from client before you execute trim function
-            string rowCommand = Console.ReadLine().Trim();
+            string rowCommand = Console.ReadLine();
 
             if (string.IsNullOrWhiteSpace(rowCommand))
             {
-                throw new ApplicationException("You have not entered a command.");
+                throw new ArgumentNullException("You have not entered a command.");
             }
 
-            return consoleCommandParser.Parse(rowCommand);
+            return consoleCommandParser.Parse(rowCommand.Trim());
         }
     }
 }

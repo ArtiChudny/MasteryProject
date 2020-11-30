@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using FileStorage.ConsoleUI.Enums;
-using FileStorage.ConsoleUI.Models;
+using FileStorage.BLL.Enums;
+using FileStorage.BLL.Models;
+
 
 namespace FileStorage.ConsoleUI.ConsoleUtils
 {
     public class ConsoleCommandParser
     {
-        private ConsoleFlagParser consoleFlagParser;
+        private readonly ConsoleFlagParser _consoleFlagParser;
         private const string UserInfoCommandName = "user info";
         private const string ExitCommandName = "exit";
         private const string FileUploadCommandName = "file upload";
@@ -24,7 +25,7 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
 
         public ConsoleCommandParser(ConsoleFlagParser consoleFlagParser)
         {
-            this.consoleFlagParser = consoleFlagParser;
+            this._consoleFlagParser = consoleFlagParser;
         }
 
         public StorageCommand Parse(string rawCommand)
@@ -119,7 +120,7 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
                 if (parametersList[listIndex].StartsWith(FlagIndicator))
                 {
                     string[] flags = parametersList.GetRange(listIndex, parametersList.Count - listIndex).ToArray();
-                    options.Flags = consoleFlagParser.Parse(flags);
+                    options.Flags = _consoleFlagParser.Parse(flags);
                     break;
                 }
                 else

@@ -1,4 +1,4 @@
-﻿namespace FileStorage.ConsoleUI.Enums
+﻿namespace FileStorage.BLL.Enums
 {
     public enum StorageFlags
     {
