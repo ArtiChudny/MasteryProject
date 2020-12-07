@@ -4,14 +4,15 @@ using FileStorage.ConsoleUI.ConsoleUtils;
 using FileStorage.ConsoleUI.ConsoleUtils.Interfaces;
 using FileStorage.ConsoleUI.Models;
 using FileStorage.ConsoleUI.IoC;
+using FileStorage.ConsoleUI.Controllers;
+using FileStorage.ConsoleUI.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using FileStorage.ConsoleUI.Helpers;
 using FileStorage.BLL.Enums;
-using MediatR;
 using FileStorage.BLL.Commands;
 using FileStorage.BLL.Queries;
 using FileStorage.BLL.Models;
+using MediatR;
 
 namespace FileStorage.ConsoleUI
 {
@@ -23,17 +24,20 @@ namespace FileStorage.ConsoleUI
         {
             var logger = _container.GetService<ILogger<Program>>();
             var consolePrinter = _container.GetService<IConsolePrinter>();
-            var controller = _container.GetService<Controller>();
+            var controller = _container.GetService<IController>();
             var mediator = _container.GetService<IMediator>();
             var consoleFlagParser = new ConsoleFlagParser();
             var consoleCommandParser = new ConsoleCommandParser(consoleFlagParser);
 
             try
             {
+                Console.InputEncoding = System.Text.Encoding.Unicode;
+                Console.OutputEncoding = System.Text.Encoding.Unicode;
+
                 mediator.Send(new InitializeStorageCommand());
-                
-                var flags = consoleFlagParser.Parse(args);
-                var credentials = GetCredentials(flags);
+
+                var argsFlags = consoleFlagParser.Parse(args);
+                var credentials = GetCredentials(argsFlags);
                 var authQuery = new IsAuthenticatedQuery(credentials.Login, credentials.Password);
 
                 if (!mediator.Send(authQuery).Result)
@@ -49,7 +53,17 @@ namespace FileStorage.ConsoleUI
                     try
                     {
                         command = GetCommand(consoleCommandParser, consolePrinter);
-                        controller.ExecuteConsoleCommand(command);
+                        var task = controller.ExecuteConsoleCommand(command);
+                        task.Wait();
+                    }
+                    catch (AggregateException agEx)
+                    {
+                        foreach (var inEx in agEx.InnerExceptions)
+                        {
+                            string logMessage = ConvertingHelper.GetLogMessage(inEx.Message, inEx.StackTrace);
+                            logger.LogError(logMessage);
+                            consolePrinter.PrintErrorMessage(inEx.Message);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -63,7 +77,7 @@ namespace FileStorage.ConsoleUI
             {
                 string logMessage = ConvertingHelper.GetLogMessage(ex.Message, ex.StackTrace);
                 logger.LogError(logMessage);
-                consolePrinter.PrintErrorMessage(logMessage);
+                consolePrinter.PrintErrorMessage(ex.Message);
                 Environment.Exit(-1);
             }
         }

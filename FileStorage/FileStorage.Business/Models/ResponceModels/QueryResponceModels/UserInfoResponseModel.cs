@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FileStorage.BLL.Models.ResponceModels
+namespace FileStorage.BLL.Models.ResponceModels.QueryResponceModels
 {
     public class UserInfoResponseModel
     {

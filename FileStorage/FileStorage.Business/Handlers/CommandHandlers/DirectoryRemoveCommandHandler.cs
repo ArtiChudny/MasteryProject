@@ -6,18 +6,19 @@ using System.Threading.Tasks;
 
 namespace FileStorage.BLL.Handlers.CommandHandlers
 {
-    class DirectoryCreateCommandHandler : IRequestHandler<DirectoryCreateCommand>
+    public class DirectoryRemoveCommandHandler : IRequestHandler<DirectoryRemoveCommand>
     {
         private readonly IStorageRepository _storageRepository;
 
-        public DirectoryCreateCommandHandler(IStorageRepository storageRepository)
+        public DirectoryRemoveCommandHandler(IStorageRepository storageRepository)
         {
             _storageRepository = storageRepository;
         }
 
-        public async Task<Unit> Handle(DirectoryCreateCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(DirectoryRemoveCommand request, CancellationToken cancellationToken)
         {
-            await _storageRepository.CreateDirectory(request.DestinationPath, request.DirectoryName);
+            await _storageRepository.RemoveDirectory(request.Path);
+
             return Unit.Value;
         }
     }

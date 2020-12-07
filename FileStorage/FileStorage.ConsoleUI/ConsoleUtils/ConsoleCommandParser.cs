@@ -21,6 +21,9 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
         private const string FileExportCommandName = "file export";
         private const string DirectoryCreateCommandName = "directory create";
         private const string DirectoryMoveCommandName = "directory move";
+        private const string DirectoryRemoveCommandName = "directory remove";
+        private const string DirectoryListCommandName = "directory list";
+        private const string DirectorySearchCommandName = "directory search";
         private const string FlagIndicator = "--";
 
         public ConsoleCommandParser(ConsoleFlagParser consoleFlagParser)
@@ -102,6 +105,27 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
                 return storageCommand;
             }
 
+            if (lowerRawCommand.StartsWith(DirectoryRemoveCommandName))
+            {
+                storageCommand.CommandType = StorageCommands.DirectoryRemove;
+                storageCommand.Options = GetOptions(rawCommand, DirectoryRemoveCommandName);
+                return storageCommand;
+            }
+
+            if (lowerRawCommand.StartsWith(DirectoryListCommandName))
+            {
+                storageCommand.CommandType = StorageCommands.DirectoryList;
+                storageCommand.Options = GetOptions(rawCommand, DirectoryListCommandName);
+                return storageCommand;
+            }
+
+            if (lowerRawCommand.StartsWith(DirectorySearchCommandName))
+            {
+                storageCommand.CommandType = StorageCommands.DirectorySearch;
+                storageCommand.Options = GetOptions(rawCommand, DirectorySearchCommandName);
+                return storageCommand;
+            }
+
             throw new ApplicationException($"Wrong command: {rawCommand}.");
         }
 
@@ -113,7 +137,7 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
             List<string> parametersList = Regex.Matches(parametersString, regPattern, RegexOptions.Multiline).Select(m => m.Value).ToList();
             parametersList.RemoveAll(item => item == string.Empty);
 
-            Options options = new Options();
+            var options = new Options();
 
             for (int listIndex = 0; listIndex < parametersList.Count; listIndex++)
             {

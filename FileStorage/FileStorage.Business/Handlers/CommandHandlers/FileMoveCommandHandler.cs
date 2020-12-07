@@ -15,11 +15,11 @@ namespace FileStorage.BLL.Handlers.CommandHandlers
             _storageRepository = storageRepository;
         }
 
-        public Task<Unit> Handle(FileMoveCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(FileMoveCommand request, CancellationToken cancellationToken)
         {
-            _storageRepository.MoveFile(request.OldFileName, request.NewFileName);
+            await _storageRepository.MoveFile(request.OldFileName, request.NewFileName);
 
-            return Task.FromResult(Unit.Value);
+            return Unit.Value;
         }
     }
 }

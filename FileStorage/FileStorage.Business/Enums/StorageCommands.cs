@@ -12,6 +12,9 @@
         FileExport,
         DirectoryCreate,
         DirectoryMove,
+        DirectoryList,
+        DirectoryRemove,
+        DirectorySearch,
         Exit
     }
 }

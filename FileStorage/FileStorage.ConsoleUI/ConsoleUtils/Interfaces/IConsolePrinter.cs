@@ -1,4 +1,5 @@
 ﻿using FileStorage.ConsoleUI.ViewModels;
+using System.Collections.Generic;
 
 namespace FileStorage.ConsoleUI.ConsoleUtils.Interfaces
 {
@@ -18,5 +19,8 @@ namespace FileStorage.ConsoleUI.ConsoleUtils.Interfaces
         void PrintExportSuccessfull(string destinationPath);
         void PrintCreateDirectorySuccessfull(string destinationPath, string directoryName);
         void PrintMoveDirectorySuccessfull(string oldPath, string newPath);
+        void PrintDirectoryList(List<string> innerDirectories, List<string> innerFiles);
+        void PrintDirectoryRemovedSuccessfull(string path);
+        void PrintDirectorySearchResult(List<string> directories, List<string> files);
     }
 }

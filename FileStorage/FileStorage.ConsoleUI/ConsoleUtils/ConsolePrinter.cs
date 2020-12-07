@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using FileStorage.ConsoleUI.ConsoleUtils.Interfaces;
 using FileStorage.ConsoleUI.ViewModels;
 
@@ -90,5 +91,41 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
         {
             Console.WriteLine("\nDirectory {0} has been succesfully moved to the path '{1}'\n", oldPath, newPath);
         }
+
+        public void PrintDirectoryList(List<string> innerDirectories, List<string> innerFiles)
+        {
+            Console.WriteLine("\nDirectories:");
+            foreach (var dir in innerDirectories)
+            {
+                Console.WriteLine(" - {0}", dir);
+            }
+
+            Console.WriteLine("Files:");
+            foreach (var dir in innerFiles)
+            {
+                Console.WriteLine(" - {0}", dir);
+            }
+        }
+
+        public void PrintDirectoryRemovedSuccessfull(string path)
+        {
+            Console.WriteLine("\nThe directory {0} has been removed", path);
+        }
+
+        public void PrintDirectorySearchResult(List<string> directories, List<string> files)
+        {
+            Console.WriteLine("\nDirectories:");
+            foreach (var dir in directories)
+            {
+                Console.WriteLine("- {0}", dir);
+            }
+
+            Console.WriteLine("Files:");
+            foreach (var dir in files)
+            {
+                Console.WriteLine("- {0}", dir);
+            }
+        }
     }
 }
+

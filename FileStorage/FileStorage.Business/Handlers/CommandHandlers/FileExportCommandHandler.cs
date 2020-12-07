@@ -19,13 +19,13 @@ namespace FileStorage.BLL.Handlers.CommandHandlers
             _fileRepository = fileRepository;
         }
 
-        public Task<Unit> Handle(FileExportCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(FileExportCommand request, CancellationToken cancellationToken)
         {
-            StorageInfo storageInfo = _storageRepository.GetStorageInfo();
+            var storageInfo = await _storageRepository.GetStorageInfo();
             SerializableStorageInfo serializableStorageInfo = ConvertingHelper.GetSerializableStorageInfo(storageInfo);
-            _fileRepository.ExportFile(serializableStorageInfo, request.DestinationPath, request.Format);
+            await _fileRepository.ExportFile(serializableStorageInfo, request.DestinationPath, request.Format);
 
-            return Task.FromResult(Unit.Value);
+            return Unit.Value;
         }
     }
 }

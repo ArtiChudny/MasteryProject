@@ -16,11 +16,11 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
             _userRepository = userRepository;
         }
 
-        public Task<bool> Handle(IsAuthenticatedQuery request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(IsAuthenticatedQuery request, CancellationToken cancellationToken)
         {
-            User user = _userRepository.GetUser();
+            var user = await _userRepository.GetUser();
 
-            return (request.Login == user.Login && request.Password == user.Password) ? Task.FromResult(true) : Task.FromResult(false);       
+            return (request.Login == user.Login && request.Password == user.Password);
         }
     }
 }

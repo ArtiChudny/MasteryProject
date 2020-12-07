@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text.Json;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace FileStorage.DAL.Repositories
@@ -15,7 +16,7 @@ namespace FileStorage.DAL.Repositories
     {
         private readonly string _storageFilesPath = ConfigurationManager.AppSettings["StorageFilesPath"];
 
-        public void DownloadFileFromStorage(string fileName, string storageFileName, string destinationPath)
+        public Task DownloadFileFromStorage(string fileName, string storageFileName, string destinationPath)
         {
             if (!Directory.Exists(destinationPath))
             {
@@ -25,9 +26,11 @@ namespace FileStorage.DAL.Repositories
             string fullStorageFilePath = Path.Combine(_storageFilesPath, storageFileName);
             string fullDestinationFilePath = Path.Combine(destinationPath, fileName);
             File.Copy(fullStorageFilePath, fullDestinationFilePath);
+
+            return Task.CompletedTask;
         }
 
-        public void ExportFile(SerializableStorageInfo storageInfo, string destinationPath, string format)
+        public Task ExportFile(SerializableStorageInfo storageInfo, string destinationPath, string format)
         {
             string directoryPath = Path.GetDirectoryName(destinationPath);
 
@@ -58,18 +61,27 @@ namespace FileStorage.DAL.Repositories
                         throw new ArgumentException($"Unknown format {format}");
                     }
             }
+
+            return Task.CompletedTask;
         }
 
-        public FileInfoModel GetFileInfo(string filePath)
+        public Task<FileInfoModel> GetFileInfo(string filePath)
         {
+            if (!File.Exists(filePath))
+            {
+                throw new ArgumentException($"File {filePath} is not exists");
+            }
+
             FileInfo fileInfo = new FileInfo(filePath);
 
-            return new FileInfoModel
+            var fileInfoModel = new FileInfoModel
             {
                 CreationDate = fileInfo.CreationTime,
                 Size = fileInfo.Length,
                 Hash = GetFileHash(filePath)
             };
+
+            return Task.FromResult(fileInfoModel);
         }
 
         public byte[] GetFileHash(string filePath)
@@ -105,7 +117,7 @@ namespace FileStorage.DAL.Repositories
             }
         }
 
-        public void MoveFile(string oldFileName, string newFileName)
+        public Task MoveFile(string oldFileName, string newFileName)
         {
             string filePath = Path.Combine(_storageFilesPath, oldFileName);
 
@@ -122,9 +134,11 @@ namespace FileStorage.DAL.Repositories
             }
 
             File.Move(filePath, newFilePath);
+
+            return Task.CompletedTask;
         }
 
-        public void RemoveFile(string fileName)
+        public Task RemoveFile(string fileName)
         {
             string filePath = Path.Combine(_storageFilesPath, fileName);
 
@@ -134,9 +148,11 @@ namespace FileStorage.DAL.Repositories
             }
 
             File.Delete(filePath);
+
+            return Task.CompletedTask;
         }
 
-        public void UploadFileIntoStorage(string filePath, string guid)
+        public Task UploadFileIntoStorage(string filePath, string guid)
         {
             if (!File.Exists(filePath))
             {
@@ -145,6 +161,8 @@ namespace FileStorage.DAL.Repositories
 
             string fullDestinationPath = Path.Combine(_storageFilesPath, guid);
             File.Copy(filePath, fullDestinationPath);
+
+            return Task.CompletedTask;
         }
 
         private void ExportFileToXML(SerializableStorageInfo storageInfo, string destinationPath)

@@ -5,14 +5,17 @@ using System;
 
 namespace FileStorage.BLL.Queries
 {
-    public class GetUserInfoQuery : IRequest<UserInfoResponseModel>
+    public class GetDirectoryInnerListQuery : IRequest<GetDirectoryInnerListResponseModel>
     {
-        public GetUserInfoQuery(Options options)
+        public string Path { get; set; }
+
+        public GetDirectoryInnerListQuery(Options options)
         {
-            if (options.Parameters.Count != 0 || options.Flags.Count != 0)
+            if (options.Parameters.Count != 1 || options.Flags.Count != 0)
             {
                 throw new ArgumentException("Wrong count of parameters or flags for this command");
             }
+            Path = options.Parameters[0];
         }
     }
 }

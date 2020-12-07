@@ -20,9 +20,9 @@ namespace FileStorage.BLL.Handlers.CommandHandlers
             _fileRepository = fileRepository;
         }
 
-        Task<StorageFile> IRequestHandler<FileUploadCommand, StorageFile>.Handle(FileUploadCommand request, CancellationToken cancellationToken)
+        public async Task<StorageFile> Handle(FileUploadCommand request, CancellationToken cancellationToken)
         {
-            FileInfoModel fileInfo = _fileRepository.GetFileInfo(request.FilePath);
+            var fileInfo = await _fileRepository.GetFileInfo(request.FilePath);
             string fileName = Path.GetFileName(request.FilePath);
 
             if (_storageRepository.GetFileInfo(fileName) != null)
@@ -40,11 +40,11 @@ namespace FileStorage.BLL.Handlers.CommandHandlers
                 throw new ArgumentException("Not enough space in the storage to upload the file");
             }
 
-            StorageFile storageFile = _storageRepository.CreateFile(fileName, fileInfo.Size, fileInfo.Hash, fileInfo.CreationDate);
+            var storageFile = await _storageRepository.CreateFile(fileName, fileInfo.Size, fileInfo.Hash, fileInfo.CreationDate);
             string storageFileName = storageFile.Id.ToString();
-            _fileRepository.UploadFileIntoStorage(request.FilePath, storageFileName);
+            await _fileRepository.UploadFileIntoStorage(request.FilePath, storageFileName);
 
-            return Task.FromResult(storageFile);
+            return storageFile;
         }
     }
 }

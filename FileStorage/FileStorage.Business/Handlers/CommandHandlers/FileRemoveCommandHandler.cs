@@ -1,5 +1,4 @@
 ﻿using FileStorage.BLL.Commands;
-using FileStorage.DAL.Models;
 using FileStorage.DAL.Repositories.Interfaces;
 using MediatR;
 using System;
@@ -19,9 +18,9 @@ namespace FileStorage.BLL.Handlers.CommandHandlers
             _fileRepository = fileRepository;
         }
 
-        public Task<Unit> Handle(FileRemoveCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(FileRemoveCommand request, CancellationToken cancellationToken)
         {
-            StorageFile storageFile = _storageRepository.GetFileInfo(request.FileName);
+            var storageFile = await _storageRepository.GetFileInfo(request.FileName);
 
             if (storageFile == null)
             {
@@ -29,10 +28,10 @@ namespace FileStorage.BLL.Handlers.CommandHandlers
             }
 
             string storageFileName = storageFile.Id.ToString();
-            _fileRepository.RemoveFile(storageFileName);
-            _storageRepository.RemoveFile(request.FileName);
+            await _fileRepository.RemoveFile(storageFileName);
+            await _storageRepository.RemoveFile(request.FileName);
 
-            return Task.FromResult(Unit.Value);
+            return Unit.Value;
         }
     }
 }

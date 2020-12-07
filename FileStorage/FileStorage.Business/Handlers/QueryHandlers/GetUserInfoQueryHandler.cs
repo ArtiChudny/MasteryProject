@@ -1,4 +1,4 @@
-﻿using FileStorage.BLL.Models.ResponceModels;
+﻿using FileStorage.BLL.Models.ResponceModels.QueryResponceModels;
 using FileStorage.BLL.Queries;
 using FileStorage.DAL.Models;
 using FileStorage.DAL.Repositories.Interfaces;
@@ -19,10 +19,10 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
             _storageRepository = storageProvider;
         }
 
-        Task<UserInfoResponseModel> IRequestHandler<GetUserInfoQuery, UserInfoResponseModel>.Handle(GetUserInfoQuery request, CancellationToken cancellationToken)
+        public async Task<UserInfoResponseModel> Handle(GetUserInfoQuery request, CancellationToken cancellationToken)
         {
-            var currentUser = _userRepository.GetUser();
-            StorageInfo storageInfo = _storageRepository.GetStorageInfo();
+            var currentUser = await _userRepository.GetUser();
+            var storageInfo = await _storageRepository.GetStorageInfo();
 
             UserInfoResponseModel userInfo = new UserInfoResponseModel
             {
@@ -31,7 +31,7 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
                 CreationDate = storageInfo.CreationDate
             };
 
-            return Task.FromResult(userInfo);
+            return userInfo;
         }
     }
 }

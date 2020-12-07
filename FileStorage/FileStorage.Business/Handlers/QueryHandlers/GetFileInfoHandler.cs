@@ -1,4 +1,4 @@
-﻿using FileStorage.BLL.Models.ResponceModels;
+﻿using FileStorage.BLL.Models.ResponceModels.QueryResponceModels;
 using FileStorage.BLL.Queries;
 using FileStorage.DAL.Models;
 using FileStorage.DAL.Repositories.Interfaces;
@@ -20,18 +20,18 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
             _storageRepository = storageRepository;
         }
 
-        public Task<FileInfoResponseModel> Handle(GetFileInfoQuery request, CancellationToken cancellationToken)
+        public async Task<FileInfoResponseModel> Handle(GetFileInfoQuery request, CancellationToken cancellationToken)
         {
-            StorageFile storageFile = _storageRepository.GetFileInfo(request.FileName);
+            var storageFile = await _storageRepository.GetFileInfo(request.FileName);
 
             if (storageFile == null)
             {
                 throw new ArgumentException($"File '{request.FileName}' is not exists");
             }
 
-            User currentUser = _userRepository.GetUser();
+            var currentUser = await _userRepository.GetUser();
 
-            FileInfoResponseModel fileInfoResponseModel = new FileInfoResponseModel
+            var fileInfoResponseModel = new FileInfoResponseModel
             {
                 FileName = request.FileName,
                 Extension = storageFile.Extension,
@@ -41,7 +41,7 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
                 Login = currentUser.Login
             };
 
-            return Task.FromResult(fileInfoResponseModel);
+            return fileInfoResponseModel;
         }
     }
 }

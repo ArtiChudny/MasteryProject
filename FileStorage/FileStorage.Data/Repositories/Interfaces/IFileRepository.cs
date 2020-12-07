@@ -1,17 +1,18 @@
 ﻿using FileStorage.DAL.Models;
+using System.Threading.Tasks;
 
 namespace FileStorage.DAL.Repositories.Interfaces
 {
     public interface IFileRepository
     {
-        void UploadFileIntoStorage(string filePath, string guid);
-        void DownloadFileFromStorage(string fileName, string storageFileName, string destinationPath);
-        FileInfoModel GetFileInfo(string filePath);
-        void MoveFile(string oldFileName, string newFileName);
-        void RemoveFile(string fileName);
+        Task UploadFileIntoStorage(string filePath, string guid);
+        Task DownloadFileFromStorage(string fileName, string storageFileName, string destinationPath);
+        Task<FileInfoModel> GetFileInfo(string filePath);
+        Task MoveFile(string oldFileName, string newFileName);
+        Task RemoveFile(string fileName);
         byte[] GetFileHash(string filePath);
         bool IsHashMatch(string fileName, byte[] storageFileHash);
         void InitializeFileStorage();
-        void ExportFile(SerializableStorageInfo storageInfo, string destinationPath, string format);
+        Task ExportFile(SerializableStorageInfo storageInfo, string destinationPath, string format);
     }
 }

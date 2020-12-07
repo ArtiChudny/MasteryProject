@@ -19,9 +19,9 @@ namespace FileStorage.BLL.Handlers.CommandHandlers
             _fileRepository = fileRepository;
         }
 
-        public Task<Unit> Handle(FileDownloadCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(FileDownloadCommand request, CancellationToken cancellationToken)
         {
-            StorageFile storageFile = _storageRepository.GetFileInfo(request.FileName);
+            var storageFile = await _storageRepository.GetFileInfo(request.FileName);
 
             if (storageFile == null)
             {
@@ -34,10 +34,10 @@ namespace FileStorage.BLL.Handlers.CommandHandlers
             }
 
             string storageFileName = storageFile.Id.ToString();
-            _fileRepository.DownloadFileFromStorage(request.FileName, storageFileName, request.DestinationPath);
+            await _fileRepository.DownloadFileFromStorage(request.FileName, storageFileName, request.DestinationPath);
             _storageRepository.IncreaseDownloadsCounter(request.FileName);
 
-            return Task.FromResult(Unit.Value);
+            return Unit.Value;
         }
     }
 }

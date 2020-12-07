@@ -1,5 +1,5 @@
 ﻿using FileStorage.BLL.Models;
-using FileStorage.BLL.Models.ResponceModels;
+using FileStorage.BLL.Models.ResponceModels.QueryResponceModels;
 using MediatR;
 using System;
 

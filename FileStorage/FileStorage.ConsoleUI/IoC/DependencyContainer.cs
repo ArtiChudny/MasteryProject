@@ -1,6 +1,7 @@
 ﻿using FileStorage.BLL;
 using FileStorage.ConsoleUI.ConsoleUtils;
 using FileStorage.ConsoleUI.ConsoleUtils.Interfaces;
+using FileStorage.ConsoleUI.Controllers;
 using FileStorage.DAL.Repositories;
 using FileStorage.DAL.Repositories.Interfaces;
 using MediatR;
@@ -21,7 +22,7 @@ namespace FileStorage.ConsoleUI.IoC
             container.AddTransient<IStorageRepository, StorageRepository>();
             container.AddTransient<IUserRepository, UserRepository>();
             container.AddTransient<IConsolePrinter, ConsolePrinter>();
-            container.AddTransient<Controller>();
+            container.AddTransient<IController, Controller>();
             container.AddMediatR(BusinessLayerAssembly.Value);
 
             string logPath = ConfigurationManager.AppSettings["LogPath"];
