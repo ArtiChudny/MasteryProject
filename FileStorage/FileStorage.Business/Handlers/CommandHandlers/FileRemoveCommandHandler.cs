@@ -20,16 +20,16 @@ namespace FileStorage.BLL.Handlers.CommandHandlers
 
         public async Task<Unit> Handle(FileRemoveCommand request, CancellationToken cancellationToken)
         {
-            var storageFile = await _storageRepository.GetFileInfo(request.FileName);
+            var storageFile = await _storageRepository.GetFileInfo(request.FilePath);
 
             if (storageFile == null)
             {
-                throw new ApplicationException($"File '{request.FileName}' is not exists");
+                throw new ApplicationException($"File '{request.FilePath}' is not exists");
             }
 
-            string storageFileName = storageFile.Id.ToString();
-            await _fileRepository.RemoveFile(storageFileName);
-            await _storageRepository.RemoveFile(request.FileName);
+            var guidFileName = storageFile.Id.ToString();
+            await _fileRepository.RemoveFile(guidFileName);
+            await _storageRepository.RemoveFile(request.FilePath);
 
             return Unit.Value;
         }

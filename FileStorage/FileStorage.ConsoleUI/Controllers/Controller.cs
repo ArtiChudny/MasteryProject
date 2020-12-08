@@ -129,8 +129,8 @@ namespace FileStorage.ConsoleUI.Controllers
             var fileDownloadCommand = new FileDownloadCommand(options);
             await _mediator.Send(fileDownloadCommand);
 
-            LogInformationMessage($"File \"{fileDownloadCommand.FileName}\" has been downloaded to {fileDownloadCommand.DestinationPath}");
-            _consolePrinter.PrintFileDownloadedSuccessful(fileDownloadCommand.FileName);
+            LogInformationMessage($"File \"{fileDownloadCommand.FilePath}\" has been downloaded to {fileDownloadCommand.DestinationPath}");
+            _consolePrinter.PrintFileDownloadedSuccessful(fileDownloadCommand.FilePath);
         }
 
         private async Task ExecuteConsoleCommandFileMove(Options options)
@@ -147,8 +147,8 @@ namespace FileStorage.ConsoleUI.Controllers
             var fileRemoveCommand = new FileRemoveCommand(options);
             await _mediator.Send(fileRemoveCommand);
 
-            LogInformationMessage($"File \"{fileRemoveCommand.FileName}\" has been removed");
-            _consolePrinter.PrintFileRemovedSuccessful(fileRemoveCommand.FileName);
+            LogInformationMessage($"File \"{fileRemoveCommand.FilePath}\" has been removed");
+            _consolePrinter.PrintFileRemovedSuccessful(fileRemoveCommand.FilePath);
         }
 
         private async Task ExecuteConsoleCommandFileInfo(Options options)
@@ -180,7 +180,7 @@ namespace FileStorage.ConsoleUI.Controllers
 
             if (options.Parameters.Count == 1)
             {
-                var fileExportCommand = new FileExportCommand(options);
+                var fileExportCommand = new FileExportQuery(options);
                 await _mediator.Send(fileExportCommand);
 
                 LogInformationMessage($"Meta-info file has been exported to '{fileExportCommand.DestinationPath}'");

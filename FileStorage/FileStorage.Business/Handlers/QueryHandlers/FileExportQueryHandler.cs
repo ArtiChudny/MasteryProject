@@ -1,25 +1,25 @@
-﻿using FileStorage.BLL.Commands;
-using FileStorage.BLL.Helpers;
+﻿using FileStorage.BLL.Helpers;
+using FileStorage.BLL.Queries;
 using FileStorage.DAL.Models;
 using FileStorage.DAL.Repositories.Interfaces;
 using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FileStorage.BLL.Handlers.CommandHandlers
+namespace FileStorage.BLL.Handlers.QueryHandlers
 {
-    public class FileExportCommandHandler : IRequestHandler<FileExportCommand>
+    public class FileExportQueryHandler : IRequestHandler<FileExportQuery>
     {
         private readonly IStorageRepository _storageRepository;
         private readonly IFileRepository _fileRepository;
 
-        public FileExportCommandHandler(IStorageRepository storageRepository, IFileRepository fileRepository)
+        public FileExportQueryHandler(IStorageRepository storageRepository, IFileRepository fileRepository)
         {
             _storageRepository = storageRepository;
             _fileRepository = fileRepository;
         }
 
-        public async Task<Unit> Handle(FileExportCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(FileExportQuery request, CancellationToken cancellationToken)
         {
             var storageInfo = await _storageRepository.GetStorageInfo();
             SerializableStorageInfo serializableStorageInfo = ConvertingHelper.GetSerializableStorageInfo(storageInfo);

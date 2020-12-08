@@ -94,17 +94,18 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
 
         public void PrintDirectoryList(List<string> innerDirectories, List<string> innerFiles)
         {
-            Console.WriteLine("\nDirectories:");
+            Console.WriteLine("\nDirectories:{0}", innerDirectories.Count);
             foreach (var dir in innerDirectories)
             {
                 Console.WriteLine(" - {0}", dir);
             }
 
-            Console.WriteLine("Files:");
+            Console.WriteLine("Files:{0}", innerFiles.Count);
             foreach (var dir in innerFiles)
             {
                 Console.WriteLine(" - {0}", dir);
             }
+            Console.WriteLine();
         }
 
         public void PrintDirectoryRemovedSuccessfull(string path)
@@ -114,17 +115,17 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
 
         public void PrintDirectorySearchResult(List<string> directories, List<string> files)
         {
-            Console.WriteLine("\nDirectories:");
+            Console.WriteLine("\nDirectories:{0}", directories.Count);
             foreach (var dir in directories)
             {
                 Console.WriteLine("- {0}", dir);
             }
-
-            Console.WriteLine("Files:");
+            Console.WriteLine("\nFiles:{0}", files.Count);
             foreach (var dir in files)
             {
                 Console.WriteLine("- {0}", dir);
             }
+            Console.WriteLine();
         }
     }
 }

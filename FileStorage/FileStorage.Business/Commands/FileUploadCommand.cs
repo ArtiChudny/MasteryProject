@@ -8,15 +8,17 @@ namespace FileStorage.BLL.Commands
     public class FileUploadCommand : IRequest<StorageFile>
     {
         public string FilePath { get; set; }
+        public string DestinationDirectoryPath { get; set; }
 
         public FileUploadCommand(Options options)
         {
-            if (options.Parameters.Count != 1 || options.Flags.Count != 0)
+            if (options.Parameters.Count != 2 || options.Flags.Count != 0)
             {
                 throw new ArgumentException("Wrong count of parameters or flags for this command");
             }
 
             FilePath = options.Parameters[0];
+            DestinationDirectoryPath = options.Parameters[1];
         }
     }
 }

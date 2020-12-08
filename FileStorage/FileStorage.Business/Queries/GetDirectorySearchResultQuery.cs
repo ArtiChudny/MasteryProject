@@ -18,7 +18,7 @@ namespace FileStorage.BLL.Queries
             }
 
             Path = options.Parameters[0];
-            SearchLine = options.Parameters[1];
+            SearchLine = options.Parameters[1].ToLower();
         }
     }
 }

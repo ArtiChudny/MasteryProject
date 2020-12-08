@@ -1,8 +1,8 @@
 ﻿using FileStorage.BLL.Commands;
-using FileStorage.DAL.Models;
 using FileStorage.DAL.Repositories.Interfaces;
 using MediatR;
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,11 +21,11 @@ namespace FileStorage.BLL.Handlers.CommandHandlers
 
         public async Task<Unit> Handle(FileDownloadCommand request, CancellationToken cancellationToken)
         {
-            var storageFile = await _storageRepository.GetFileInfo(request.FileName);
+            var storageFile = await _storageRepository.GetFileInfo(request.FilePath);
 
             if (storageFile == null)
             {
-                throw new ApplicationException($"File '{request.FileName}' is not exists");
+                throw new ApplicationException($"File '{request.FilePath}' is not exists");
             }
 
             if (!_fileRepository.IsHashMatch(storageFile.Id.ToString(), storageFile.Hash))
@@ -33,9 +33,11 @@ namespace FileStorage.BLL.Handlers.CommandHandlers
                 throw new ApplicationException("The file has been damaged or changed");
             }
 
-            string storageFileName = storageFile.Id.ToString();
-            await _fileRepository.DownloadFileFromStorage(request.FileName, storageFileName, request.DestinationPath);
-            _storageRepository.IncreaseDownloadsCounter(request.FileName);
+            string fileName = Path.GetFileName(request.FilePath);
+            string guidFileName = storageFile.Id.ToString();
+
+            await _fileRepository.DownloadFileFromStorage(fileName, guidFileName, request.DestinationPath);
+            _storageRepository.IncreaseDownloadsCounter(request.FilePath);
 
             return Unit.Value;
         }

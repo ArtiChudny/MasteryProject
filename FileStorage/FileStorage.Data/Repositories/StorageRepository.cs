@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 
@@ -22,11 +21,17 @@ namespace FileStorage.DAL.Repositories
             _binaryFormatter = new BinaryFormatter();
         }
 
-        public Task<StorageFile> CreateFile(string fileName, long fileSize, byte[] hash, DateTime creationDate)
+        public Task<StorageFile> CreateFile(string directoryPath, string fileName, long fileSize, byte[] hash, DateTime creationDate)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
-            storageInfo.UsedStorage += fileSize;
-            StorageFile storageFile = new StorageFile
+            StorageDirectory directory = GetDirectoryByPath(directoryPath, storageInfo.Directories);
+
+            if (directory.Files.ContainsKey(fileName))
+            {
+                throw new ArgumentException($"The file '{fileName}' is already exists in the '{directoryPath}'");
+            }
+
+            var storageFile = new StorageFile
             {
                 Id = Guid.NewGuid(),
                 CreationDate = creationDate,
@@ -36,7 +41,8 @@ namespace FileStorage.DAL.Repositories
                 DownloadsNumber = 0
             };
 
-            storageInfo.Files.Add(fileName, storageFile);
+            directory.Files.Add(fileName, storageFile);
+            storageInfo.UsedStorage += fileSize;
             SerializeStorageInfoFile(storageInfo);
 
             return Task.FromResult(storageFile);
@@ -49,31 +55,38 @@ namespace FileStorage.DAL.Repositories
             return storageInfo.Files[fileName].Hash;
         }
 
-        public Task<StorageFile> GetFileInfo(string fileName)
+        public Task<StorageFile> GetFileInfo(string filePath)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
 
-            if (storageInfo.Files.ContainsKey(fileName))
-            {
-                return Task.FromResult(storageInfo.Files[fileName]);
-            }
-            else
-            {
-                return null;
-            }
+            var storageFile = GetFileByPath(storageInfo, filePath);
+
+            return Task.FromResult(storageFile);
         }
 
         public Task<StorageInfo> GetStorageInfo()
         {
-            var storageInfo = DeserializeStorageInfoFile();
+            StorageInfo storageInfo = DeserializeStorageInfoFile();
 
             return Task.FromResult(storageInfo);
         }
 
-        public void IncreaseDownloadsCounter(string fileName)
+        private StorageFile GetFileByPath(StorageInfo storageInfo, string filePath)
+        {
+            string fileName = Path.GetFileName(filePath);
+            string parentDirectoryPath = filePath.Substring(0, filePath.IndexOf(fileName) - 1);
+
+            var directory = GetDirectoryByPath(parentDirectoryPath, storageInfo.Directories);
+
+            return directory.Files.ContainsKey(fileName) ? directory.Files[fileName] : null;
+        }
+
+        public void IncreaseDownloadsCounter(string filePath)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
-            storageInfo.Files[fileName].DownloadsNumber++;
+            var storageFile = GetFileByPath(storageInfo, filePath);
+            storageFile.DownloadsNumber++;
+
             SerializeStorageInfoFile(storageInfo);
         }
 
@@ -105,23 +118,50 @@ namespace FileStorage.DAL.Repositories
             return fileSize < _maxFileSize;
         }
 
-        public Task MoveFile(string oldFileName, string newFileName)
+        public Task MoveFile(string oldFilePath, string newFilePath)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
-            StorageFile storageFile = storageInfo.Files[oldFileName];
-            storageInfo.Files.Remove(oldFileName);
-            storageFile.Extension = Path.GetExtension(newFileName);
-            storageInfo.Files.Add(newFileName, storageFile);
+            StorageFile movableStorageFile = GetFileByPath(storageInfo, oldFilePath);
+
+            if (movableStorageFile == null)
+            {
+                throw new ArgumentException($"The file '{oldFilePath}' is not exists");
+            }
+
+            string oldFileName = Path.GetFileName(oldFilePath);
+            string oldParentDerictoryPath = oldFilePath.Substring(0, oldFilePath.IndexOf(oldFileName) - 1);
+            StorageDirectory oldParentDirectory = GetDirectoryByPath(oldParentDerictoryPath, storageInfo.Directories);
+            oldParentDirectory.Files.Remove(oldFileName);
+
+            string newFileName = Path.GetFileName(newFilePath);
+            string newParentDerictoryPath = newFilePath.Substring(0, newFilePath.IndexOf(newFileName) - 1);
+
+            StorageDirectory newParentDirectory = GetDirectoryByPath(newParentDerictoryPath, storageInfo.Directories);
+
+            if (newParentDirectory.Files.ContainsKey(newFileName))
+            {
+                throw new ArgumentException($"The file '{newFileName}' is already exists in directory {newParentDerictoryPath}");
+            }
+
+            movableStorageFile.Extension = Path.GetExtension(newFileName);
+            newParentDirectory.Files.Add(newFileName, movableStorageFile);
+
             SerializeStorageInfoFile(storageInfo);
 
             return Task.CompletedTask;
         }
 
-        public Task RemoveFile(string fileName)
+        public Task RemoveFile(string filePath)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
-            storageInfo.UsedStorage -= storageInfo.Files[fileName].Size;
-            storageInfo.Files.Remove(fileName);
+
+            string fileName = Path.GetFileName(filePath);
+            string parentDirectoryPath = filePath.Substring(0, filePath.IndexOf(fileName) - 1);
+            StorageDirectory parentDirectory = GetDirectoryByPath(parentDirectoryPath, storageInfo.Directories);
+
+            storageInfo.UsedStorage -= parentDirectory.Files[fileName].Size;
+            parentDirectory.Files.Remove(fileName);
+
             SerializeStorageInfoFile(storageInfo);
 
             return Task.CompletedTask;
@@ -148,7 +188,7 @@ namespace FileStorage.DAL.Repositories
         public Task CreateDirectory(string path, string directoryName)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
-            StorageDirectory parentDirectory = GetDirectoryByPathList(GetPathList(path), storageInfo.Directories);
+            StorageDirectory parentDirectory = GetDirectoryByPath(path, storageInfo.Directories);
 
             if (parentDirectory.Directories.ContainsKey(directoryName))
             {
@@ -166,28 +206,21 @@ namespace FileStorage.DAL.Repositories
             return Task.CompletedTask;
         }
 
-
-        private List<string> GetPathList(string path)
+        private StorageDirectory GetDirectoryByPath(string path, Dictionary<string, StorageDirectory> directories)
         {
-            var pathList = path.Trim().Split("/").ToList();
-            pathList.Remove(pathList.First());
+            var pathArray = path.Remove(0, 1).Trim().Split("/");
 
-            return pathList;
-        }
-
-        private StorageDirectory GetDirectoryByPathList(List<string> pathList, Dictionary<string, StorageDirectory> directories)
-        {
-            if (pathList.Count != 0 && directories.ContainsKey(pathList.First()))
+            if (pathArray.Length != 0 && directories.ContainsKey(pathArray[0]))
             {
-                if (pathList.Count == 1)
+                if (pathArray.Length == 1)
                 {
-                    return directories[pathList.First()];
+                    return directories[pathArray[0]];
                 }
                 else
                 {
-                    string tmpDirName = pathList.First();
-                    pathList.Remove(pathList.First());
-                    return GetDirectoryByPathList(pathList, directories[tmpDirName].Directories);
+                    string tmpDirName = pathArray[0];
+                    path = path.Remove(0, 1 + tmpDirName.Length);
+                    return GetDirectoryByPath(path, directories[tmpDirName].Directories);
                 }
             }
 
@@ -199,31 +232,27 @@ namespace FileStorage.DAL.Repositories
             StorageInfo storageInfo = DeserializeStorageInfoFile();
 
             //Getting old directory
-            List<string> oldDirectoryPathList = GetPathList(oldPath);
-            StorageDirectory movableDirectory = GetDirectoryByPathList(oldDirectoryPathList, storageInfo.Directories);
+            StorageDirectory movableDirectory = GetDirectoryByPath(oldPath, storageInfo.Directories);
 
             //Getting old parent directory
-            oldDirectoryPathList.Remove(oldDirectoryPathList.Last());
-            StorageDirectory oldParentDirectory = GetDirectoryByPathList(oldDirectoryPathList, storageInfo.Directories);
-            oldParentDirectory.Directories.Remove(movableDirectory.Name);
+            string oldParentDirectoryPath = oldPath.Substring(0, movableDirectory.Name.Length - 1);
+            StorageDirectory oldParentDirectory = GetDirectoryByPath(oldParentDirectoryPath, storageInfo.Directories);
 
-            //Getting new directory name
-            List<string> newDirectoryPathList = GetPathList(newPath);
-            string newDirName = newDirectoryPathList.Last();
-            movableDirectory.Name = newDirName;
+            //Getting new parent directory
+            string newDirectoryName = Path.GetFileName(newPath);
+            string newParentDirectoryPath = newPath.Substring(0, newDirectoryName.Length - 1);
+            StorageDirectory newParentDirectory = GetDirectoryByPath(newParentDirectoryPath, storageInfo.Directories);
 
-            //Getting new parent directory and adding new directory into it
-            newDirectoryPathList.Remove(newDirectoryPathList.Last());
-            StorageDirectory newParentDirectory = GetDirectoryByPathList(newDirectoryPathList, storageInfo.Directories);
-            movableDirectory.ParentId = newParentDirectory.Name;
-
-            if (newParentDirectory.Directories.ContainsKey(newDirName))
+            if (newParentDirectory.Directories.ContainsKey(newDirectoryName))
             {
-                throw new InvalidOperationException($"The directory {newDirName} is already exists at the path '{newPath}'");
+                throw new InvalidOperationException($"The directory {newDirectoryName} is already exists at the path '{newPath}'");
             }
             else
             {
-                newParentDirectory.Directories.Add(newDirName, movableDirectory);
+                oldParentDirectory.Directories.Remove(movableDirectory.Name);
+                movableDirectory.Name = newDirectoryName;
+                movableDirectory.ParentId = newParentDirectory.Name;
+                newParentDirectory.Directories.Add(newDirectoryName, movableDirectory);
             }
 
             SerializeStorageInfoFile(storageInfo);
@@ -233,24 +262,21 @@ namespace FileStorage.DAL.Repositories
 
         public Task<StorageDirectory> GetDirectory(string path)
         {
-            var pathList = GetPathList(path);
-            var storageInfo = DeserializeStorageInfoFile();
-            var storageDirectory = GetDirectoryByPathList(pathList, storageInfo.Directories);
+            StorageInfo storageInfo = DeserializeStorageInfoFile();
+            var storageDirectory = GetDirectoryByPath(path, storageInfo.Directories);
 
             return Task.FromResult(storageDirectory);
         }
 
         public Task RemoveDirectory(string path)
         {
-            var pathList = GetPathList(path);
-            var directoryName = pathList.Last();
+            StorageInfo storageInfo = DeserializeStorageInfoFile();
 
-            pathList.Remove(pathList.First());
+            string directoryName = Path.GetFileName(path);
+            string parentDirectoryPath = path.Substring(0, path.IndexOf(directoryName) - 1);
+            StorageDirectory parentDirectory = GetDirectoryByPath(parentDirectoryPath, storageInfo.Directories);
 
-            var storageInfo = DeserializeStorageInfoFile();
-            var parentDirectory = GetDirectoryByPathList(pathList, storageInfo.Directories);
-
-            if (parentDirectory.Directories.ContainsKey(directoryName))
+            if (!parentDirectory.Directories.ContainsKey(directoryName))
             {
                 throw new ArgumentException("The path doesn't exist");
             }

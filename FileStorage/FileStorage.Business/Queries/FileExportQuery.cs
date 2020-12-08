@@ -3,14 +3,14 @@ using FileStorage.BLL.Models;
 using MediatR;
 using System;
 
-namespace FileStorage.BLL.Commands
+namespace FileStorage.BLL.Queries
 {
-    public class FileExportCommand : IRequest
+    public class FileExportQuery : IRequest
     {
         public string DestinationPath { get; set; }
         public string Format { get; set; }
 
-        public FileExportCommand(Options options)
+        public FileExportQuery(Options options)
         {
             if (options.Parameters.Count != 1 || options.Flags.Count > 1)
             {

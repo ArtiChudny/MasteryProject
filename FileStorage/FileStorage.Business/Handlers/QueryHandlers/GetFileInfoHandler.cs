@@ -1,6 +1,5 @@
 ﻿using FileStorage.BLL.Models.ResponceModels.QueryResponceModels;
 using FileStorage.BLL.Queries;
-using FileStorage.DAL.Models;
 using FileStorage.DAL.Repositories.Interfaces;
 using MediatR;
 using System;

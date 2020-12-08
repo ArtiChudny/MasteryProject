@@ -22,10 +22,12 @@ namespace FileStorage.BLL.Handlers.CommandHandlers
 
         public async Task<StorageFile> Handle(FileUploadCommand request, CancellationToken cancellationToken)
         {
-            var fileInfo = await _fileRepository.GetFileInfo(request.FilePath);
-            string fileName = Path.GetFileName(request.FilePath);
+            FileInfoModel fileInfo = await _fileRepository.GetFileInfo(request.FilePath);
 
-            if (_storageRepository.GetFileInfo(fileName) != null)
+            string fileName = Path.GetFileName(request.FilePath);
+            string storageFilePath = $"{request.DestinationDirectoryPath}/{fileName}";
+
+            if (await _storageRepository.GetFileInfo(storageFilePath) != null)
             {
                 throw new ArgumentException("A file with the same name already exists in the storage");
             }
@@ -40,9 +42,9 @@ namespace FileStorage.BLL.Handlers.CommandHandlers
                 throw new ArgumentException("Not enough space in the storage to upload the file");
             }
 
-            var storageFile = await _storageRepository.CreateFile(fileName, fileInfo.Size, fileInfo.Hash, fileInfo.CreationDate);
-            string storageFileName = storageFile.Id.ToString();
-            await _fileRepository.UploadFileIntoStorage(request.FilePath, storageFileName);
+            StorageFile storageFile = await _storageRepository.CreateFile(request.DestinationDirectoryPath, fileName, fileInfo.Size, fileInfo.Hash, fileInfo.CreationDate);
+            string guidFileName = storageFile.Id.ToString();
+            await _fileRepository.UploadFileIntoStorage(request.FilePath, guidFileName);
 
             return storageFile;
         }

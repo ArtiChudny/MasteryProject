@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 using FileStorage.BLL.Enums;
 using FileStorage.BLL.Models;
 
-
 namespace FileStorage.ConsoleUI.ConsoleUtils
 {
     public class ConsoleCommandParser
@@ -34,92 +33,91 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
         public StorageCommand Parse(string rawCommand)
         {
             StorageCommand storageCommand = new StorageCommand();
-            string lowerRawCommand = rawCommand.ToLower();
 
-            if (lowerRawCommand.StartsWith(UserInfoCommandName))
+            if (rawCommand.StartsWith(UserInfoCommandName))
             {
                 storageCommand.CommandType = StorageCommands.UserInfo;
                 storageCommand.Options = GetOptions(rawCommand, UserInfoCommandName);
                 return storageCommand;
             }
 
-            if (lowerRawCommand.StartsWith(ExitCommandName))
+            if (rawCommand.StartsWith(ExitCommandName))
             {
                 storageCommand.CommandType = StorageCommands.Exit;
                 return storageCommand;
             }
 
-            if (lowerRawCommand.StartsWith(FileUploadCommandName))
+            if (rawCommand.StartsWith(FileUploadCommandName))
             {
                 storageCommand.CommandType = StorageCommands.FileUpload;
                 storageCommand.Options = GetOptions(rawCommand, FileUploadCommandName);
                 return storageCommand;
             }
 
-            if (lowerRawCommand.StartsWith(FileDownloadCommandName))
+            if (rawCommand.StartsWith(FileDownloadCommandName))
             {
                 storageCommand.CommandType = StorageCommands.FileDownload;
                 storageCommand.Options = GetOptions(rawCommand, FileDownloadCommandName);
                 return storageCommand;
             }
 
-            if (lowerRawCommand.StartsWith(FileMoveCommandName))
+            if (rawCommand.StartsWith(FileMoveCommandName))
             {
                 storageCommand.CommandType = StorageCommands.FileMove;
                 storageCommand.Options = GetOptions(rawCommand, FileMoveCommandName);
                 return storageCommand;
             }
 
-            if (lowerRawCommand.StartsWith(FileRemoveCommandName))
+            if (rawCommand.StartsWith(FileRemoveCommandName))
             {
                 storageCommand.CommandType = StorageCommands.FileRemove;
                 storageCommand.Options = GetOptions(rawCommand, FileRemoveCommandName);
                 return storageCommand;
             }
 
-            if (lowerRawCommand.StartsWith(FileInfoCommandName))
+            if (rawCommand.StartsWith(FileInfoCommandName))
             {
                 storageCommand.CommandType = StorageCommands.FileInfo;
                 storageCommand.Options = GetOptions(rawCommand, FileInfoCommandName);
                 return storageCommand;
             }
 
-            if (lowerRawCommand.StartsWith(FileExportCommandName))
+            if (rawCommand.StartsWith(FileExportCommandName))
             {
                 storageCommand.CommandType = StorageCommands.FileExport;
                 storageCommand.Options = GetOptions(rawCommand, FileExportCommandName);
                 return storageCommand;
             }
 
-            if (lowerRawCommand.StartsWith(DirectoryCreateCommandName))
+            if (rawCommand.StartsWith(DirectoryCreateCommandName))
             {
                 storageCommand.CommandType = StorageCommands.DirectoryCreate;
                 storageCommand.Options = GetOptions(rawCommand, DirectoryCreateCommandName);
                 return storageCommand;
             }
 
-            if (lowerRawCommand.StartsWith(DirectoryMoveCommandName))
+            if (rawCommand.StartsWith(DirectoryMoveCommandName))
             {
                 storageCommand.CommandType = StorageCommands.DirectoryMove;
                 storageCommand.Options = GetOptions(rawCommand, DirectoryMoveCommandName);
                 return storageCommand;
             }
 
-            if (lowerRawCommand.StartsWith(DirectoryRemoveCommandName))
+            if (rawCommand.StartsWith(DirectoryRemoveCommandName))
             {
                 storageCommand.CommandType = StorageCommands.DirectoryRemove;
                 storageCommand.Options = GetOptions(rawCommand, DirectoryRemoveCommandName);
                 return storageCommand;
             }
 
-            if (lowerRawCommand.StartsWith(DirectoryListCommandName))
+            if (rawCommand.StartsWith(DirectoryListCommandName))
             {
                 storageCommand.CommandType = StorageCommands.DirectoryList;
                 storageCommand.Options = GetOptions(rawCommand, DirectoryListCommandName);
                 return storageCommand;
             }
 
-            if (lowerRawCommand.StartsWith(DirectorySearchCommandName))
+            if (rawCommand.StartsWith(DirectorySearchCommandName))
             {
                 storageCommand.CommandType = StorageCommands.DirectorySearch;
                 storageCommand.Options = GetOptions(rawCommand, DirectorySearchCommandName);

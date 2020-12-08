@@ -33,6 +33,14 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
             path += $"/{directory.Name}";
             foreach (var dir in directory.Directories)
             {
+                foreach (var file in dir.Value.Files)
+                {
+                    if (file.Key.Contains(searchLine))
+                    {
+                        searchResult.MatchedFiles.Add($"{path}/{file.Key}");
+                    }
+                }
+
                 if (dir.Key.ToLower().Contains(searchLine.ToLower()))
                 {
                     searchResult.MatchedDirectories.Add($"{path}/{dir.Key}");

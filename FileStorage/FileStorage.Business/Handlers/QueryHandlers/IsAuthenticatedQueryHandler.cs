@@ -1,5 +1,4 @@
 ﻿using FileStorage.BLL.Queries;
-using FileStorage.DAL.Models;
 using FileStorage.DAL.Repositories.Interfaces;
 using MediatR;
 using System.Threading;

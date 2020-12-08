@@ -13,6 +13,7 @@ using FileStorage.BLL.Commands;
 using FileStorage.BLL.Queries;
 using FileStorage.BLL.Models;
 using MediatR;
+using System.Threading.Tasks;
 
 namespace FileStorage.ConsoleUI
 {
@@ -20,7 +21,7 @@ namespace FileStorage.ConsoleUI
     {
         private static readonly IServiceProvider _container = new DependencyContainer().GetContainer();
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var logger = _container.GetService<ILogger<Program>>();
             var consolePrinter = _container.GetService<IConsolePrinter>();
@@ -34,27 +35,25 @@ namespace FileStorage.ConsoleUI
                 Console.InputEncoding = System.Text.Encoding.Unicode;
                 Console.OutputEncoding = System.Text.Encoding.Unicode;
 
-                mediator.Send(new InitializeStorageCommand());
+                await mediator.Send(new InitializeStorageCommand());
 
                 var argsFlags = consoleFlagParser.Parse(args);
                 var credentials = GetCredentials(argsFlags);
                 var authQuery = new IsAuthenticatedQuery(credentials.Login, credentials.Password);
 
-                if (!mediator.Send(authQuery).Result)
+                if (!(await mediator.Send(authQuery)))
                 {
                     throw new ArgumentException("Incorrect login or password");
                 }
-
                 consolePrinter.PrintAuthenticationSuccessful();
-                var command = new StorageCommand();
 
+                var command = new StorageCommand();
                 while (command.CommandType != StorageCommands.Exit)
                 {
                     try
                     {
                         command = GetCommand(consoleCommandParser, consolePrinter);
-                        var task = controller.ExecuteConsoleCommand(command);
-                        task.Wait();
+                        await controller.ExecuteConsoleCommand(command);
                     }
                     catch (AggregateException agEx)
                     {
@@ -107,7 +106,7 @@ namespace FileStorage.ConsoleUI
                 throw new ArgumentNullException("You have not entered a command.");
             }
 
-            return consoleCommandParser.Parse(rowCommand.Trim());
+            return consoleCommandParser.Parse(rowCommand.ToLower().Trim());
         }
     }
 }

@@ -6,7 +6,7 @@ namespace FileStorage.BLL.Commands
 {
     public class FileDownloadCommand : IRequest
     {
-        public string FileName { get; set; }
+        public string FilePath { get; set; }
         public string DestinationPath { get; set; }
 
         public FileDownloadCommand(Options options)
@@ -16,7 +16,7 @@ namespace FileStorage.BLL.Commands
                 throw new ArgumentException("Wrong count of parameters or flags for this command");
             }
 
-            FileName = options.Parameters[0];
+            FilePath = options.Parameters[0];
             DestinationPath = options.Parameters[0];
         }
     }
