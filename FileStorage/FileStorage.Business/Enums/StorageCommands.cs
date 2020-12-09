@@ -15,6 +15,7 @@
         DirectoryList,
         DirectoryRemove,
         DirectorySearch,
+        DirectoryInfo,
         Exit
     }
 }

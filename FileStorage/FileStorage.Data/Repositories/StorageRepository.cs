@@ -43,7 +43,9 @@ namespace FileStorage.DAL.Repositories
             };
 
             directory.Files.Add(fileName, storageFile);
+            directory.ModificationDate = DateTime.Now;
             storageInfo.UsedStorage += fileSize;
+
             SerializeStorageInfoFile(storageInfo);
 
             return Task.FromResult(storageFile);
@@ -136,9 +138,11 @@ namespace FileStorage.DAL.Repositories
             string oldParentDerictoryPath = PathHelper.GetParentDirectoryPath(oldFilePath);
             StorageDirectory oldParentDirectory = GetDirectoryByPath(oldParentDerictoryPath, storageInfo.Directories);
             oldParentDirectory.Files.Remove(oldFileName);
+            oldParentDirectory.ModificationDate = DateTime.Now;
 
             movableStorageFile.Extension = Path.GetExtension(newFileName);
             newParentDirectory.Files.Add(newFileName, movableStorageFile);
+            newParentDirectory.ModificationDate = DateTime.Now;
 
             SerializeStorageInfoFile(storageInfo);
 
@@ -155,6 +159,7 @@ namespace FileStorage.DAL.Repositories
 
             storageInfo.UsedStorage -= parentDirectory.Files[fileName].Size;
             parentDirectory.Files.Remove(fileName);
+            parentDirectory.ModificationDate = DateTime.Now;
 
             SerializeStorageInfoFile(storageInfo);
 
@@ -194,6 +199,7 @@ namespace FileStorage.DAL.Repositories
                 Name = directoryName,
                 ParentId = parentDirectory.Name
             });
+            parentDirectory.ModificationDate = DateTime.Now;
 
             SerializeStorageInfoFile(storageInfo);
 
@@ -244,9 +250,14 @@ namespace FileStorage.DAL.Repositories
             else
             {
                 oldParentDirectory.Directories.Remove(movableDirectory.Name);
+                oldParentDirectory.ModificationDate = DateTime.Now;
+
                 movableDirectory.Name = newDirectoryName;
                 movableDirectory.ParentId = newParentDirectory.Name;
+                movableDirectory.ModificationDate = DateTime.Now;
+
                 newParentDirectory.Directories.Add(newDirectoryName, movableDirectory);
+                newParentDirectory.ModificationDate = DateTime.Now;
             }
 
             SerializeStorageInfoFile(storageInfo);
@@ -276,6 +287,8 @@ namespace FileStorage.DAL.Repositories
             }
 
             parentDirectory.Directories.Remove(directoryName);
+            parentDirectory.ModificationDate = DateTime.Now;
+
             SerializeStorageInfoFile(storageInfo);
 
             return Task.CompletedTask;

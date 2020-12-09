@@ -22,5 +22,6 @@ namespace FileStorage.ConsoleUI.ConsoleUtils.Interfaces
         void PrintDirectoryList(List<string> innerDirectories, List<string> innerFiles);
         void PrintDirectoryRemovedSuccessfull(string path);
         void PrintDirectorySearchResult(List<string> directories, List<string> files);
+        void PrintDirectoryInfo(DirectoryInfoViewModel directoryInfoViewModel);
     }
 }

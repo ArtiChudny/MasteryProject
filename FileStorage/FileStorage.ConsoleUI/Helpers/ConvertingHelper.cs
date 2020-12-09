@@ -31,7 +31,7 @@ namespace FileStorage.ConsoleUI.Helpers
             }
         }
 
-        public static string GetKbString(long size)
+        private static string GetKbString(long size)
         {
             var kbSize = Math.Round((double)size / 1024, 2);
 

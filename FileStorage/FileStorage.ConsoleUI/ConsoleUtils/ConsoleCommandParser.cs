@@ -23,6 +23,7 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
         private const string DirectoryRemoveCommandName = "directory remove";
         private const string DirectoryListCommandName = "directory list";
         private const string DirectorySearchCommandName = "directory search";
+        private const string DirectoryInfoCommandName = "directory info";
         private const string FlagIndicator = "--";
 
         public ConsoleCommandParser(ConsoleFlagParser consoleFlagParser)
@@ -121,6 +122,13 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
             {
                 storageCommand.CommandType = StorageCommands.DirectorySearch;
                 storageCommand.Options = GetOptions(rawCommand, DirectorySearchCommandName);
+                return storageCommand;
+            }
+
+            if (rawCommand.StartsWith(DirectoryInfoCommandName))
+            {
+                storageCommand.CommandType = StorageCommands.DirectoryInfo;
+                storageCommand.Options = GetOptions(rawCommand, DirectoryInfoCommandName);
                 return storageCommand;
             }
 

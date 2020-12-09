@@ -133,6 +133,16 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
             }
             Console.WriteLine();
         }
+
+        public void PrintDirectoryInfo(DirectoryInfoViewModel directoryInfoViewModel)
+        {
+            Console.WriteLine("\nName: {0}", directoryInfoViewModel.Name);
+            Console.WriteLine("Path: {0}", directoryInfoViewModel.Path);
+            Console.WriteLine("Creation date: {0}", directoryInfoViewModel.CreationDate);
+            Console.WriteLine("Modification date: {0}", directoryInfoViewModel.ModificationDate);
+            Console.WriteLine("Size: {0}", directoryInfoViewModel.Size);
+            Console.WriteLine("Login: {0}\n", directoryInfoViewModel.Login);
+        }
     }
 }
 

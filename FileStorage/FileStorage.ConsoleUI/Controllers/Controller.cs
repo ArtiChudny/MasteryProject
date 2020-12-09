@@ -9,6 +9,7 @@ using FileStorage.BLL.Commands;
 using FileStorage.BLL.Enums;
 using System.IO;
 using System.Threading.Tasks;
+using System;
 
 namespace FileStorage.ConsoleUI.Controllers
 {
@@ -87,6 +88,11 @@ namespace FileStorage.ConsoleUI.Controllers
                 case StorageCommands.DirectorySearch:
                     {
                         await ExecuteConsoleCommandDirectorySearch(command.Options);
+                        break;
+                    }
+                case StorageCommands.DirectoryInfo:
+                    {
+                        await ExecuteConsoleCommandDirectoryInfo(command.Options);
                         break;
                     }
             }
@@ -229,6 +235,24 @@ namespace FileStorage.ConsoleUI.Controllers
             var searchResult = await _mediator.Send(getDirectorySearchResultQuery);
 
             _consolePrinter.PrintDirectorySearchResult(searchResult.MatchedDirectories, searchResult.MatchedFiles);
+        }
+
+        private async Task ExecuteConsoleCommandDirectoryInfo(Options options)
+        {
+            var getDirectoryInfoQuery = new GetDirectoryInfoQuery(options);
+            var directoryInfo = await _mediator.Send(getDirectoryInfoQuery);
+
+            var directoryInfoViewModel = new DirectoryInfoViewModel()
+            {
+                CreationDate = ConvertingHelper.GetDateString(directoryInfo.CreationDate),
+                ModificationDate = ConvertingHelper.GetDateString(directoryInfo.ModificationDate),
+                Login = directoryInfo.Login,
+                Name = directoryInfo.Name,
+                Path = directoryInfo.Path,
+                Size = ConvertingHelper.GetSizeString(directoryInfo.Size)
+            };
+
+            _consolePrinter.PrintDirectoryInfo(directoryInfoViewModel);
         }
 
         private void LogInformationMessage(string message)
