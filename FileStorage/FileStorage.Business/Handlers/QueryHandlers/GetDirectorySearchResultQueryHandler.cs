@@ -21,14 +21,15 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
         {
             var directory = await _storageRepository.GetDirectory(request.Path);
             var searchResult = new GetDirectorySearchResultResponseModel();
-            var pathWithoutCurrentDirectory = request.Path.Substring(0, request.Path.Length - directory.Name.Length - 1);
+            var pathWithoutCurrentDirectory = request.Path.Remove(request.Path.IndexOf(directory.Name) - 1, directory.Name.Length + 1);
 
-            Search(searchResult, request.SearchLine, directory, pathWithoutCurrentDirectory);
+            FindMatches(directory, request.SearchLine, pathWithoutCurrentDirectory, searchResult);
 
             return searchResult;
         }
 
-        private void Search(GetDirectorySearchResultResponseModel searchResult, string searchLine, StorageDirectory directory, string path)
+        //method recursively searches for directories and files that match search line, and adds their paths to response model
+        private void FindMatches(StorageDirectory directory, string searchLine, string path, GetDirectorySearchResultResponseModel searchResult)
         {
             path += $"/{directory.Name}";
             foreach (var dir in directory.Directories)
@@ -37,7 +38,7 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
                 {
                     if (file.Key.Contains(searchLine))
                     {
-                        searchResult.MatchedFiles.Add($"{path}/{file.Key}");
+                        searchResult.MatchedFiles.Add($"{path}/{dir.Key}/{file.Key}");
                     }
                 }
 
@@ -45,7 +46,7 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
                 {
                     searchResult.MatchedDirectories.Add($"{path}/{dir.Key}");
                 }
-                Search(searchResult, searchLine, dir.Value, path);
+                FindMatches(dir.Value, searchLine, path, searchResult);
             }
         }
     }

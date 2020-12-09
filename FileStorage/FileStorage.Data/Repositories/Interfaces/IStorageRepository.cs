@@ -10,7 +10,6 @@ namespace FileStorage.DAL.Repositories.Interfaces
         Task<StorageInfo> GetStorageInfo();
         Task<StorageFile> CreateFile(string directoryPath, string fileName, long fileSize, byte[] hash, DateTime creationDate);
         Task<StorageFile> GetFileInfo(string filePath);
-        byte[] GetFileHash(string fileName);
         void IncreaseDownloadsCounter(string filePath);
         bool IsEnoughStorageSpace(long fileSize);
         bool IsFileSizeLessThanMaxSize(long fileSize);

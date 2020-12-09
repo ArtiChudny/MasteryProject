@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using FileStorage.ConsoleUI.ConsoleUtils;
 using FileStorage.ConsoleUI.ConsoleUtils.Interfaces;
 using FileStorage.ConsoleUI.Models;
@@ -13,7 +14,6 @@ using FileStorage.BLL.Commands;
 using FileStorage.BLL.Queries;
 using FileStorage.BLL.Models;
 using MediatR;
-using System.Threading.Tasks;
 
 namespace FileStorage.ConsoleUI
 {
@@ -32,16 +32,13 @@ namespace FileStorage.ConsoleUI
 
             try
             {
-                Console.InputEncoding = System.Text.Encoding.Unicode;
-                Console.OutputEncoding = System.Text.Encoding.Unicode;
-
                 await mediator.Send(new InitializeStorageCommand());
 
                 var argsFlags = consoleFlagParser.Parse(args);
                 var credentials = GetCredentials(argsFlags);
-                var authQuery = new IsAuthenticatedQuery(credentials.Login, credentials.Password);
+                var isAuthQuery = new IsAuthenticatedQuery(credentials.Login, credentials.Password);
 
-                if (!(await mediator.Send(authQuery)))
+                if (!(await mediator.Send(isAuthQuery)))
                 {
                     throw new ArgumentException("Incorrect login or password");
                 }
@@ -57,11 +54,11 @@ namespace FileStorage.ConsoleUI
                     }
                     catch (AggregateException agEx)
                     {
-                        foreach (var inEx in agEx.InnerExceptions)
+                        foreach (var innerEx in agEx.InnerExceptions)
                         {
-                            string logMessage = ConvertingHelper.GetLogMessage(inEx.Message, inEx.StackTrace);
+                            string logMessage = ConvertingHelper.GetLogMessage(innerEx.Message, innerEx.StackTrace);
                             logger.LogError(logMessage);
-                            consolePrinter.PrintErrorMessage(inEx.Message);
+                            consolePrinter.PrintErrorMessage(innerEx.Message);
                         }
                     }
                     catch (Exception ex)
@@ -103,7 +100,7 @@ namespace FileStorage.ConsoleUI
 
             if (string.IsNullOrWhiteSpace(rowCommand))
             {
-                throw new ArgumentNullException("You have not entered a command.");
+                throw new ArgumentException("You have not entered a command.");
             }
 
             return consoleCommandParser.Parse(rowCommand.ToLower().Trim());

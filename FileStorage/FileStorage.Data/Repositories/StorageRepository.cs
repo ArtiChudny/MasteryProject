@@ -1,4 +1,5 @@
-﻿using FileStorage.DAL.Models;
+﻿using FileStorage.DAL.Helpers;
+using FileStorage.DAL.Models;
 using FileStorage.DAL.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -48,13 +49,6 @@ namespace FileStorage.DAL.Repositories
             return Task.FromResult(storageFile);
         }
 
-        public byte[] GetFileHash(string fileName)
-        {
-            StorageInfo storageInfo = DeserializeStorageInfoFile();
-
-            return storageInfo.Files[fileName].Hash;
-        }
-
         public Task<StorageFile> GetFileInfo(string filePath)
         {
             StorageInfo storageInfo = DeserializeStorageInfoFile();
@@ -74,7 +68,7 @@ namespace FileStorage.DAL.Repositories
         private StorageFile GetFileByPath(StorageInfo storageInfo, string filePath)
         {
             string fileName = Path.GetFileName(filePath);
-            string parentDirectoryPath = filePath.Substring(0, filePath.IndexOf(fileName) - 1);
+            string parentDirectoryPath = PathHelper.GetParentDirectoryPath(filePath);
 
             var directory = GetDirectoryByPath(parentDirectoryPath, storageInfo.Directories);
 
@@ -128,13 +122,8 @@ namespace FileStorage.DAL.Repositories
                 throw new ArgumentException($"The file '{oldFilePath}' is not exists");
             }
 
-            string oldFileName = Path.GetFileName(oldFilePath);
-            string oldParentDerictoryPath = oldFilePath.Substring(0, oldFilePath.IndexOf(oldFileName) - 1);
-            StorageDirectory oldParentDirectory = GetDirectoryByPath(oldParentDerictoryPath, storageInfo.Directories);
-            oldParentDirectory.Files.Remove(oldFileName);
-
             string newFileName = Path.GetFileName(newFilePath);
-            string newParentDerictoryPath = newFilePath.Substring(0, newFilePath.IndexOf(newFileName) - 1);
+            string newParentDerictoryPath = PathHelper.GetParentDirectoryPath(newFilePath);
 
             StorageDirectory newParentDirectory = GetDirectoryByPath(newParentDerictoryPath, storageInfo.Directories);
 
@@ -142,6 +131,11 @@ namespace FileStorage.DAL.Repositories
             {
                 throw new ArgumentException($"The file '{newFileName}' is already exists in directory {newParentDerictoryPath}");
             }
+
+            string oldFileName = Path.GetFileName(oldFilePath);
+            string oldParentDerictoryPath = PathHelper.GetParentDirectoryPath(oldFilePath);
+            StorageDirectory oldParentDirectory = GetDirectoryByPath(oldParentDerictoryPath, storageInfo.Directories);
+            oldParentDirectory.Files.Remove(oldFileName);
 
             movableStorageFile.Extension = Path.GetExtension(newFileName);
             newParentDirectory.Files.Add(newFileName, movableStorageFile);
@@ -156,7 +150,7 @@ namespace FileStorage.DAL.Repositories
             StorageInfo storageInfo = DeserializeStorageInfoFile();
 
             string fileName = Path.GetFileName(filePath);
-            string parentDirectoryPath = filePath.Substring(0, filePath.IndexOf(fileName) - 1);
+            string parentDirectoryPath = PathHelper.GetParentDirectoryPath(filePath);
             StorageDirectory parentDirectory = GetDirectoryByPath(parentDirectoryPath, storageInfo.Directories);
 
             storageInfo.UsedStorage -= parentDirectory.Files[fileName].Size;
@@ -208,7 +202,7 @@ namespace FileStorage.DAL.Repositories
 
         private StorageDirectory GetDirectoryByPath(string path, Dictionary<string, StorageDirectory> directories)
         {
-            var pathArray = path.Remove(0, 1).Trim().Split("/");
+            var pathArray = path.Remove(0, 1).Split("/");
 
             if (pathArray.Length != 0 && directories.ContainsKey(pathArray[0]))
             {
@@ -219,7 +213,7 @@ namespace FileStorage.DAL.Repositories
                 else
                 {
                     string tmpDirName = pathArray[0];
-                    path = path.Remove(0, 1 + tmpDirName.Length);
+                    path = path.Remove(0, tmpDirName.Length + 1);
                     return GetDirectoryByPath(path, directories[tmpDirName].Directories);
                 }
             }
@@ -235,12 +229,12 @@ namespace FileStorage.DAL.Repositories
             StorageDirectory movableDirectory = GetDirectoryByPath(oldPath, storageInfo.Directories);
 
             //Getting old parent directory
-            string oldParentDirectoryPath = oldPath.Substring(0, movableDirectory.Name.Length - 1);
+            string oldParentDirectoryPath = PathHelper.GetParentDirectoryPath(oldPath);
             StorageDirectory oldParentDirectory = GetDirectoryByPath(oldParentDirectoryPath, storageInfo.Directories);
 
             //Getting new parent directory
             string newDirectoryName = Path.GetFileName(newPath);
-            string newParentDirectoryPath = newPath.Substring(0, newDirectoryName.Length - 1);
+            string newParentDirectoryPath = PathHelper.GetParentDirectoryPath(newPath);
             StorageDirectory newParentDirectory = GetDirectoryByPath(newParentDirectoryPath, storageInfo.Directories);
 
             if (newParentDirectory.Directories.ContainsKey(newDirectoryName))
@@ -273,7 +267,7 @@ namespace FileStorage.DAL.Repositories
             StorageInfo storageInfo = DeserializeStorageInfoFile();
 
             string directoryName = Path.GetFileName(path);
-            string parentDirectoryPath = path.Substring(0, path.IndexOf(directoryName) - 1);
+            string parentDirectoryPath = PathHelper.GetParentDirectoryPath(path);
             StorageDirectory parentDirectory = GetDirectoryByPath(parentDirectoryPath, storageInfo.Directories);
 
             if (!parentDirectory.Directories.ContainsKey(directoryName))

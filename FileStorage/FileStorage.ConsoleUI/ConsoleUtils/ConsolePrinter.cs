@@ -7,6 +7,12 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
 {
     public class ConsolePrinter : IConsolePrinter
     {
+        public ConsolePrinter()
+        {
+            Console.InputEncoding = System.Text.Encoding.Unicode;
+            Console.OutputEncoding = System.Text.Encoding.Unicode;
+        }
+
         public void PrintUserInformation(UserInfoViewModel userInfo)
         {
             Console.WriteLine("\nlogin: {0}", userInfo.Login);
@@ -84,12 +90,12 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
 
         public void PrintCreateDirectorySuccessfull(string destinationPath, string directoryName)
         {
-            Console.WriteLine("\nDirectory {0} has been succesfully created at the path '{1}'\n", directoryName, destinationPath);
+            Console.WriteLine("\nDirectory '{0}' has been succesfully created at the path '{1}'\n", directoryName, destinationPath);
         }
 
         public void PrintMoveDirectorySuccessfull(string oldPath, string newPath)
         {
-            Console.WriteLine("\nDirectory {0} has been succesfully moved to the path '{1}'\n", oldPath, newPath);
+            Console.WriteLine("\nDirectory '{0}' has been succesfully moved to the path '{1}'\n", oldPath, newPath);
         }
 
         public void PrintDirectoryList(List<string> innerDirectories, List<string> innerFiles)
@@ -110,7 +116,7 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
 
         public void PrintDirectoryRemovedSuccessfull(string path)
         {
-            Console.WriteLine("\nThe directory {0} has been removed", path);
+            Console.WriteLine("\nThe directory '{0}' has been removed", path);
         }
 
         public void PrintDirectorySearchResult(List<string> directories, List<string> files)
