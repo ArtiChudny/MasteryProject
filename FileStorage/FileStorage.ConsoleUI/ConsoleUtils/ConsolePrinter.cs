@@ -85,12 +85,12 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
 
         public void PrintExportSuccessfull(string destinationPath)
         {
-            Console.WriteLine("The meta-information has been exported, path = \"{0}\"", destinationPath);
+            Console.WriteLine("\nThe meta-information has been exported, path = \"{0}\"\n", destinationPath);
         }
 
         public void PrintCreateDirectorySuccessfull(string destinationPath, string directoryName)
         {
-            Console.WriteLine("\nDirectory '{0}' has been succesfully created at the path '{1}'\n", directoryName, destinationPath);
+            Console.WriteLine("\nDirectory '{0}' has been succesfully created at the path '{1}'", directoryName, destinationPath);
         }
 
         public void PrintMoveDirectorySuccessfull(string oldPath, string newPath)

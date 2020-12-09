@@ -20,7 +20,7 @@ namespace FileStorage.DAL.Repositories
         {
             if (!Directory.Exists(destinationPath))
             {
-                throw new ArgumentException($"Directory {destinationPath} is not exists");
+                throw new ArgumentException($"Directory '{destinationPath}' is not exists");
             }
 
             string fullStorageFilePath = Path.Combine(_storageFilesPath, storageFileName);
@@ -36,7 +36,7 @@ namespace FileStorage.DAL.Repositories
 
             if (!Directory.Exists(directoryPath))
             {
-                throw new ArgumentException($"Directory {directoryPath} is not exists");
+                throw new ArgumentException($"Directory '{directoryPath}' is not exists");
             }
 
             if (string.IsNullOrWhiteSpace(format))
@@ -58,7 +58,7 @@ namespace FileStorage.DAL.Repositories
                     }
                 default:
                     {
-                        throw new ArgumentException($"Unknown format {format}");
+                        throw new ArgumentException($"Unknown format '{format}'");
                     }
             }
 
@@ -69,7 +69,7 @@ namespace FileStorage.DAL.Repositories
         {
             if (!File.Exists(filePath))
             {
-                throw new ArgumentException($"File {filePath} is not exists");
+                throw new ArgumentException($"File '{filePath}' is not exists");
             }
 
             FileInfo fileInfo = new FileInfo(filePath);
@@ -123,14 +123,14 @@ namespace FileStorage.DAL.Repositories
 
             if (!File.Exists(filePath))
             {
-                throw new ArgumentException($"File {oldFileName} is not exists");
+                throw new ArgumentException($"File '{oldFileName}' is not exists");
             }
 
             string newFilePath = Path.Combine(_storageFilesPath, newFileName);
 
             if (File.Exists(newFilePath))
             {
-                throw new ArgumentException($"File {newFileName} is already exist in storage");
+                throw new ArgumentException($"File '{newFileName}' is already exist in storage");
             }
 
             File.Move(filePath, newFilePath);

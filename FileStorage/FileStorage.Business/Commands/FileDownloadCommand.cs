@@ -17,7 +17,7 @@ namespace FileStorage.BLL.Commands
             }
 
             FilePath = options.Parameters[0];
-            DestinationPath = options.Parameters[0];
+            DestinationPath = options.Parameters[1];
         }
     }
 }
