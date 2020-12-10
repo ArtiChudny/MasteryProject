@@ -156,6 +156,12 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
                 else
                 {
                     string parameter = parametersList[listIndex].Replace("\"", string.Empty).Trim();
+
+                    if (String.IsNullOrEmpty(parameter))
+                    {
+                        throw new ArgumentException("Parameter can't be empty string");
+                    }
+
                     options.Parameters.Add(parameter);
                 }
             }
