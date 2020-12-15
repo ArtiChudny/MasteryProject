@@ -28,13 +28,11 @@ namespace FileStorage.ConsoleUI.IoC
             string logPath = ConfigurationManager.AppSettings["LogPath"];
             LoggerConfiguration serilogLogger = new LoggerConfiguration();
             serilogLogger.WriteTo.File(logPath);
-            container.AddLogging
-                (builder =>
+            container.AddLogging(builder =>
             {
                 builder.SetMinimumLevel(LogLevel.Information);
                 builder.AddSerilog(serilogLogger.CreateLogger(), true);
-            }
-                );
+            });
 
             return container.BuildServiceProvider();
         }

@@ -15,10 +15,12 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
         public Dictionary<StorageFlags, string> Parse(string[] args)
         {
             Dictionary<StorageFlags, string> flagsValues = new Dictionary<StorageFlags, string>();
+
             for (int argIndex = 0; argIndex < args.Length; argIndex++)
             {
                 StorageFlags flag = GetFlag(args[argIndex]);
                 string value = string.Empty;
+                //TODO: I don't understand what is it
                 if (((argIndex + 1) < args.Length) && (!args[argIndex + 1].StartsWith(FlagIndicator)))
                 {
                     value = args[argIndex + 1];

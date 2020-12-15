@@ -42,6 +42,7 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
                     }
                 }
 
+                //TODO: Instead of convert strings to lower case for matching, try to use Contains with InvariantCultureIgnoreCase option.
                 if (dir.Key.ToLower().Contains(searchLine.ToLower()))
                 {
                     searchResult.MatchedDirectories.Add($"{path}/{dir.Key}");

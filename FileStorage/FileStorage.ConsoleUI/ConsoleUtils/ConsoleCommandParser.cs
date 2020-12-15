@@ -153,11 +153,12 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
                     options.Flags = _consoleFlagParser.Parse(flags);
                     break;
                 }
+                //TODO: NO NEED TO USE ELSE HERE.
                 else
                 {
                     string parameter = parametersList[listIndex].Replace("\"", string.Empty).Trim();
 
-                    if (String.IsNullOrEmpty(parameter))
+                    if (string.IsNullOrEmpty(parameter))
                     {
                         throw new ArgumentException("Parameter can't be empty string");
                     }

@@ -1,5 +1,6 @@
 ﻿using FileStorage.BLL.Models.ResponceModels.QueryResponceModels;
 using FileStorage.BLL.Queries;
+//TODO: You forgot to remove this namespace.
 using FileStorage.DAL.Models;
 using FileStorage.DAL.Repositories.Interfaces;
 using MediatR;
@@ -24,6 +25,8 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
             var currentUser = await _userRepository.GetUser();
             var storageInfo = await _storageRepository.GetStorageInfo();
 
+
+            //TODO: Use var here.
             UserInfoResponseModel userInfo = new UserInfoResponseModel
             {
                 Login = currentUser.Login,
