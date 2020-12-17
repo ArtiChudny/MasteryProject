@@ -1,4 +1,5 @@
 ﻿using FileStorage.DAL.Models;
+using System.Collections.Generic;
 
 namespace FileStorage.BLL.Helpers
 {
@@ -12,18 +13,52 @@ namespace FileStorage.BLL.Helpers
                 UsedStorage = storageInfo.UsedStorage
             };
 
-            foreach (var file in storageInfo.Files)
+            GetInnerFiles(serializableStorageInfo.Directories, storageInfo.Directories);
+
+            return serializableStorageInfo;
+        }
+
+        private static void GetInnerFiles(List<SerializableStorageDirectoryKeyValuePair> Directories, Dictionary<string, StorageDirectory> directories)
+        {
+            foreach (var dir in directories)
             {
-                KeyValue pair = new KeyValue
+                var serializablePair = new SerializableStorageDirectoryKeyValuePair
+                {
+                    Key = dir.Key,
+                    Value = ConvertToSerializableStorageDirectory(dir.Value)
+                };
+
+                Directories.Add(serializablePair);
+
+                if (dir.Value.Directories.Count != 0)
+                {
+                    GetInnerFiles(Directories.Find(x => x == serializablePair).Value.Directories, dir.Value.Directories);
+                }
+            }
+        }
+
+        private static SerializableStorageDirectory ConvertToSerializableStorageDirectory(StorageDirectory directory)
+        {
+            var serializableDirectory = new SerializableStorageDirectory()
+            {
+                CreationDate = directory.CreationDate,
+                ModificationDate = directory.ModificationDate,
+                Name = directory.Name,
+                ParentId = directory.ParentId,
+            };
+
+            foreach (var file in directory.Files)
+            {
+                var serializablePair = new SerializableStorageFileKeyValuePair()
                 {
                     Key = file.Key,
                     Value = file.Value
                 };
 
-                serializableStorageInfo.Files.Add(pair);
+                serializableDirectory.Files.Add(serializablePair);
             }
 
-            return serializableStorageInfo;
+            return serializableDirectory;
         }
     }
 }

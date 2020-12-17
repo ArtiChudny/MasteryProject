@@ -1,9 +1,10 @@
 ﻿using FileStorage.DAL.Models;
+using System.Threading.Tasks;
 
 namespace FileStorage.DAL.Repositories.Interfaces
 {
     public interface IUserRepository
     {
-        public User GetUser();
+        Task<User> GetUser();
     }
 }

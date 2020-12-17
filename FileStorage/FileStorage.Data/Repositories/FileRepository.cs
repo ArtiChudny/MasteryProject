@@ -7,33 +7,36 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text.Json;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace FileStorage.DAL.Repositories
 {
     public class FileRepository : IFileRepository
     {
-        private string storageFilesPath = ConfigurationManager.AppSettings["StorageFilesPath"];
+        private readonly string _storageFilesPath = ConfigurationManager.AppSettings["StorageFilesPath"];
 
-        public void DownloadFileFromStorage(string fileName, string storageFileName, string destinationPath)
+        public Task DownloadFileFromStorage(string fileName, string storageFileName, string destinationPath)
         {
             if (!Directory.Exists(destinationPath))
             {
-                throw new ApplicationException($"Directory {destinationPath} is not exists");
+                throw new ArgumentException($"Directory '{destinationPath}' is not exists");
             }
 
-            string fullStorageFilePath = Path.Combine(storageFilesPath, storageFileName);
+            string fullStorageFilePath = Path.Combine(_storageFilesPath, storageFileName);
             string fullDestinationFilePath = Path.Combine(destinationPath, fileName);
             File.Copy(fullStorageFilePath, fullDestinationFilePath);
+
+            return Task.CompletedTask;
         }
 
-        public void ExportFile(SerializableStorageInfo storageInfo, string destinationPath, string format)
+        public Task ExportFile(SerializableStorageInfo storageInfo, string destinationPath, string format)
         {
             string directoryPath = Path.GetDirectoryName(destinationPath);
 
             if (!Directory.Exists(directoryPath))
             {
-                throw new ApplicationException($"Directory {directoryPath} is not exists");
+                throw new ArgumentException($"Directory '{directoryPath}' is not exists");
             }
 
             if (string.IsNullOrWhiteSpace(format))
@@ -55,21 +58,30 @@ namespace FileStorage.DAL.Repositories
                     }
                 default:
                     {
-                        throw new ApplicationException($"Unknown format {format}");
+                        throw new ArgumentException($"Unknown format '{format}'");
                     }
             }
+
+            return Task.CompletedTask;
         }
 
-        public FileInfoModel GetFileInfo(string filePath)
+        public Task<FileInfoModel> GetFileInfo(string filePath)
         {
+            if (!File.Exists(filePath))
+            {
+                throw new ArgumentException($"File '{filePath}' is not exists");
+            }
+
             FileInfo fileInfo = new FileInfo(filePath);
 
-            return new FileInfoModel
+            var fileInfoModel = new FileInfoModel
             {
                 CreationDate = fileInfo.CreationTime,
                 Size = fileInfo.Length,
                 Hash = GetFileHash(filePath)
             };
+
+            return Task.FromResult(fileInfoModel);
         }
 
         public byte[] GetFileHash(string filePath)
@@ -85,15 +97,15 @@ namespace FileStorage.DAL.Repositories
 
         public void InitializeFileStorage()
         {
-            if (!Directory.Exists(storageFilesPath))
+            if (!Directory.Exists(_storageFilesPath))
             {
-                throw new ApplicationException($"Missing path '{Path.GetFullPath(storageFilesPath)}'");
+                throw new ArgumentException($"Missing path '{Path.GetFullPath(_storageFilesPath)}'");
             }
         }
 
         public bool IsHashMatch(string fileName, byte[] storageFileHash)
         {
-            string filePath = Path.Combine(storageFilesPath, fileName);
+            string filePath = Path.Combine(_storageFilesPath, fileName);
             byte[] fileHash = GetFileHash(filePath);
             if (fileHash.SequenceEqual(storageFileHash))
             {
@@ -105,46 +117,52 @@ namespace FileStorage.DAL.Repositories
             }
         }
 
-        public void MoveFile(string oldFileName, string newFileName)
+        public Task MoveFile(string oldFileName, string newFileName)
         {
-            string filePath = Path.Combine(storageFilesPath, oldFileName);
+            string filePath = Path.Combine(_storageFilesPath, oldFileName);
 
             if (!File.Exists(filePath))
             {
-                throw new ApplicationException($"File {oldFileName} is not exists");
+                throw new ArgumentException($"File '{oldFileName}' is not exists");
             }
 
-            string newFilePath = Path.Combine(storageFilesPath, newFileName);
+            string newFilePath = Path.Combine(_storageFilesPath, newFileName);
 
             if (File.Exists(newFilePath))
             {
-                throw new ApplicationException($"File {newFileName} is already exist in storage");
+                throw new ArgumentException($"File '{newFileName}' is already exist in storage");
             }
 
             File.Move(filePath, newFilePath);
+
+            return Task.CompletedTask;
         }
 
-        public void RemoveFile(string fileName)
+        public Task RemoveFile(string fileName)
         {
-            string filePath = Path.Combine(storageFilesPath, fileName);
+            string filePath = Path.Combine(_storageFilesPath, fileName);
 
             if (!File.Exists(filePath))
             {
-                throw new ApplicationException($"File is not exists");
+                throw new ArgumentException($"File is not exists");
             }
 
             File.Delete(filePath);
+
+            return Task.CompletedTask;
         }
 
-        public void UploadFileIntoStorage(string filePath, string guid)
+        public Task UploadFileIntoStorage(string filePath, string guid)
         {
             if (!File.Exists(filePath))
             {
-                throw new ApplicationException($"File with such directory '{Path.GetFileName(filePath)}' is not exists");
+                throw new ArgumentException($"File with such directory '{Path.GetFileName(filePath)}' is not exists");
             }
 
-            string fullDestinationPath = Path.Combine(storageFilesPath, guid);
+            string fullDestinationPath = Path.Combine(_storageFilesPath, guid);
             File.Copy(filePath, fullDestinationPath);
+
+            return Task.CompletedTask;
         }
 
         private void ExportFileToXML(SerializableStorageInfo storageInfo, string destinationPath)
