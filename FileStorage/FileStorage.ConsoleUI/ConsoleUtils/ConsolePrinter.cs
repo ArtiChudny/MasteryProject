@@ -16,41 +16,41 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
         public void PrintUserInformation(UserInfoViewModel userInfo)
         {
             Console.WriteLine($"\nlogin: {userInfo.Login}");
-            Console.WriteLine("creation date: {0}", userInfo.CreationDate);
-            Console.WriteLine("storage used: {0}\n", userInfo.UsedStorage);
+            Console.WriteLine($"creation date: {userInfo.CreationDate}");
+            Console.WriteLine($"storage used: {userInfo.UsedStorage}\n");
         }
 
         public void PrintFileUploadedSuccessful(FileUploadViewModel uploadViewModel)
         {
-            Console.WriteLine("\nThe file '{0}' has been uploaded.", uploadViewModel.FilePath);
-            Console.WriteLine("- file name: '{0}'", uploadViewModel.FileName);
-            Console.WriteLine("- file size: '{0}'", uploadViewModel.FileSize);
-            Console.WriteLine("- extension: '{0}'\n", uploadViewModel.Extension);
+            Console.WriteLine($"\nThe file '{uploadViewModel.FilePath}' has been uploaded.");
+            Console.WriteLine($"- file name: '{uploadViewModel.FileName}'");
+            Console.WriteLine($"- file size: '{uploadViewModel.FileSize}'");
+            Console.WriteLine($"- extension: '{uploadViewModel.Extension}'\n");
         }
 
         public void PrintFileInfo(FileInfoViewModel fileInfoViewModel)
         {
-            Console.WriteLine("\n- file name: '{0}'", fileInfoViewModel.FileName);
-            Console.WriteLine("- extension: '{0}'", fileInfoViewModel.Extension);
-            Console.WriteLine("- file size: '{0}'", fileInfoViewModel.FileSize);
-            Console.WriteLine("- creation date: '{0}'", fileInfoViewModel.CreationDate);
-            Console.WriteLine("- downloads number: '{0}'", fileInfoViewModel.DownloadsNumber);
-            Console.WriteLine("- login: '{0}'\n", fileInfoViewModel.Login);
+            Console.WriteLine($"\n- file name: '{fileInfoViewModel.FileName}'");
+            Console.WriteLine($"- extension: '{fileInfoViewModel.Extension}'");
+            Console.WriteLine($"- file size: '{fileInfoViewModel.FileSize}'");
+            Console.WriteLine($"- creation date: '{fileInfoViewModel.CreationDate}'");
+            Console.WriteLine($"- downloads number: '{fileInfoViewModel.DownloadsNumber}'");
+            Console.WriteLine($"- login: '{fileInfoViewModel.Login}'\n");
         }
 
         public void PrintFileDownloadedSuccessful(string fileName)
         {
-            Console.WriteLine("\nThe file '{0}' has been downloaded\n", fileName);
+            Console.WriteLine($"\nThe file '{fileName}' has been downloaded\n");
         }
 
         public void PrintFileMovedSuccessful(string oldFileName, string newFileName)
         {
-            Console.WriteLine("\nThe file '{0}' has been moved to '{1}'\n", oldFileName, newFileName);
+            Console.WriteLine($"\nThe file '{oldFileName}' has been moved to '{newFileName}'\n");
         }
 
         public void PrintFileRemovedSuccessful(string fileName)
         {
-            Console.WriteLine("\nThe file '{0}' has been removed\n", fileName);
+            Console.WriteLine($"\nThe file '{fileName}' has been removed\n");
         }
 
         public void PrintAuthenticationSuccessful()
@@ -65,7 +65,7 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
 
         public void PrintErrorMessage(string errorMessage)
         {
-            Console.WriteLine("\n{0}\n", errorMessage);
+            Console.WriteLine($"\n{errorMessage}\n");
         }
 
         public void PrintExitMessage()
@@ -78,70 +78,70 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
             Console.WriteLine();
             foreach (var format in formats)
             {
-                Console.WriteLine("- {0}", format);
+                Console.WriteLine($"- {format}");
             }
             Console.WriteLine();
         }
 
         public void PrintExportSuccessfull(string destinationPath)
         {
-            Console.WriteLine("\nThe meta-information has been exported, path = \"{0}\"\n", destinationPath);
+            Console.WriteLine($"\nThe meta-information has been exported, path = '{destinationPath}'\n");
         }
 
         public void PrintCreateDirectorySuccessfull(string destinationPath, string directoryName)
         {
-            Console.WriteLine("\nDirectory '{0}' has been succesfully created at the path '{1}'", directoryName, destinationPath);
+            Console.WriteLine($"\nDirectory '{directoryName}' has been succesfully created at the path '{destinationPath}'");
         }
 
         public void PrintMoveDirectorySuccessfull(string oldPath, string newPath)
         {
-            Console.WriteLine("\nDirectory '{0}' has been succesfully moved to the path '{1}'\n", oldPath, newPath);
+            Console.WriteLine($"\nDirectory '{oldPath}' has been succesfully moved to the path '{newPath}'\n");
         }
 
         public void PrintDirectoryList(List<string> innerDirectories, List<string> innerFiles)
         {
-            Console.WriteLine("\nDirectories:{0}", innerDirectories.Count);
+            Console.WriteLine($"\nDirectories:{innerDirectories.Count}");
             foreach (var dir in innerDirectories)
             {
-                Console.WriteLine(" - {0}", dir);
+                Console.WriteLine($" - {dir}");
             }
 
-            Console.WriteLine("Files:{0}", innerFiles.Count);
+            Console.WriteLine($"Files:{ innerFiles.Count}");
             foreach (var dir in innerFiles)
             {
-                Console.WriteLine(" - {0}", dir);
+                Console.WriteLine($" - {dir}");
             }
             Console.WriteLine();
         }
 
         public void PrintDirectoryRemovedSuccessfull(string path)
         {
-            Console.WriteLine("\nThe directory '{0}' has been removed", path);
+            Console.WriteLine($"\nThe directory '{path}' has been removed");
         }
 
         public void PrintDirectorySearchResult(List<string> directories, List<string> files)
         {
-            Console.WriteLine("\nDirectories:{0}", directories.Count);
+            Console.WriteLine($"\nDirectories:{directories.Count}");
             foreach (var dir in directories)
             {
-                Console.WriteLine("- {0}", dir);
+                Console.WriteLine($"- {dir}");
             }
-            Console.WriteLine("\nFiles:{0}", files.Count);
+            Console.WriteLine($"\nFiles:{files.Count}");
             foreach (var dir in files)
             {
-                Console.WriteLine("- {0}", dir);
+                Console.WriteLine($"- {dir}");
             }
             Console.WriteLine();
         }
 
         public void PrintDirectoryInfo(DirectoryInfoViewModel directoryInfoViewModel)
         {
-            Console.WriteLine("\nName: {0}", directoryInfoViewModel.Name);
-            Console.WriteLine("Path: {0}", directoryInfoViewModel.Path);
-            Console.WriteLine("Creation date: {0}", directoryInfoViewModel.CreationDate);
-            Console.WriteLine("Modification date: {0}", directoryInfoViewModel.ModificationDate);
-            Console.WriteLine("Size: {0}", directoryInfoViewModel.Size);
-            Console.WriteLine("Login: {0}\n", directoryInfoViewModel.Login);
+            Console.WriteLine($"\nName: {directoryInfoViewModel.Name}");
+            Console.WriteLine($"Path: {directoryInfoViewModel.Path}");
+            Console.WriteLine($"Creation date: {directoryInfoViewModel.CreationDate}");
+            Console.WriteLine($"Modification date: {directoryInfoViewModel.ModificationDate}");
+            Console.WriteLine($"Size: { directoryInfoViewModel.Size}");
+            Console.WriteLine($"Login: {directoryInfoViewModel.Login}\n");
         }
     }
 }

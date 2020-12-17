@@ -4,8 +4,8 @@ namespace FileStorage.BLL.Queries
 {
     public class IsAuthenticatedQuery : IRequest<bool>
     {
-        public string Login { get; set; }
-        public string Password { get; set; }
+        public string Login { get; }
+        public string Password { get; }
 
         public IsAuthenticatedQuery(string login, string password)
         {

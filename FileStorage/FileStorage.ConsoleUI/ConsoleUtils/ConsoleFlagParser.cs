@@ -14,31 +14,31 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
 
         public Dictionary<StorageFlags, string> Parse(string[] args)
         {
-            Dictionary<StorageFlags, string> flagsValues = new Dictionary<StorageFlags, string>();
+            var flags = new Dictionary<StorageFlags, string>();
 
             for (int argIndex = 0; argIndex < args.Length; argIndex++)
             {
                 StorageFlags flag = GetFlag(args[argIndex]);
-                string value = string.Empty;
-                //TODO: I don't understand what is it
-                if (((argIndex + 1) < args.Length) && (!args[argIndex + 1].StartsWith(FlagIndicator)))
-                {
-                    value = args[argIndex + 1];
-                    argIndex++;
-                }
-                if (flagsValues.ContainsKey(flag))
+                if (flags.ContainsKey(flag))
                 {
                     throw new ApplicationException($"Flag {flag} repeats.");
                 }
-                else
+
+                //checking that the next argument is a flag value, because not all flags need it
+                var flagValue = string.Empty;
+                if (((argIndex + 1) < args.Length) && (IsFlagValue(args[argIndex + 1])))
                 {
-                    flagsValues.Add(flag, value);
+                    flagValue = args[argIndex + 1];
+                    argIndex++;
                 }
+
+                flags.Add(flag, flagValue);
             }
-            return flagsValues;
+
+            return flags;
         }
 
-        public StorageFlags GetFlag(string flagName)
+        private StorageFlags GetFlag(string flagName)
         {
             switch (flagName)
             {
@@ -53,6 +53,11 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
                 default:
                     throw new ApplicationException($"Wrong flag: {flagName}.");
             }
+        }
+
+        private bool IsFlagValue(string arg)
+        {
+            return !arg.StartsWith(FlagIndicator);
         }
     }
 }

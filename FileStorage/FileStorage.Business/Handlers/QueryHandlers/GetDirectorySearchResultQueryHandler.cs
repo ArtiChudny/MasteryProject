@@ -3,6 +3,7 @@ using FileStorage.BLL.Queries;
 using FileStorage.DAL.Models;
 using FileStorage.DAL.Repositories.Interfaces;
 using MediatR;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -42,11 +43,11 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
                     }
                 }
 
-                //TODO: Instead of convert strings to lower case for matching, try to use Contains with InvariantCultureIgnoreCase option.
-                if (dir.Key.ToLower().Contains(searchLine.ToLower()))
+                if (dir.Key.Contains(searchLine, StringComparison.InvariantCultureIgnoreCase))
                 {
                     searchResult.MatchedDirectories.Add($"{path}/{dir.Key}");
                 }
+
                 FindMatches(dir.Value, searchLine, path, searchResult);
             }
         }

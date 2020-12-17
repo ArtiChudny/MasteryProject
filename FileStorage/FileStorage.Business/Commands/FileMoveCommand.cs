@@ -6,14 +6,19 @@ namespace FileStorage.BLL.Commands
 {
     public class FileMoveCommand : IRequest
     {
-        public string OldFileName { get; set; }
-        public string NewFileName { get; set; }
+        public string OldFileName { get; }
+        public string NewFileName { get; }
 
         public FileMoveCommand(Options options)
         {
-            if (options.Parameters.Count != 2 || options.Flags.Count != 0)
+            if (options.Parameters.Count != 2)
             {
-                throw new ArgumentException("Wrong count of parameters or flags for this command");
+                throw new ArgumentException($"Wrong count of parameters '{options.Parameters.Count}' for this command");
+            }
+
+            if (options.Flags.Count != 0)
+            {
+                throw new ArgumentException($"Wrong count of flags '{options.Flags.Count}' for this command");
             }
 
             OldFileName = options.Parameters[0];
