@@ -8,13 +8,6 @@ namespace FileStorage.DAL.Models
     {
         public long UsedStorage { get; set; }
         public DateTime CreationDate { get; set; }
-        public Dictionary<string, StorageDirectory> Directories { get; set; }
-
-        public StorageInfo()
-        {
-            CreationDate = DateTime.Today;
-            Directories = new Dictionary<string, StorageDirectory>();
-            Directories.Add("root", new StorageDirectory() { Name = "root" });
-        }
+        public StorageDirectory InitialDirectory { get; set; }
     }
 }

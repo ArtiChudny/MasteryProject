@@ -18,6 +18,7 @@ namespace FileStorage.BLL.Handlers.CommandHandlers
         public async Task<Unit> Handle(DirectoryCreateCommand request, CancellationToken cancellationToken)
         {
             await _storageRepository.CreateDirectory(request.DestinationPath, request.DirectoryName);
+
             return Unit.Value;
         }
     }

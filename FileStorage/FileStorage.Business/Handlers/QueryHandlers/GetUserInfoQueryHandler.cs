@@ -1,5 +1,6 @@
 ﻿using FileStorage.BLL.Models.ResponceModels.QueryResponceModels;
 using FileStorage.BLL.Queries;
+using FileStorage.DAL.Constants;
 using FileStorage.DAL.Repositories.Interfaces;
 using MediatR;
 using System.Threading;
@@ -21,13 +22,14 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
         public async Task<UserInfoResponseModel> Handle(GetUserInfoQuery request, CancellationToken cancellationToken)
         {
             var currentUser = await _userRepository.GetUser();
-            var storageInfo = await _storageRepository.GetStorageInfo();
-
+            var usedStorage = await _storageRepository.GetUsedStorage(DirectoryPaths.InitialDirectoryPath);
+            var directory = await _storageRepository.GetDirectory(DirectoryPaths.InitialDirectoryPath);
+            
             var userInfo = new UserInfoResponseModel
             {
                 Login = currentUser.Login,
-                UsedStorage = storageInfo.UsedStorage,
-                CreationDate = storageInfo.CreationDate
+                UsedStorage = usedStorage,
+                CreationDate = directory.CreationDate
             };
 
             return userInfo;

@@ -1,5 +1,6 @@
 ﻿using FileStorage.BLL.Helpers;
 using FileStorage.BLL.Queries;
+using FileStorage.DAL.Constants;
 using FileStorage.DAL.Models;
 using FileStorage.DAL.Repositories.Interfaces;
 using MediatR;
@@ -21,9 +22,17 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
 
         public async Task<Unit> Handle(FileExportQuery request, CancellationToken cancellationToken)
         {
-            var storageInfo = await _storageRepository.GetStorageInfo();
-            SerializableStorageInfo serializableStorageInfo = ConvertingHelper.GetSerializableStorageInfo(storageInfo);
-            await _fileRepository.ExportFile(serializableStorageInfo, request.DestinationPath, request.Format);
+            long usedStorage = await _storageRepository.GetUsedStorage(DirectoryPaths.InitialDirectoryPath);
+            var innerDirectory = await _storageRepository.GetDirectory(DirectoryPaths.InitialDirectoryPath);
+
+            var storageInfo = new SerializableStorageInfo()
+            {
+                UsedStorage = usedStorage,
+                InitialDirectory = ConvertingHelper.GetSerializableInnerDirectory(innerDirectory),
+                CreationDate = innerDirectory.CreationDate
+            };
+
+            await _fileRepository.ExportFile(storageInfo, request.DestinationPath, request.Format);
 
             return Unit.Value;
         }

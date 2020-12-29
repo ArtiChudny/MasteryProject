@@ -6,12 +6,12 @@ namespace FileStorage.DAL.Repositories.Interfaces
 {
     public interface IStorageRepository
     {
-        void InitializeStorage();
-        Task<StorageInfo> GetStorageInfo();
+        Task InitializeStorage();
+        Task<long> GetUsedStorage(string path);
         Task<StorageFile> CreateFile(string directoryPath, string fileName, long fileSize, byte[] hash, DateTime creationDate);
-        Task<StorageFile> GetFileInfo(string filePath);
-        void IncreaseDownloadsCounter(string filePath);
-        bool IsEnoughStorageSpace(long fileSize);
+        Task<StorageFile> GetFile(string filePath);
+        Task IncreaseDownloadsCounter(string filePath);
+        Task<bool> IsEnoughStorageSpace(long fileSize);
         bool IsFileSizeLessThanMaxSize(long fileSize);
         Task MoveFile(string oldFilePath, string newFilePath);
         Task RemoveFile(string filePath);

@@ -21,7 +21,7 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
 
         public async Task<FileInfoResponseModel> Handle(GetFileInfoQuery request, CancellationToken cancellationToken)
         {
-            var storageFile = await _storageRepository.GetFileInfo(request.FileName);
+            var storageFile = await _storageRepository.GetFile(request.FileName);
 
             if (storageFile == null)
             {

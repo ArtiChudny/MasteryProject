@@ -16,14 +16,14 @@ namespace FileStorage.DAL.Repositories
     {
         private readonly string _storageFilesPath = ConfigurationManager.AppSettings["StorageFilesPath"];
 
-        public Task DownloadFileFromStorage(string fileName, string storageFileName, string destinationPath)
+        public Task DownloadFileFromStorage(string fileName, string guidFileName, string destinationPath)
         {
             if (!Directory.Exists(destinationPath))
             {
                 throw new ArgumentException($"Directory '{destinationPath}' is not exists");
             }
 
-            string fullStorageFilePath = Path.Combine(_storageFilesPath, storageFileName);
+            string fullStorageFilePath = Path.Combine(_storageFilesPath, guidFileName);
             string fullDestinationFilePath = Path.Combine(destinationPath, fileName);
             File.Copy(fullStorageFilePath, fullDestinationFilePath);
 
@@ -107,6 +107,7 @@ namespace FileStorage.DAL.Repositories
         {
             string filePath = Path.Combine(_storageFilesPath, fileName);
             byte[] fileHash = GetFileHash(filePath);
+
             if (fileHash.SequenceEqual(storageFileHash))
             {
                 return true;

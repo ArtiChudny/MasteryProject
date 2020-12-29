@@ -65,7 +65,9 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
 
         public void PrintErrorMessage(string errorMessage)
         {
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"\n{errorMessage}\n");
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         public void PrintExitMessage()
@@ -90,7 +92,7 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
 
         public void PrintCreateDirectorySuccessfull(string destinationPath, string directoryName)
         {
-            Console.WriteLine($"\nDirectory '{directoryName}' has been succesfully created at the path '{destinationPath}'");
+            Console.WriteLine($"\nDirectory '{directoryName}' has been succesfully created at the path '{destinationPath}'\n");
         }
 
         public void PrintMoveDirectorySuccessfull(string oldPath, string newPath)
@@ -116,7 +118,7 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
 
         public void PrintDirectoryRemovedSuccessfull(string path)
         {
-            Console.WriteLine($"\nThe directory '{path}' has been removed");
+            Console.WriteLine($"\nThe directory '{path}' has been removed\n");
         }
 
         public void PrintDirectorySearchResult(List<string> directories, List<string> files)

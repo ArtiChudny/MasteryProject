@@ -23,12 +23,12 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
 
             foreach (var dir in directory.Directories)
             {
-                responceModel.InnerDirectories.Add(dir.Key);
+                responceModel.InnerDirectories.Add(dir.Name);
             }
 
             foreach (var file in directory.Files)
             {
-                responceModel.InnerFiles.Add(file.Key);
+                responceModel.InnerFiles.Add(file.Name);
             }
 
             return responceModel;

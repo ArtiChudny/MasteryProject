@@ -8,42 +8,42 @@ namespace FileStorage.DAL.Models
     {
         public long UsedStorage { get; set; }
         public DateTime CreationDate { get; set; }
-        public List<SerializableStorageDirectoryKeyValuePair> Directories { get; set; }
-
-        public SerializableStorageInfo()
-        {
-            Directories = new List<SerializableStorageDirectoryKeyValuePair>();
-        }
+        public SerializableStorageDirectory InitialDirectory { get; set; }
     }
 
     [Serializable]
-    public class SerializableStorageFileKeyValuePair
+    public class SerializableStorageFile
     {
-        public string Key { get; set; }
-        public StorageFile Value { get; set; }
-    }
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public Guid GuidName { get; set; }
+        public string Extension { get; set; }
+        public long Size { get; set; }
+        public int DownloadsNumber { get; set; }
+        public DateTime CreationDate { get; set; }
+        public byte[] Hash { get; set; }
+        public string Path { get; set; }
 
-    [Serializable]
-    public class SerializableStorageDirectoryKeyValuePair
-    {
-        public string Key { get; set; }
-        public SerializableStorageDirectory Value { get; set; }
+        public int StorageDirectoryId { get; set; }
     }
 
     [Serializable]
     public class SerializableStorageDirectory
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime ModificationDate { get; set; }
-        public string ParentId { get; set; }
-        public List<SerializableStorageFileKeyValuePair> Files { get; set; }
-        public List<SerializableStorageDirectoryKeyValuePair> Directories { get; set; }
+        public string Path { get; set; }
+        public List<SerializableStorageFile> Files { get; set; }
+        public List<SerializableStorageDirectory> Directories { get; set; }
+
+        public int? ParentId { get; set; }
 
         public SerializableStorageDirectory()
         {
-            Files = new List<SerializableStorageFileKeyValuePair>();
-            Directories = new List<SerializableStorageDirectoryKeyValuePair>();
+            Files = new List<SerializableStorageFile>();
+            Directories = new List<SerializableStorageDirectory>();
         }
     }
 }

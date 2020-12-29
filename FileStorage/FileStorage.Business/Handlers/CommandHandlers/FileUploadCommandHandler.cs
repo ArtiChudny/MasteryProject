@@ -27,7 +27,7 @@ namespace FileStorage.BLL.Handlers.CommandHandlers
             string fileName = Path.GetFileName(request.FilePath);
             string storageFilePath = $"{request.DestinationDirectoryPath}/{fileName}";
 
-            if (await _storageRepository.GetFileInfo(storageFilePath) != null)
+            if (await _storageRepository.GetFile(storageFilePath) != null)
             {
                 throw new ArgumentException("A file with the same name already exists in the storage");
             }
@@ -37,13 +37,13 @@ namespace FileStorage.BLL.Handlers.CommandHandlers
                 throw new ArgumentException("The file exceeds the maximum size");
             }
 
-            if (!_storageRepository.IsEnoughStorageSpace(fileInfo.Size))
+            if (!(await _storageRepository.IsEnoughStorageSpace(fileInfo.Size)))
             {
                 throw new ArgumentException("Not enough space in the storage to upload the file");
             }
 
             StorageFile storageFile = await _storageRepository.CreateFile(request.DestinationDirectoryPath, fileName, fileInfo.Size, fileInfo.Hash, fileInfo.CreationDate);
-            string guidFileName = storageFile.Id.ToString();
+            string guidFileName = storageFile.GuidName.ToString();
             await _fileRepository.UploadFileIntoStorage(request.FilePath, guidFileName);
 
             return storageFile;

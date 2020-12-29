@@ -17,12 +17,12 @@ namespace FileStorage.BLL.Handlers.CommandHandlers
             _fileRepository = fileRepository;
         }
 
-        public Task<Unit> Handle(InitializeStorageCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(InitializeStorageCommand request, CancellationToken cancellationToken)
         {
-            _storageRepository.InitializeStorage();
+            await _storageRepository.InitializeStorage();
             _fileRepository.InitializeFileStorage();
 
-            return Task.FromResult(Unit.Value);
+            return Unit.Value;
         }
     }
 }

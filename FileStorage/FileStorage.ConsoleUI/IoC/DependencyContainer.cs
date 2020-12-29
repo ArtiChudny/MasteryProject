@@ -2,6 +2,7 @@
 using FileStorage.ConsoleUI.ConsoleUtils;
 using FileStorage.ConsoleUI.ConsoleUtils.Interfaces;
 using FileStorage.ConsoleUI.Controllers;
+using FileStorage.DAL;
 using FileStorage.DAL.Repositories;
 using FileStorage.DAL.Repositories.Interfaces;
 using MediatR;
@@ -24,6 +25,7 @@ namespace FileStorage.ConsoleUI.IoC
             container.AddTransient<IConsolePrinter, ConsolePrinter>();
             container.AddTransient<IController, Controller>();
             container.AddMediatR(BusinessLayerAssembly.Value);
+            container.AddDbContext<StorageContext>();
 
             string logPath = ConfigurationManager.AppSettings["LogPath"];
             LoggerConfiguration serilogLogger = new LoggerConfiguration();

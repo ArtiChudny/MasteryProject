@@ -6,19 +6,21 @@ namespace FileStorage.DAL.Models
     [Serializable]
     public class StorageDirectory
     {
+        public int Id { get; set; }
         public string Name { get; set; }
+        public string Path { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime ModificationDate { get; set; }
-        public string ParentId { get; set; }
-        public Dictionary<string, StorageFile> Files { get; set; }
-        public Dictionary<string, StorageDirectory> Directories { get; set; }
+        public List<StorageFile> Files { get; set; }
+        public List<StorageDirectory> Directories { get; set; }
+
+        public int? ParentId { get; set; }
+        public StorageDirectory ParentDirectory { get; set; }
 
         public StorageDirectory()
         {
-            Files = new Dictionary<string, StorageFile>();
-            Directories = new Dictionary<string, StorageDirectory>();
-            CreationDate = DateTime.Now;
-            ModificationDate = DateTime.Now;
+            Files = new List<StorageFile>();
+            Directories = new List<StorageDirectory>();
         }
     }
 }

@@ -6,7 +6,7 @@ namespace FileStorage.DAL.Repositories.Interfaces
     public interface IFileRepository
     {
         Task UploadFileIntoStorage(string filePath, string guid);
-        Task DownloadFileFromStorage(string fileName, string storageFileName, string destinationPath);
+        Task DownloadFileFromStorage(string fileName, string guidFileName, string destinationPath);
         Task<FileInfoModel> GetFileInfo(string filePath);
         Task MoveFile(string oldFileName, string newFileName);
         Task RemoveFile(string fileName);

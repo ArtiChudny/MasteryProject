@@ -22,33 +22,31 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
         {
             var directory = await _storageRepository.GetDirectory(request.Path);
             var searchResult = new GetDirectorySearchResultResponseModel();
-            var pathWithoutCurrentDirectory = request.Path.Remove(request.Path.IndexOf(directory.Name) - 1, directory.Name.Length + 1);
 
-            FindMatches(directory, request.SearchLine, pathWithoutCurrentDirectory, searchResult);
+            FindMatches(directory, request.SearchLine, searchResult);
 
             return searchResult;
         }
 
         //method recursively searches for directories and files that match search line, and adds their paths to response model
-        private void FindMatches(StorageDirectory directory, string searchLine, string path, GetDirectorySearchResultResponseModel searchResult)
+        private void FindMatches(StorageDirectory directory, string searchLine, GetDirectorySearchResultResponseModel searchResult)
         {
-            path += $"/{directory.Name}";
             foreach (var dir in directory.Directories)
             {
-                foreach (var file in dir.Value.Files)
+                foreach (var file in dir.Files)
                 {
-                    if (file.Key.Contains(searchLine))
+                    if (file.Name.Contains(searchLine))
                     {
-                        searchResult.MatchedFiles.Add($"{path}/{dir.Key}/{file.Key}");
+                        searchResult.MatchedFiles.Add(file.Path);
                     }
                 }
 
-                if (dir.Key.Contains(searchLine, StringComparison.InvariantCultureIgnoreCase))
+                if (dir.Name.Contains(searchLine, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    searchResult.MatchedDirectories.Add($"{path}/{dir.Key}");
+                    searchResult.MatchedDirectories.Add(dir.Path);
                 }
 
-                FindMatches(dir.Value, searchLine, path, searchResult);
+                FindMatches(dir, searchLine, searchResult);
             }
         }
     }

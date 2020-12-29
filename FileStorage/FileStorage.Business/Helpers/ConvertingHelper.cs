@@ -1,43 +1,34 @@
 ﻿using FileStorage.DAL.Models;
-using System.Collections.Generic;
 
 namespace FileStorage.BLL.Helpers
 {
-    public class ConvertingHelper
+    public static class ConvertingHelper
     {
-        public static SerializableStorageInfo GetSerializableStorageInfo(StorageInfo storageInfo)
+        public static SerializableStorageDirectory GetSerializableInnerDirectory(StorageDirectory initialDirectory)
         {
-            SerializableStorageInfo serializableStorageInfo = new SerializableStorageInfo
-            {
-                CreationDate = storageInfo.CreationDate,
-                UsedStorage = storageInfo.UsedStorage
-            };
+            var serializableInitialDirectory = ConvertToSerializableDirectory(initialDirectory);
 
-            GetInnerFiles(serializableStorageInfo.Directories, storageInfo.Directories);
+            GetInnerFiles(serializableInitialDirectory, initialDirectory);
 
-            return serializableStorageInfo;
+            return serializableInitialDirectory;
         }
 
-        private static void GetInnerFiles(List<SerializableStorageDirectoryKeyValuePair> Directories, Dictionary<string, StorageDirectory> directories)
+        private static void GetInnerFiles(SerializableStorageDirectory serializableDirectory, StorageDirectory directory)
         {
-            foreach (var dir in directories)
+            foreach (var dir in directory.Directories)
             {
-                var serializablePair = new SerializableStorageDirectoryKeyValuePair
-                {
-                    Key = dir.Key,
-                    Value = ConvertToSerializableStorageDirectory(dir.Value)
-                };
+                var serDirectory = ConvertToSerializableDirectory(dir);
 
-                Directories.Add(serializablePair);
+                serializableDirectory.Directories.Add(serDirectory);
 
-                if (dir.Value.Directories.Count != 0)
+                if (dir.Directories.Count != 0)
                 {
-                    GetInnerFiles(Directories.Find(x => x == serializablePair).Value.Directories, dir.Value.Directories);
+                    GetInnerFiles(serDirectory, dir);
                 }
             }
         }
 
-        private static SerializableStorageDirectory ConvertToSerializableStorageDirectory(StorageDirectory directory)
+        private static SerializableStorageDirectory ConvertToSerializableDirectory(StorageDirectory directory)
         {
             var serializableDirectory = new SerializableStorageDirectory()
             {
@@ -45,20 +36,36 @@ namespace FileStorage.BLL.Helpers
                 ModificationDate = directory.ModificationDate,
                 Name = directory.Name,
                 ParentId = directory.ParentId,
+                Id = directory.Id,
+                Path = directory.Path
             };
 
             foreach (var file in directory.Files)
             {
-                var serializablePair = new SerializableStorageFileKeyValuePair()
-                {
-                    Key = file.Key,
-                    Value = file.Value
-                };
-
-                serializableDirectory.Files.Add(serializablePair);
+                var serializableFile = ConvertToSerializableFile(file);
+                serializableDirectory.Files.Add(serializableFile);
             }
 
             return serializableDirectory;
+        }
+
+        private static SerializableStorageFile ConvertToSerializableFile(StorageFile file)
+        {
+            var serializableFile = new SerializableStorageFile()
+            {
+                CreationDate = file.CreationDate,
+                DownloadsNumber = file.DownloadsNumber,
+                Extension = file.Extension,
+                GuidName = file.GuidName,
+                Hash = file.Hash,
+                Id = file.Id,
+                Name = file.Name,
+                Path = file.Path,
+                Size = file.Size,
+                StorageDirectoryId = file.DirectoryId
+            };
+
+            return serializableFile;
         }
     }
 }
