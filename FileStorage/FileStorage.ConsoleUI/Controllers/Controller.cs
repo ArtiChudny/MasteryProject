@@ -9,6 +9,8 @@ using FileStorage.BLL.Commands;
 using FileStorage.BLL.Enums;
 using System.IO;
 using System.Threading.Tasks;
+using System.Threading;
+using System;
 
 namespace FileStorage.ConsoleUI.Controllers
 {
@@ -114,28 +116,60 @@ namespace FileStorage.ConsoleUI.Controllers
 
         private async Task ExecuteConsoleCommandFileUpload(Options options)
         {
-            var fileUploadCommand = new FileUploadCommand(options);
-            var storageFile = await _mediator.Send(fileUploadCommand);
+            CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
+            CancellationToken token = cancelTokenSource.Token;
 
-            FileUploadViewModel uploadViewModel = new FileUploadViewModel
+            try
             {
-                FilePath = fileUploadCommand.FilePath,
-                FileName = Path.GetFileName(fileUploadCommand.FilePath),
-                FileSize = ConvertingHelper.GetSizeString(storageFile.Size),
-                Extension = storageFile.Extension
-            };
+                _consolePrinter.PrintLoading(token);
+                var fileUploadCommand = new FileUploadCommand(options);
+                var storageFile = await _mediator.Send(fileUploadCommand);
 
-            LogInformationMessage($"File \"{fileUploadCommand.FilePath}\" has been uploaded");
-            _consolePrinter.PrintFileUploadedSuccessful(uploadViewModel);
+                FileUploadViewModel uploadViewModel = new FileUploadViewModel
+                {
+                    FilePath = fileUploadCommand.FilePath,
+                    FileName = Path.GetFileName(fileUploadCommand.FilePath),
+                    FileSize = ConvertingHelper.GetSizeString(storageFile.Size),
+                    Extension = storageFile.Extension
+                };
+
+                cancelTokenSource.Cancel();
+                _consolePrinter.ClearCurrentConsoleLine();
+                LogInformationMessage($"File \"{fileUploadCommand.FilePath}\" has been uploaded");
+                _consolePrinter.PrintFileUploadedSuccessful(uploadViewModel);
+            }
+            catch (Exception ex)
+            {
+                cancelTokenSource.Cancel();
+                _consolePrinter.ClearCurrentConsoleLine();
+
+                throw ex;
+            }
         }
 
         private async Task ExecuteConsoleCommandFileDownload(Options options)
         {
-            var fileDownloadCommand = new FileDownloadCommand(options);
-            await _mediator.Send(fileDownloadCommand);
+            CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
+            CancellationToken token = cancelTokenSource.Token;
 
-            LogInformationMessage($"File \"{fileDownloadCommand.FilePath}\" has been downloaded to {fileDownloadCommand.DestinationPath}");
-            _consolePrinter.PrintFileDownloadedSuccessful(fileDownloadCommand.FilePath);
+            try
+            {
+                _consolePrinter.PrintLoading(token);
+                var fileDownloadCommand = new FileDownloadCommand(options);
+                await _mediator.Send(fileDownloadCommand);
+
+                cancelTokenSource.Cancel();
+                _consolePrinter.ClearCurrentConsoleLine();
+                LogInformationMessage($"File \"{fileDownloadCommand.FilePath}\" has been downloaded to {fileDownloadCommand.DestinationPath}");
+                _consolePrinter.PrintFileDownloadedSuccessful(fileDownloadCommand.FilePath);
+            }
+            catch (Exception ex)
+            {
+                cancelTokenSource.Cancel();
+                _consolePrinter.ClearCurrentConsoleLine();
+
+                throw ex;
+            }
         }
 
         private async Task ExecuteConsoleCommandFileMove(Options options)

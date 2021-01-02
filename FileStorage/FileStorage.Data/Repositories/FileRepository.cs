@@ -106,6 +106,12 @@ namespace FileStorage.DAL.Repositories
         public bool IsHashMatch(string fileName, byte[] storageFileHash)
         {
             string filePath = Path.Combine(_storageFilesPath, fileName);
+
+            if (!File.Exists(filePath))
+            {
+                throw new ArgumentException("Could not find physical file. Maybe it was removed without using the app");
+            }
+
             byte[] fileHash = GetFileHash(filePath);
 
             if (fileHash.SequenceEqual(storageFileHash))
@@ -145,7 +151,7 @@ namespace FileStorage.DAL.Repositories
 
             if (!File.Exists(filePath))
             {
-                throw new ArgumentException($"File is not exists");
+                throw new ArgumentException($"Could not find physical file. Maybe it was already removed without using the app");
             }
 
             File.Delete(filePath);

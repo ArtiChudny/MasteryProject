@@ -27,10 +27,10 @@ namespace FileStorage.BLL.Handlers.CommandHandlers
                 throw new ApplicationException($"File '{request.FilePath}' is not exists");
             }
 
+            await _storageRepository.RemoveFile(request.FilePath);
             var guidFileName = storageFile.GuidName.ToString();
             await _fileRepository.RemoveFile(guidFileName);
-            await _storageRepository.RemoveFile(request.FilePath);
-
+            
             return Unit.Value;
         }
     }

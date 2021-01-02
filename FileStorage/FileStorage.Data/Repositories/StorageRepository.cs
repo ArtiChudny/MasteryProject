@@ -72,17 +72,28 @@ namespace FileStorage.DAL.Repositories
 
         public async Task<StorageDirectory> GetDirectory(string path)
         {
-            var directory = await db.Directories.FirstOrDefaultAsync(d => d.Path == path);
+            var directory = await db.Directories
+                                                .Include(d => d.ParentDirectory)
+                                                .Include(d => d.Files)
+                                                .Include(d => d.Directories)
+                                                .FirstOrDefaultAsync(d => d.Path == path);
 
             if (directory == null)
             {
                 throw new ArgumentException($"The directory {path} doesn't exist");
             }
 
+            return directory;
+        }
+
+        public async Task<StorageDirectory> GetFullDirectoryTree(string path)
+        {
+            var directory = await GetDirectory(path);
             FillDirectoryTree(directory);
 
             return directory;
         }
+
 
         public async Task<StorageFile> GetFile(string filePath)
         {
@@ -108,12 +119,14 @@ namespace FileStorage.DAL.Repositories
 
         public async Task InitializeStorage()
         {
-            using (var db = new StorageContext())
+            try
             {
-                if (!await db.Database.CanConnectAsync())
-                {
-                    throw new ArgumentException("Server doesn't exists");
-                }
+                await db.Database.EnsureCreatedAsync();
+            }
+            catch (Exception)
+            {
+
+                throw new ArgumentException("Server doesn't exists");
             }
         }
 
@@ -138,7 +151,7 @@ namespace FileStorage.DAL.Repositories
 
             if (db.Directories.Any(d => d.Path == newPath))
             {
-                throw new ArgumentException($"The directory is already exists at the path '{newPath}'");
+                throw new ArgumentException($"The directory with the same name is already exists at the path '{newPath}'");
             }
 
             string newParentDirectoryPath = PathHelper.GetParentDirectoryPath(newPath);
@@ -195,7 +208,9 @@ namespace FileStorage.DAL.Repositories
                 throw new ArgumentException("You can't delete the initial root directory");
             }
 
-            db.Directories.RemoveRange(db.Directories.Where(d => d.Path.StartsWith(directory.Path)));
+            //deleting all inner directories
+            db.Directories.RemoveRange(db.Directories.Where(d => d.Path.StartsWith($"{directory.Path}/")));
+            db.Directories.Remove(directory);
 
             await db.SaveChangesAsync();
         }

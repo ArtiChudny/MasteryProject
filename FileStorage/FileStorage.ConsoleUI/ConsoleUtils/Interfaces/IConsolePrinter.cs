@@ -1,5 +1,6 @@
 ﻿using FileStorage.ConsoleUI.ViewModels;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace FileStorage.ConsoleUI.ConsoleUtils.Interfaces
 {
@@ -23,5 +24,7 @@ namespace FileStorage.ConsoleUI.ConsoleUtils.Interfaces
         void PrintDirectoryRemovedSuccessfull(string path);
         void PrintDirectorySearchResult(List<string> directories, List<string> files);
         void PrintDirectoryInfo(DirectoryInfoViewModel directoryInfoViewModel);
+        void PrintLoading(CancellationToken token);
+        void ClearCurrentConsoleLine();
     }
 }

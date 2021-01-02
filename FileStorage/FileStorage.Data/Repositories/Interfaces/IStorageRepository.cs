@@ -18,6 +18,7 @@ namespace FileStorage.DAL.Repositories.Interfaces
         Task CreateDirectory(string path, string directoryName);
         Task MoveDirectory(string oldPath, string newPath);
         Task<StorageDirectory> GetDirectory(string path);
+        Task<StorageDirectory> GetFullDirectoryTree(string path);
         Task RemoveDirectory(string path);
     }
 }

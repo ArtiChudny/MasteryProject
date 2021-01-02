@@ -32,7 +32,7 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
 
             var fileInfoResponseModel = new FileInfoResponseModel
             {
-                FileName = request.FileName,
+                FileName = storageFile.Name,
                 Extension = storageFile.Extension,
                 CreationDate = storageFile.CreationDate,
                 FileSize = storageFile.Size,

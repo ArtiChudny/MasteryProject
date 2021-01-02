@@ -20,7 +20,7 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
 
         public async Task<GetDirectorySearchResultResponseModel> Handle(GetDirectorySearchResultQuery request, CancellationToken cancellationToken)
         {
-            var directory = await _storageRepository.GetDirectory(request.Path);
+            var directory = await _storageRepository.GetFullDirectoryTree(request.Path);
             var searchResult = new GetDirectorySearchResultResponseModel();
 
             FindMatches(directory, request.SearchLine, searchResult);

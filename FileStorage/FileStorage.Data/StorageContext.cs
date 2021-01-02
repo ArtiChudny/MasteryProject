@@ -9,12 +9,6 @@ namespace FileStorage.DAL
         public DbSet<StorageDirectory> Directories { get; set; }
         public DbSet<StorageFile> Files { get; set; }
 
-        public StorageContext()
-        {
-            Database.EnsureDeleted();
-            Database.EnsureCreated();
-        }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<StorageDirectory>(e =>

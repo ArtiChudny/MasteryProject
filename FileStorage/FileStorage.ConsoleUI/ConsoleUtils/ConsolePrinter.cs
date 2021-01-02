@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using FileStorage.ConsoleUI.ConsoleUtils.Interfaces;
 using FileStorage.ConsoleUI.ViewModels;
 
@@ -145,6 +147,34 @@ namespace FileStorage.ConsoleUI.ConsoleUtils
             Console.WriteLine($"Size: { directoryInfoViewModel.Size}");
             Console.WriteLine($"Login: {directoryInfoViewModel.Login}\n");
         }
+
+        public async void PrintLoading(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                Console.Write("Loading");
+                for (int i = 0; i < 3; i++)
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        ClearCurrentConsoleLine();
+                        return;
+                    }
+                    await Task.Delay(100);
+                    Console.Write(".");
+                }
+                ClearCurrentConsoleLine();
+            }
+        }
+
+        public void ClearCurrentConsoleLine()
+        {
+            int currentLineCursor = Console.CursorTop;
+            Console.SetCursorPosition(0, Console.CursorTop);
+            Console.Write(new string(' ', Console.WindowWidth));
+            Console.SetCursorPosition(0, currentLineCursor);
+        }
+
     }
 }
 
