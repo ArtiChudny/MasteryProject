@@ -8,9 +8,25 @@ namespace FileStorage.DAL
     {
         public DbSet<StorageDirectory> Directories { get; set; }
         public DbSet<StorageFile> Files { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<User>(e =>
+            {
+                e.HasMany(u => u.Directories);
+                e.Property(p => p.Login).IsRequired();
+                e.Property(p => p.Password).IsRequired();
+                e.Property(p => p.CreationDate).HasDefaultValueSql("GETDATE()");
+                e.HasData(new User()
+                {
+                    Id = 1,
+                    Login = "StorageUser",
+                    Password = "StoragePassword",
+                });
+            });
+
             modelBuilder.Entity<StorageDirectory>(e =>
             {
                 e.HasOne(d => d.ParentDirectory).WithMany(p => p.Directories).HasForeignKey(f => f.ParentId);
@@ -24,6 +40,7 @@ namespace FileStorage.DAL
                     Id = 1,
                     Name = DirectoryPaths.InitialDirectoryPath.Replace("/", ""),
                     Path = DirectoryPaths.InitialDirectoryPath,
+                    UserId = 1
                 });
             });
 

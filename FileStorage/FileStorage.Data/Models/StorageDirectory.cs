@@ -17,6 +17,8 @@ namespace FileStorage.DAL.Models
         public int? ParentId { get; set; }
         public StorageDirectory ParentDirectory { get; set; }
 
+        public int UserId { get; set; }
+
         public StorageDirectory()
         {
             Files = new List<StorageFile>();
