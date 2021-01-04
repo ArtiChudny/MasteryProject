@@ -14,10 +14,12 @@ namespace FileStorage.DAL.Repositories
     public class StorageRepository : IStorageRepository
     {
         private readonly StorageContext db;
+        private readonly CurrentUser currentUser;
 
-        public StorageRepository(StorageContext storageContext)
+        public StorageRepository(StorageContext db, CurrentUser currentUser)
         {
-            db = storageContext;
+            this.db = db;
+            this.currentUser = currentUser;
         }
 
         public async Task CreateDirectory(string path, string directoryName)
@@ -33,7 +35,8 @@ namespace FileStorage.DAL.Repositories
             {
                 Name = directoryName,
                 ParentId = parentDirrectory.Id,
-                Path = $"{parentDirrectory.Path}/{directoryName}"
+                Path = $"{parentDirrectory.Path}/{directoryName}",
+                UserId = currentUser.Id
             });
 
             parentDirrectory.ModificationDate = DateTime.Now;
@@ -76,7 +79,7 @@ namespace FileStorage.DAL.Repositories
                                                 .Include(d => d.ParentDirectory)
                                                 .Include(d => d.Files)
                                                 .Include(d => d.Directories)
-                                                .FirstOrDefaultAsync(d => d.Path == path);
+                                                .FirstOrDefaultAsync(d => d.Path == path && d.UserId == currentUser.Id);
 
             if (directory == null)
             {
@@ -97,14 +100,14 @@ namespace FileStorage.DAL.Repositories
 
         public async Task<StorageFile> GetFile(string filePath)
         {
-            var storageFile = await db.Files.Include(d => d.ParentDirectory).FirstOrDefaultAsync(f => f.Path == filePath);
+            var storageFile = await db.Files.Include(d => d.ParentDirectory).FirstOrDefaultAsync(f => f.Path == filePath && f.ParentDirectory.UserId == currentUser.Id);
 
             return storageFile;
         }
 
         public async Task<long> GetUsedStorage(string path)
         {
-            var usedSrorage = await db.Files.Where(f => f.Path.StartsWith(path)).SumAsync(f => f.Size);
+            long usedSrorage = await db.Files.Include(f => f.ParentDirectory).Where(f => f.ParentDirectory.UserId == currentUser.Id).SumAsync(f => f.Size);
 
             return usedSrorage;
         }
@@ -132,7 +135,7 @@ namespace FileStorage.DAL.Repositories
 
         public async Task<bool> IsEnoughStorageSpace(long fileSize)
         {
-            long usedSpace = await db.Files.SumAsync(f => f.Size);
+            long usedSpace = await GetUsedStorage(DirectoryPaths.InitialDirectoryPath);
             long maxStorage = Convert.ToInt64(ConfigurationManager.AppSettings["MaxStorage"]);
 
             return (usedSpace + fileSize) < maxStorage;
@@ -201,7 +204,7 @@ namespace FileStorage.DAL.Repositories
 
         public async Task RemoveDirectory(string path)
         {
-            var directory = await db.Directories.Where(d => d.Path == path).FirstOrDefaultAsync();
+            var directory = await GetDirectory(path);
 
             if (directory.Path == DirectoryPaths.InitialDirectoryPath)
             {
@@ -209,7 +212,7 @@ namespace FileStorage.DAL.Repositories
             }
 
             //deleting all inner directories
-            db.Directories.RemoveRange(db.Directories.Where(d => d.Path.StartsWith($"{directory.Path}/")));
+            db.Directories.RemoveRange(db.Directories.Where(d => d.Path.StartsWith($"{directory.Path}/") && d.UserId == currentUser.Id));
             db.Directories.Remove(directory);
 
             await db.SaveChangesAsync();
@@ -243,7 +246,7 @@ namespace FileStorage.DAL.Repositories
 
         private void ChangeInnerDirectoriesPath(string oldPath, string newPath)
         {
-            var innerDirectories = db.Directories.Where(d => d.Path.StartsWith(oldPath));
+            var innerDirectories = db.Directories.Where(d => d.Path.StartsWith(oldPath) && d.UserId == currentUser.Id);
             foreach (var innerDirectory in innerDirectories)
             {
                 innerDirectory.Path = innerDirectory.Path.Replace(oldPath, newPath);

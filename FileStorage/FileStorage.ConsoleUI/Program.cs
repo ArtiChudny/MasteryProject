@@ -35,13 +35,10 @@ namespace FileStorage.ConsoleUI
                 await mediator.Send(new InitializeStorageCommand());
 
                 var argsFlags = consoleFlagParser.Parse(args);
-                var credentials = GetCredentials(argsFlags);
+                var credentials = GetCredentials(argsFlags);             
+                
                 var isAuthQuery = new IsAuthenticatedQuery(credentials.Login, credentials.Password);
-
-                if (!(await mediator.Send(isAuthQuery)))
-                {
-                    throw new ArgumentException("Incorrect login or password");
-                }
+                await mediator.Send(isAuthQuery);
                 consolePrinter.PrintAuthenticationSuccessful();
 
                 var command = new StorageCommand();

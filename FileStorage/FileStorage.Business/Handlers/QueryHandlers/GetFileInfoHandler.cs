@@ -1,5 +1,6 @@
 ﻿using FileStorage.BLL.Models.ResponceModels.QueryResponceModels;
 using FileStorage.BLL.Queries;
+using FileStorage.DAL;
 using FileStorage.DAL.Repositories.Interfaces;
 using MediatR;
 using System;
@@ -10,13 +11,13 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
 {
     public class GetFileInfoHandler : IRequestHandler<GetFileInfoQuery, FileInfoResponseModel>
     {
-        private readonly IUserRepository _userRepository;
         private readonly IStorageRepository _storageRepository;
+        private readonly CurrentUser _currentUser;
 
-        public GetFileInfoHandler(IUserRepository userRepository, IStorageRepository storageRepository)
+        public GetFileInfoHandler(IStorageRepository storageRepository, CurrentUser currentUser)
         {
-            _userRepository = userRepository;
             _storageRepository = storageRepository;
+            _currentUser = currentUser;
         }
 
         public async Task<FileInfoResponseModel> Handle(GetFileInfoQuery request, CancellationToken cancellationToken)
@@ -28,8 +29,6 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
                 throw new ArgumentException($"File '{request.FileName}' is not exists");
             }
 
-            var currentUser = await _userRepository.GetUser();
-
             var fileInfoResponseModel = new FileInfoResponseModel
             {
                 FileName = storageFile.Name,
@@ -37,7 +36,7 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
                 CreationDate = storageFile.CreationDate,
                 FileSize = storageFile.Size,
                 DownloadsNumber = storageFile.DownloadsNumber,
-                Login = currentUser.Login
+                Login = _currentUser.Login
             };
 
             return fileInfoResponseModel;

@@ -21,9 +21,8 @@ namespace FileStorage.BLL.Handlers.CommandHandlers
         public async Task<Unit> Handle(DirectoryRemoveCommand request, CancellationToken cancellationToken)
         {
             var directory = await _storageRepository.GetFullDirectoryTree(request.Path);
-
-            RemovePhysicalFiles(directory);
             await _storageRepository.RemoveDirectory(request.Path);
+            RemovePhysicalFiles(directory);
 
             return Unit.Value;
         }

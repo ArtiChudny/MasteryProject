@@ -24,6 +24,7 @@ namespace FileStorage.ConsoleUI.IoC
             container.AddTransient<IUserRepository, UserRepository>();
             container.AddTransient<IConsolePrinter, ConsolePrinter>();
             container.AddTransient<IController, Controller>();
+            container.AddSingleton<CurrentUser>();
             container.AddMediatR(BusinessLayerAssembly.Value);
             container.AddDbContext<StorageContext>();
 

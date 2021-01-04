@@ -5,6 +5,6 @@ namespace FileStorage.DAL.Repositories.Interfaces
 {
     public interface IUserRepository
     {
-        Task<User> GetUser();
+        Task<int> Authenticate(string login, string password);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FileStorage.BLL.Models.ResponceModels.QueryResponceModels;
 using FileStorage.BLL.Queries;
+using FileStorage.DAL;
 using FileStorage.DAL.Constants;
 using FileStorage.DAL.Repositories.Interfaces;
 using MediatR;
@@ -10,24 +11,23 @@ namespace FileStorage.BLL.Handlers.QueryHandlers
 {
     public class GetUserInfoQueryHandler : IRequestHandler<GetUserInfoQuery, UserInfoResponseModel>
     {
-        private readonly IUserRepository _userRepository;
         private readonly IStorageRepository _storageRepository;
+        private readonly CurrentUser _currentUser;
 
-        public GetUserInfoQueryHandler(IUserRepository userProvider, IStorageRepository storageProvider)
+        public GetUserInfoQueryHandler(IStorageRepository storageRepository, CurrentUser currentUser)
         {
-            _userRepository = userProvider;
-            _storageRepository = storageProvider;
+            _storageRepository = storageRepository;
+            _currentUser = currentUser;
         }
 
         public async Task<UserInfoResponseModel> Handle(GetUserInfoQuery request, CancellationToken cancellationToken)
         {
-            var currentUser = await _userRepository.GetUser();
             var usedStorage = await _storageRepository.GetUsedStorage(DirectoryPaths.InitialDirectoryPath);
             var directory = await _storageRepository.GetDirectory(DirectoryPaths.InitialDirectoryPath);
             
             var userInfo = new UserInfoResponseModel
             {
-                Login = currentUser.Login,
+                Login = _currentUser.Login,
                 UsedStorage = usedStorage,
                 CreationDate = directory.CreationDate
             };

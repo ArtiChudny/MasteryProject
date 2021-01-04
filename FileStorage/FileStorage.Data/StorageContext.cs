@@ -19,12 +19,19 @@ namespace FileStorage.DAL
                 e.Property(p => p.Login).IsRequired();
                 e.Property(p => p.Password).IsRequired();
                 e.Property(p => p.CreationDate).HasDefaultValueSql("GETDATE()");
-                e.HasData(new User()
-                {
-                    Id = 1,
-                    Login = "StorageUser",
-                    Password = "StoragePassword",
-                });
+                e.HasData(
+                    new User()
+                    {
+                        Id = 1,
+                        Login = "storageUser",
+                        Password = "storagePassword",
+                    },
+                    new User()
+                    {
+                        Id = 2,
+                        Login = "secondUser",
+                        Password = "secondPassword"
+                    });
             });
 
             modelBuilder.Entity<StorageDirectory>(e =>
@@ -35,13 +42,21 @@ namespace FileStorage.DAL
                 e.Property(p => p.Path).IsRequired();
                 e.Property(p => p.CreationDate).HasDefaultValueSql("GETDATE()");
                 e.Property(p => p.ModificationDate).HasDefaultValueSql("GETDATE()");
-                e.HasData(new StorageDirectory()
-                {
-                    Id = 1,
-                    Name = DirectoryPaths.InitialDirectoryPath.Replace("/", ""),
-                    Path = DirectoryPaths.InitialDirectoryPath,
-                    UserId = 1
-                });
+                e.HasData(
+                    new StorageDirectory()
+                    {
+                        Id = 1,
+                        Name = DirectoryPaths.InitialDirectoryPath.Replace("/", ""),
+                        Path = DirectoryPaths.InitialDirectoryPath,
+                        UserId = 1
+                    },
+                    new StorageDirectory()
+                    {
+                        Id = 2,
+                        Name = DirectoryPaths.InitialDirectoryPath.Replace("/", ""),
+                        Path = DirectoryPaths.InitialDirectoryPath,
+                        UserId = 2
+                    });
             });
 
             modelBuilder.Entity<StorageFile>(e =>
