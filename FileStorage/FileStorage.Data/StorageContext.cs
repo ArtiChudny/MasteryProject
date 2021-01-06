@@ -2,11 +2,17 @@
 using FileStorage.DAL.Encryptors;
 using FileStorage.DAL.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Configuration;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace FileStorage.DAL
 {
     public class StorageContext : DbContext
     {
+        private readonly StreamWriter _logStream = new StreamWriter($"{ConfigurationManager.AppSettings["LogPath"]}/{DateTime.Today:yyy-MM-dd} EfLog.txt", true);
+
         public DbSet<StorageDirectory> Directories { get; set; }
         public DbSet<StorageFile> Files { get; set; }
         public DbSet<User> Users { get; set; }
@@ -77,6 +83,19 @@ namespace FileStorage.DAL
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(@"Server=A-Chudny\SQLEXPRESS;Database=StorageRepository;Trusted_Connection=True;");
+            optionsBuilder.LogTo(_logStream.WriteLine).EnableSensitiveDataLogging();
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            _logStream.Dispose();
+        }
+
+        public override async ValueTask DisposeAsync()
+        {
+            await base.DisposeAsync();
+            await _logStream.DisposeAsync();
         }
     }
 }

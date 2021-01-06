@@ -13,13 +13,13 @@ namespace FileStorage.DAL.Repositories
 {
     public class StorageRepository : IStorageRepository
     {
-        private readonly StorageContext db;
-        private readonly CurrentUser currentUser;
+        private readonly StorageContext _db;
+        private readonly CurrentUser _currentUser;
 
         public StorageRepository(StorageContext db, CurrentUser currentUser)
         {
-            this.db = db;
-            this.currentUser = currentUser;
+            _db = db;
+            _currentUser = currentUser;
         }
 
         public async Task CreateDirectory(string path, string directoryName)
@@ -36,12 +36,12 @@ namespace FileStorage.DAL.Repositories
                 Name = directoryName,
                 ParentId = parentDirrectory.Id,
                 Path = $"{parentDirrectory.Path}/{directoryName}",
-                UserId = currentUser.Id
+                UserId = _currentUser.Id
             });
 
             parentDirrectory.ModificationDate = DateTime.Now;
 
-            await db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
         }
 
         public async Task<StorageFile> CreateFile(string directoryPath, string fileName, long fileSize, byte[] hash, DateTime creationDate)
@@ -68,18 +68,18 @@ namespace FileStorage.DAL.Repositories
             parentDirectory.Files.Add(storageFile);
             parentDirectory.ModificationDate = DateTime.Now;
 
-            await db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
 
             return storageFile;
         }
 
         public async Task<StorageDirectory> GetDirectory(string path)
         {
-            var directory = await db.Directories
+            var directory = await _db.Directories
                                                 .Include(d => d.ParentDirectory)
                                                 .Include(d => d.Files)
                                                 .Include(d => d.Directories)
-                                                .FirstOrDefaultAsync(d => d.Path == path && d.UserId == currentUser.Id);
+                                                .FirstOrDefaultAsync(d => d.Path == path && d.UserId == _currentUser.Id);
 
             if (directory == null)
             {
@@ -100,14 +100,14 @@ namespace FileStorage.DAL.Repositories
 
         public async Task<StorageFile> GetFile(string filePath)
         {
-            var storageFile = await db.Files.Include(d => d.ParentDirectory).FirstOrDefaultAsync(f => f.Path == filePath && f.ParentDirectory.UserId == currentUser.Id);
+            var storageFile = await _db.Files.Include(d => d.ParentDirectory).FirstOrDefaultAsync(f => f.Path == filePath && f.ParentDirectory.UserId == _currentUser.Id);
 
             return storageFile;
         }
 
         public async Task<long> GetUsedStorage(string path)
         {
-            long usedSrorage = await db.Files.Include(f => f.ParentDirectory).Where(f => f.ParentDirectory.UserId == currentUser.Id).SumAsync(f => f.Size);
+            long usedSrorage = await _db.Files.Include(f => f.ParentDirectory).Where(f => f.ParentDirectory.UserId == _currentUser.Id).SumAsync(f => f.Size);
 
             return usedSrorage;
         }
@@ -117,14 +117,14 @@ namespace FileStorage.DAL.Repositories
             var file = await GetFile(filePath);
             file.DownloadsNumber++;
 
-            db.SaveChanges();
+            _db.SaveChanges();
         }
 
         public async Task InitializeStorage()
         {
             try
             {
-                await db.Database.EnsureCreatedAsync();
+                await _db.Database.EnsureCreatedAsync();
             }
             catch (Exception)
             {
@@ -152,7 +152,7 @@ namespace FileStorage.DAL.Repositories
         {
             var movableDirectory = await GetDirectory(oldPath);
 
-            if (db.Directories.Any(d => d.Path == newPath))
+            if (_db.Directories.Any(d => d.Path == newPath))
             {
                 throw new ArgumentException($"The directory with the same name is already exists at the path '{newPath}'");
             }
@@ -169,7 +169,7 @@ namespace FileStorage.DAL.Repositories
             movableDirectory.ModificationDate = DateTime.Now;
             ChangeInnerDirectoriesPath(oldPath, movableDirectory.Path);
 
-            await db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
         }
 
         public async Task MoveFile(string oldFilePath, string newFilePath)
@@ -184,7 +184,7 @@ namespace FileStorage.DAL.Repositories
             string newFileName = Path.GetFileName(newFilePath);
             string newParentDerictoryPath = PathHelper.GetParentDirectoryPath(newFilePath);
 
-            if (await db.Files.AnyAsync(f => f.Path == newFilePath))
+            if (await _db.Files.AnyAsync(f => f.Path == newFilePath))
             {
                 throw new ArgumentException($"The file '{newFileName}' is already exists in the directory {newParentDerictoryPath}");
             }
@@ -199,7 +199,7 @@ namespace FileStorage.DAL.Repositories
             movableFile.ParentDirectory = newParentDirectory;
             newParentDirectory.ModificationDate = DateTime.Now;
 
-            db.SaveChanges();
+            _db.SaveChanges();
         }
 
         public async Task RemoveDirectory(string path)
@@ -212,10 +212,10 @@ namespace FileStorage.DAL.Repositories
             }
 
             //deleting all inner directories
-            db.Directories.RemoveRange(db.Directories.Where(d => d.Path.StartsWith($"{directory.Path}/") && d.UserId == currentUser.Id));
-            db.Directories.Remove(directory);
+            _db.Directories.RemoveRange(_db.Directories.Where(d => d.Path.StartsWith($"{directory.Path}/") && d.UserId == _currentUser.Id));
+            _db.Directories.Remove(directory);
 
-            await db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
         }
 
         public async Task RemoveFile(string filePath)
@@ -229,14 +229,14 @@ namespace FileStorage.DAL.Repositories
 
             file.ParentDirectory.Files.Remove(file);
 
-            db.SaveChanges();
+            _db.SaveChanges();
         }
 
         private void FillDirectoryTree(StorageDirectory directory)
         {
-            directory.ParentDirectory = db.Directories.FirstOrDefault(d => d.Id == directory.ParentId);
-            directory.Files = db.Files.Where(f => f.DirectoryId == directory.Id).ToList();
-            directory.Directories = db.Directories.Where(d => d.ParentId == directory.Id).ToList();
+            directory.ParentDirectory = _db.Directories.FirstOrDefault(d => d.Id == directory.ParentId);
+            directory.Files = _db.Files.Where(f => f.DirectoryId == directory.Id).ToList();
+            directory.Directories = _db.Directories.Where(d => d.ParentId == directory.Id).ToList();
 
             foreach (var innerDir in directory.Directories)
             {
@@ -246,7 +246,7 @@ namespace FileStorage.DAL.Repositories
 
         private void ChangeInnerDirectoriesPath(string oldPath, string newPath)
         {
-            var innerDirectories = db.Directories.Where(d => d.Path.StartsWith(oldPath) && d.UserId == currentUser.Id);
+            var innerDirectories = _db.Directories.Where(d => d.Path.StartsWith(oldPath) && d.UserId == _currentUser.Id);
             foreach (var innerDirectory in innerDirectories)
             {
                 innerDirectory.Path = innerDirectory.Path.Replace(oldPath, newPath);

@@ -28,7 +28,7 @@ namespace FileStorage.ConsoleUI.IoC
             container.AddMediatR(BusinessLayerAssembly.Value);
             container.AddDbContext<StorageContext>();
 
-            string logPath = ConfigurationManager.AppSettings["LogPath"];
+            string logPath = $"{ConfigurationManager.AppSettings["LogPath"]}/{DateTime.Today:yyy-MM-dd} AppLog.txt";
             LoggerConfiguration serilogLogger = new LoggerConfiguration();
             serilogLogger.WriteTo.File(logPath);
             container.AddLogging(builder =>
