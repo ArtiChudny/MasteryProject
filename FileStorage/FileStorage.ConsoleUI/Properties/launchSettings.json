@@ -1,8 +1,8 @@
-{
+﻿{
   "profiles": {
     "FileStorage": {
       "commandName": "Project",
-      "commandLineArgs": "--p storagePassword  --l storageUser"
+      "commandLineArgs": "--p firstPassword  --l firstUser"
     }
   }
 }

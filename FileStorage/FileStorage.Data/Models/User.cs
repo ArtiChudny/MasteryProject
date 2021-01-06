@@ -7,7 +7,8 @@ namespace FileStorage.DAL.Models
     {
         public int Id { get; set; }
         public string Login { get; set; }
-        public string Password { get; set; }
+        public byte[] HashPassword { get; set; }
+        public byte[] Salt { get; set; }
         public DateTime CreationDate { get; set; }
         public List<StorageDirectory> Directories { get; set; }
 

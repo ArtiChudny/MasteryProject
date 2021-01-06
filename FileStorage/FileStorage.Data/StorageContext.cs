@@ -1,4 +1,5 @@
 ﻿using FileStorage.DAL.Constants;
+using FileStorage.DAL.Encryptors;
 using FileStorage.DAL.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,26 +13,31 @@ namespace FileStorage.DAL
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             modelBuilder.Entity<User>(e =>
             {
                 e.HasMany(u => u.Directories);
                 e.Property(p => p.Login).IsRequired();
-                e.Property(p => p.Password).IsRequired();
+                e.Property(p => p.HashPassword).IsRequired();
                 e.Property(p => p.CreationDate).HasDefaultValueSql("GETDATE()");
+
+                var password1 = Encryptor.Encrypt("firstPassword");
+                var password2 = Encryptor.Encrypt("secondPassword");
+
                 e.HasData(
                     new User()
                     {
                         Id = 1,
-                        Login = "storageUser",
-                        Password = "storagePassword",
+                        Login = "firstUser",
+                        HashPassword = password1.HashPassword,
+                        Salt = password1.Salt
                     },
                     new User()
                     {
                         Id = 2,
                         Login = "secondUser",
-                        Password = "secondPassword"
-                    });
+                        HashPassword = password2.HashPassword,
+                        Salt = password2.Salt
+                    }); ;
             });
 
             modelBuilder.Entity<StorageDirectory>(e =>
