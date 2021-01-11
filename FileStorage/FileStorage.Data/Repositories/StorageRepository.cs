@@ -3,6 +3,8 @@ using FileStorage.DAL.Helpers;
 using FileStorage.DAL.Models;
 using FileStorage.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Configuration;
 using System.IO;
@@ -16,10 +18,11 @@ namespace FileStorage.DAL.Repositories
         private readonly StorageContext _db;
         private readonly CurrentUser _currentUser;
 
-        public StorageRepository(StorageContext db, CurrentUser currentUser)
+        public StorageRepository(StorageContext db, CurrentUser currentUser, ILoggerProvider loggerProvider)
         {
             _db = db;
             _currentUser = currentUser;
+            _db.GetService<ILoggerFactory>().AddProvider(loggerProvider); 
         }
 
         public async Task CreateDirectory(string path, string directoryName)
@@ -128,7 +131,6 @@ namespace FileStorage.DAL.Repositories
             }
             catch (Exception)
             {
-
                 throw new ArgumentException("Server doesn't exists");
             }
         }

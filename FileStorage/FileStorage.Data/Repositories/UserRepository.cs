@@ -1,6 +1,8 @@
 ﻿using FileStorage.DAL.Encryptors;
 using FileStorage.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,9 +13,10 @@ namespace FileStorage.DAL.Repositories
     {
         private readonly StorageContext _db;
 
-        public UserRepository(StorageContext db)
+        public UserRepository(StorageContext db, ILoggerProvider loggerProvider)
         {
             _db = db;
+            _db.GetService<ILoggerFactory>().AddProvider(loggerProvider);
         }
 
         public async Task<int> Authenticate(string login, string password)
