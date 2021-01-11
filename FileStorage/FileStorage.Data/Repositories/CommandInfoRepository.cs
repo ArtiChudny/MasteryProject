@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace FileStorage.DAL.Repositories
 {
-    public class CommandRepository : ICommandInfoRepository
+    public class CommandInfoRepository : ICommandInfoRepository
     {
         private readonly StorageContext _db;
 
-        public CommandRepository(StorageContext db)
+        public CommandInfoRepository(StorageContext db)
         {
             _db = db;
         }

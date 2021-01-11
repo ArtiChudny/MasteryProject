@@ -24,7 +24,7 @@ namespace FileStorage.ConsoleUI.IoC
             container.AddTransient<IFileRepository, FileRepository>();
             container.AddTransient<IStorageRepository, StorageRepository>();
             container.AddTransient<IUserRepository, UserRepository>();
-            container.AddTransient<ICommandInfoRepository, CommandRepository>();
+            container.AddTransient<ICommandInfoRepository, CommandInfoRepository>();
             container.AddTransient<IConsolePrinter, ConsolePrinter>();
             container.AddTransient<IController, Controller>();
             container.AddSingleton<CurrentUser>();

@@ -100,7 +100,6 @@ namespace FileStorage.DAL.Repositories
             return directory;
         }
 
-
         public async Task<StorageFile> GetFile(string filePath)
         {
             var storageFile = await _db.Files.Include(d => d.ParentDirectory).FirstOrDefaultAsync(f => f.Path == filePath && f.ParentDirectory.UserId == _currentUser.Id);

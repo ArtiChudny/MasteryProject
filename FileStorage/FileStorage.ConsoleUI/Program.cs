@@ -54,8 +54,7 @@ namespace FileStorage.ConsoleUI
                         await controller.ExecuteConsoleCommand(command);
                         stopWatch.Stop();
 
-                        var saveExecutionInfoCommand = new SaveExecutionInfoCommand(command.CommandType.ToString(), stopWatch.Elapsed.TotalMilliseconds);
-                        await mediator.Send(saveExecutionInfoCommand);
+                        PrintExecutionTimeIntoDebugOutput(mediator, command.CommandType.ToString(), stopWatch.ElapsedMilliseconds);
                     }
                     catch (AggregateException agEx)
                     {
@@ -109,6 +108,17 @@ namespace FileStorage.ConsoleUI
             }
 
             return consoleCommandParser.Parse(rowCommand.ToLower().Trim());
+        }
+
+        private async static void PrintExecutionTimeIntoDebugOutput(IMediator mediator, string commandName, double executionTime)
+        {
+            var saveExecutionInfoCommand = new SaveExecutionInfoCommand(commandName, executionTime);
+            await mediator.Send(saveExecutionInfoCommand);
+
+            var getAverageExecutionTimeQuery = new GetAverageExecutionTimeQuery(commandName);
+            var avgExecutionTime = await mediator.Send(getAverageExecutionTimeQuery);
+
+            Debug.WriteLine($"Execution time for command {commandName}: {executionTime}ms. Average execution time: {avgExecutionTime}ms");
         }
     }
 }
