@@ -2,20 +2,15 @@
 using FileStorage.DAL.Encryptors;
 using FileStorage.DAL.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Configuration;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace FileStorage.DAL
 {
     public class StorageContext : DbContext
     {
-        private readonly StreamWriter _logStream = new StreamWriter($"{ConfigurationManager.AppSettings["LogPath"]}/{DateTime.Today:yyy-MM-dd} EfLog.txt", true);
-
         public DbSet<StorageDirectory> Directories { get; set; }
         public DbSet<StorageFile> Files { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<CommandExecutionInfo> CommandsInfo { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,24 +20,25 @@ namespace FileStorage.DAL
                 e.Property(p => p.Login).IsRequired();
                 e.Property(p => p.HashPassword).IsRequired();
                 e.Property(p => p.CreationDate).HasDefaultValueSql("GETDATE()");
+                e.HasIndex(u => u.Login).IsUnique();
 
-                var password1 = Encryptor.Encrypt("firstPassword");
-                var password2 = Encryptor.Encrypt("secondPassword");
+                var firstPassword = Encryptor.Encrypt("firstPassword");
+                var secondPassword = Encryptor.Encrypt("secondPassword");
 
                 e.HasData(
                     new User()
                     {
                         Id = 1,
                         Login = "firstUser",
-                        HashPassword = password1.HashPassword,
-                        Salt = password1.Salt
+                        HashPassword = firstPassword.HashPassword,
+                        Salt = firstPassword.Salt
                     },
                     new User()
                     {
                         Id = 2,
                         Login = "secondUser",
-                        HashPassword = password2.HashPassword,
-                        Salt = password2.Salt
+                        HashPassword = secondPassword.HashPassword,
+                        Salt = secondPassword.Salt
                     }); ;
             });
 
@@ -78,24 +74,17 @@ namespace FileStorage.DAL
                 e.Property(p => p.Hash).IsRequired();
                 e.Property(p => p.Extension).IsRequired();
             });
+
+            modelBuilder.Entity<CommandExecutionInfo>(e =>
+            {
+                e.Property(e => e.ExecutionDate).HasDefaultValueSql("GETDATE()");
+            });
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(@"Server=A-Chudny\SQLEXPRESS;Database=StorageRepository;Trusted_Connection=True;");
-            optionsBuilder.LogTo(_logStream.WriteLine).EnableSensitiveDataLogging();
-        }
-
-        public override void Dispose()
-        {
-            base.Dispose();
-            _logStream.Dispose();
-        }
-
-        public override async ValueTask DisposeAsync()
-        {
-            await base.DisposeAsync();
-            await _logStream.DisposeAsync();
+            optionsBuilder.EnableSensitiveDataLogging();
         }
     }
 }

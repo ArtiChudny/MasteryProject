@@ -16,25 +16,28 @@ namespace FileStorage.ConsoleUI.IoC
 {
     public class DependencyContainer
     {
+        private readonly string _logPath = $"{ConfigurationManager.AppSettings["LogPath"]}/{DateTime.Today:yyy-MM-dd} Log.txt";
+
         public IServiceProvider GetContainer()
         {
-            ServiceCollection container = new ServiceCollection();
+            var container = new ServiceCollection();
             container.AddTransient<IFileRepository, FileRepository>();
             container.AddTransient<IStorageRepository, StorageRepository>();
             container.AddTransient<IUserRepository, UserRepository>();
+            container.AddTransient<ICommandInfoRepository, CommandRepository>();
             container.AddTransient<IConsolePrinter, ConsolePrinter>();
             container.AddTransient<IController, Controller>();
             container.AddSingleton<CurrentUser>();
             container.AddMediatR(BusinessLayerAssembly.Value);
             container.AddDbContext<StorageContext>();
 
-            string logPath = $"{ConfigurationManager.AppSettings["LogPath"]}/{DateTime.Today:yyy-MM-dd} AppLog.txt";
-            LoggerConfiguration serilogLogger = new LoggerConfiguration();
-            serilogLogger.WriteTo.File(logPath);
+            var SerilogLogger = new LoggerConfiguration();
+            SerilogLogger.WriteTo.File(_logPath);
+
             container.AddLogging(builder =>
             {
-                builder.SetMinimumLevel(LogLevel.Information);
-                builder.AddSerilog(serilogLogger.CreateLogger(), true);
+                builder.SetMinimumLevel(LogLevel.Information);     
+                builder.AddSerilog(SerilogLogger.CreateLogger(), dispose: true);                
             });
 
             return container.BuildServiceProvider();

@@ -14,6 +14,7 @@ using FileStorage.BLL.Commands;
 using FileStorage.BLL.Queries;
 using FileStorage.BLL.Models;
 using MediatR;
+using System.Diagnostics;
 
 namespace FileStorage.ConsoleUI
 {
@@ -47,7 +48,14 @@ namespace FileStorage.ConsoleUI
                     try
                     {
                         command = GetCommand(consoleCommandParser, consolePrinter);
+                     
+                        var stopWatch = new Stopwatch();
+                        stopWatch.Start();
                         await controller.ExecuteConsoleCommand(command);
+                        stopWatch.Stop();
+
+                        var saveExecutionInfoCommand = new SaveExecutionInfoCommand(command.CommandType.ToString(), stopWatch.Elapsed.TotalMilliseconds);
+                        await mediator.Send(saveExecutionInfoCommand);
                     }
                     catch (AggregateException agEx)
                     {
